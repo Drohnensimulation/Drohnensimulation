@@ -1,4 +1,4 @@
-package framework.math.bounds;
+package de.thi.hindernis;
 
 public class Bounds {
 

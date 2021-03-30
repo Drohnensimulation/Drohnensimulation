@@ -1,6 +1,6 @@
-package framework.math.bounds;
+package de.thi.hindernis;
 
-import framework.math.Vector3;
+import de.thi.hindernis.math.Vector3;
 
 public class Sphere extends Bounds {
 
@@ -12,5 +12,11 @@ public class Sphere extends Bounds {
         super();
         this.center = new Vector3(x, y, z);
         this.radius = radius;
+    }
+    
+    public Sphere(Vector3 center, float radius) {
+    	super();
+    	this.center = center;
+    	this.radius = radius;
     }
 }
