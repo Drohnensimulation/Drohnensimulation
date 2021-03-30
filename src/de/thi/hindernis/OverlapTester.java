@@ -3,43 +3,50 @@ package de.thi.hindernis;
 import de.thi.hindernis.math.Vector3;
 
 public class OverlapTester {
+	
+	public static Vector3 leftDownBack = new Vector3(0, 0, 0);
+	public static Vector3 rightTopFront = new Vector3(0, 0, 0);
 
     public static boolean overlapSpheres(Sphere s1, Sphere s2) {
-        float distance = s1.center.distSquared(s2.center);
-        float radiusSum = s1.radius + s2.radius;
+        double distance = s1.center.distSquared(s2.center);
+        double radiusSum = s1.radius + s2.radius;
         return distance <= radiusSum * radiusSum;
     }
     
     public static boolean overlapCuboid(Cuboid c1, Cuboid c2) {
-        return  c1.leftDownBack.x  < c2.rightTopFront.x &&
-                c1.rightTopFront.x > c2.leftDownBack.x  &&
-                c1.leftDownBack.y  < c2.rightTopFront.y &&
-                c1.rightTopFront.y > c2.leftDownBack.y  &&
-                c1.leftDownBack.z  < c2.rightTopFront.z &&
-                c1.rightTopFront.z > c2.leftDownBack.z;
+    	leftDownBack = getLeftDownBack(c1);
+    	rightTopFront = getRightTopFront(c1);
+        return  leftDownBack.x  < c2.center.x + c2.dimensions.x / 2 &&
+                rightTopFront.x > c2.center.x - c2.dimensions.x / 2 &&
+                leftDownBack.y  < c2.center.y + c2.dimensions.y / 2 &&
+                rightTopFront.y > c2.center.y - c2.dimensions.y / 2 &&
+                leftDownBack.z  < c2.center.z + c2.dimensions.z / 2 &&
+                rightTopFront.z > c2.center.z - c2.dimensions.z / 2;
     }
 
     public static boolean overlapSphereCuboid(Sphere s, Cuboid c) {
-        float closestX = s.center.x;
-        float closestY = s.center.y;
-        float closestZ = s.center.z;
+        double closestX = s.center.x;
+        double closestY = s.center.y;
+        double closestZ = s.center.z;
+    	leftDownBack = getLeftDownBack(c);
+    	rightTopFront = getRightTopFront(c);
 
-        if (s.center.x < c.leftDownBack.x) {
-            closestX = c.leftDownBack.x;
-        } else if(s.center.x > c.rightTopFront.x) {
-            closestX = c.rightTopFront.x;
+        if (s.center.x < leftDownBack.x) {
+            closestX = leftDownBack.x;
+        } else if(s.center.x > rightTopFront.x) {
+            closestX = rightTopFront.x;
         }
 
-        if (s.center.y < c.leftDownBack.y) {
-            closestY = c.leftDownBack.y;
-        } else if(s.center.y > c.rightTopFront.y) {
-            closestY = c.rightTopFront.y;
+        if (s.center.y < leftDownBack.y) {
+            closestY = leftDownBack.y;
+        } else if(s.center.y > rightTopFront.y) {
+            closestY = rightTopFront.y;
         }
 
-        if (s.center.z < c.leftDownBack.z) {
-            closestZ = c.leftDownBack.z;
-        } else if(s.center.z > c.rightTopFront.z) {
-            closestZ = c.rightTopFront.z;
+        if (s.center.z < leftDownBack.z) {
+            closestZ = leftDownBack.z;
+        } else if(s.center.z > rightTopFront.z) {
+            closestZ = rightTopFront.z;
         }
 
         return s.center.distSquared(closestX, closestY, closestZ) < s.radius * s.radius;
@@ -54,14 +61,30 @@ public class OverlapTester {
     }
 
     public static boolean pointInCuboid(Cuboid c, Vector3 p) {
-        return  c.leftDownBack.x <= p.x && c.rightTopFront.x >= p.x &&
-                c.leftDownBack.y <= p.y && c.rightTopFront.y >= p.y &&
-                c.leftDownBack.z <= p.z && c.rightTopFront.z >= p.z;
+    	leftDownBack = getLeftDownBack(c);
+    	rightTopFront = getRightTopFront(c);
+        return  leftDownBack.x <= p.x && rightTopFront.x >= p.x &&
+                leftDownBack.y <= p.y && rightTopFront.y >= p.y &&
+                leftDownBack.z <= p.z && rightTopFront.z >= p.z;
     }
     
     public static boolean pointInCuboid(Cuboid c, float x, float y, float z) {
-        return  c.leftDownBack.x <= x && c.rightTopFront.x >= x &&
-                c.leftDownBack.y <= y && c.rightTopFront.y >= y &&
-                c.leftDownBack.z <= z && c.rightTopFront.z >= z;
+    	leftDownBack = getLeftDownBack(c);
+    	rightTopFront = getRightTopFront(c);
+        return  leftDownBack.x <= x && rightTopFront.x >= x &&
+                leftDownBack.y <= y && rightTopFront.y >= y &&
+                leftDownBack.z <= z && rightTopFront.z >= z;
+    }
+    
+    public static Vector3 getLeftDownBack(Cuboid c) {
+    	return new Vector3(c.center.x - c.dimensions.x / 2,
+    					   c.center.y - c.dimensions.y / 2,
+    					   c.center.z - c.dimensions.z / 2);
+    }
+    
+    public static Vector3 getRightTopFront(Cuboid c) {
+    	return new Vector3(c.center.x + c.dimensions.x / 2,
+    					   c.center.y + c.dimensions.y / 2,
+    					   c.center.z + c.dimensions.z / 2);
     }
 }

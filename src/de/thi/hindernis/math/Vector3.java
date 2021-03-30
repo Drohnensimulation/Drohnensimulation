@@ -2,7 +2,7 @@ package de.thi.hindernis.math;
 
 public class Vector3 {
 
-    public float x, y, z;
+    public double x, y, z;
 
 
     public Vector3() {
@@ -11,7 +11,7 @@ public class Vector3 {
         this.z = 0;
     }
     
-    public Vector3(float x, float y, float z) {
+    public Vector3(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -27,7 +27,7 @@ public class Vector3 {
         return new Vector3(x, y, z);
     }
 
-    public Vector3 set(float x, float y, float z) {
+    public Vector3 set(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -42,7 +42,7 @@ public class Vector3 {
         return this;
     }
 
-    public Vector3 add(float x, float y, float z) {
+    public Vector3 add(double x, double y, double z) {
         this.x += x;
         this.y += y;
         this.z += z;
@@ -57,7 +57,7 @@ public class Vector3 {
         return this;
     }
 
-    public Vector3 sub(float x, float y, float z) {
+    public Vector3 sub(double x, double y, double z) {
         this.x -= x;
         this.y -= y;
         this.z -= z;
@@ -71,19 +71,19 @@ public class Vector3 {
         return this;
     }
 
-    public Vector3 mul(float scalar) {
+    public Vector3 mul(double scalar) {
         this.x *= scalar;
         this.y *= scalar;
         this.z *= scalar;
         return this;
     }
 
-    public float len() {
-        return (float) Math.sqrt(x * x + y * y + z * z);
+    public double len() {
+        return Math.sqrt(x * x + y * y + z * z);
     }
 
     public Vector3 nor() {
-        float len = len();
+        double len = len();
         if (len != 0) {
             this.x /= len;
             this.y /= len;
@@ -92,31 +92,31 @@ public class Vector3 {
         return this;
     }
 
-    public float dist(float x, float y, float z) {
-        float distX = this.x - x;
-        float distY = this.y - y;
-        float distZ = this.z - z;
-        return (float) Math.sqrt(distX * distX + distY * distY + distZ * distZ);
+    public double dist(double x, double y, double z) {
+        double distX = this.x - x;
+        double distY = this.y - y;
+        double distZ = this.z - z;
+        return Math.sqrt(distX * distX + distY * distY + distZ * distZ);
     }
     
-    public float dist(Vector3 other) {
-        float distX = this.x - other.x;
-        float distY = this.y - other.y;
-        float distZ = this.y - other.z;
-        return (float) Math.sqrt(distX * distX + distY * distY + distZ * distZ);
+    public double dist(Vector3 other) {
+        double distX = this.x - other.x;
+        double distY = this.y - other.y;
+        double distZ = this.y - other.z;
+        return Math.sqrt(distX * distX + distY * distY + distZ * distZ);
     }
 
-    public float distSquared(float x, float y, float z) {
-        float distX = this.x - x;
-        float distY = this.y - y;
-        float distZ = this.z - z;
+    public double distSquared(double x, double y, double z) {
+        double distX = this.x - x;
+        double distY = this.y - y;
+        double distZ = this.z - z;
         return distX * distX + distY * distY + distZ * distZ;
     }
     
-    public float distSquared(Vector3 other) {
-        float distX = this.x - other.x;
-        float distY = this.y - other.y;
-        float distZ = this.z - other.z;
+    public double distSquared(Vector3 other) {
+        double distX = this.x - other.x;
+        double distY = this.y - other.y;
+        double distZ = this.z - other.z;
         return distX * distX + distY * distY + distZ * distZ;
     }
 
