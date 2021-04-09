@@ -21,7 +21,10 @@ public class UfoMView extends JFrame implements Runnable, KeyListener {
   private UfoSim sim  = UfoSim.getInstance(); // UfoView instance
   private JTextArea dataTextArea;             // text area where flight data are displayed
   private volatile boolean trigger = false;   // event triggered by key pressed in view window
-  
+
+
+  private Location location;
+
   // constructor
   public UfoMView() {
 
