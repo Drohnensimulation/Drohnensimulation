@@ -1,0 +1,3 @@
+# Wind
+
+crazy wind calculations
