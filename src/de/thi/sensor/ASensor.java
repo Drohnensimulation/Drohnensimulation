@@ -3,7 +3,7 @@ package de.thi.sensor;
 public abstract class ASensor {
 	
 	//TODO: -Beschreibung des Kegels
-	//		-Vervollständigung der Methodenimplementierung
+	//		-VervollstÃ¤ndigung der Methodenimplementierung
 	
 	protected Drone drone;
 	protected double range;
@@ -48,7 +48,7 @@ public abstract class ASensor {
 	}
 	
 	/**
-	 * Gibt den Namen oder Typ des Sensors zurück (Infrarot, Ultraschall, ...)
+	 * Gibt den Namen oder Typ des Sensors zurÃ¼ck (Infrarot, Ultraschall, ...)
 	 * @return Name oder Typ
 	 */
 	public abstract String getType();
@@ -68,7 +68,7 @@ public abstract class ASensor {
 	}
 
 	/**
-	 * Gibt die Drohne zurück, an der der Sensor montiert ist.
+	 * Gibt die Drohne zurÃ¼ck, an der der Sensor montiert ist.
 	 * @return Drohne
 	 */
 	public Drone getDrone() {
@@ -110,10 +110,10 @@ public abstract class ASensor {
 	}
 	
 	/**
-	 * Ändert die Ausrichtung des Sensors
-	 * @param deltaX Änderung der x-Richtung
-	 * @param deltaY Änderung der y-Richtung
-	 * @param deltaZ Änderung der z-Richtung
+	 * Ã„ndert die Ausrichtung des Sensors
+	 * @param deltaX Ã„nderung der x-Richtung
+	 * @param deltaY Ã„nderung der y-Richtung
+	 * @param deltaZ Ã„nderung der z-Richtung
 	 */
 	public void changeDirection(double deltaX, double deltaY, double deltaZ) {
 		this.directionX+= deltaX;
@@ -122,7 +122,7 @@ public abstract class ASensor {
 	}
 	
 	/**
-	 * Ändert die Ausrichtung des Sensors
+	 * Ã„ndert die Ausrichtung des Sensors
 	 * @param deltaX Verschiebung in x-Richtung
 	 * @param deltaY Verschiebung in y-Richtung
 	 * @param deltaZ Verschiebung in z-Richtung
@@ -158,7 +158,7 @@ public abstract class ASensor {
 	}
 
 	/**
-	 * Gibt die Reichweite des Sensors zurück.
+	 * Gibt die Reichweite des Sensors zurÃ¼ck.
 	 * @return Reichweite des Sensors
 	 */
 	public double getRange() {
@@ -177,7 +177,7 @@ public abstract class ASensor {
 	}
 
 	/**
-	 * Gibt den Radius der Sensorfläche in Metern zurück
+	 * Gibt den Radius der SensorflÃ¤che in Metern zurÃ¼ck
 	 * @return
 	 */
 	public double getSize() {
@@ -185,8 +185,8 @@ public abstract class ASensor {
 	}
 	
 	/**
-	 * Setzt den Radius der Sensorfläche in Metern
-	 * @param size Radius der Sensorfläche in Metern
+	 * Setzt den Radius der SensorflÃ¤che in Metern
+	 * @param size Radius der SensorflÃ¤che in Metern
 	 */
 	protected void setSize(double size) {
 		if(Double.compare(size, 0.0) <= 0) {
@@ -196,16 +196,16 @@ public abstract class ASensor {
 	}
 	
 	/**
-	 * Gibt den Bildwinkel des Sensors in horizontaler Richtung im Gradmaß zurück
-	 * @return Bildwinkel im Gradmaß
+	 * Gibt den Bildwinkel des Sensors in horizontaler Richtung im GradmaÃŸ zurÃ¼ck
+	 * @return Bildwinkel im GradmaÃŸ
 	 */
 	public double getAngleOfViewHorizontal() {
 		return this.angleOfViewHorizontal;
 	}
 
 	/**
-	 * Legt den horizontalen Bildwinkel des Sensors im Gradmaß fest
-	 * @param deg Gültiges Interval [0;90]
+	 * Legt den horizontalen Bildwinkel des Sensors im GradmaÃŸ fest
+	 * @param deg GÃ¼ltiges Interval [0;90]
 	 */
 	protected void setAngleOfViewHorizontal(double deg) {
 		if(Double.compare(deg, 0.0) < 0) {
@@ -218,16 +218,16 @@ public abstract class ASensor {
 	}
 	
 	/**
-	 * Gibt den Bildwinkel des Sensors in vertikaler Richtung im Gradmaß zurück
-	 * @return Bildwinkel im Gradmaß
+	 * Gibt den Bildwinkel des Sensors in vertikaler Richtung im GradmaÃŸ zurÃ¼ck
+	 * @return Bildwinkel im GradmaÃŸ
 	 */
 	public double getAngleOfViewVertical() {
 		return this.angleOfViewVertical;
 	}
 
 	/**
-	 * Legt den vertikalen Bildwinkel des Sensors im Gradmaß fest
-	 * @param deg Gültiges Interval [0;90]
+	 * Legt den vertikalen Bildwinkel des Sensors im GradmaÃŸ fest
+	 * @param deg GÃ¼ltiges Interval [0;90]
 	 */
 	protected void setAngleOfViewVertical(double deg) {
 		if(Double.compare(deg, 0.0) < 0) {
@@ -240,11 +240,11 @@ public abstract class ASensor {
 	}
 	
 	/**
-	 * Legt eine Messungenauigkeit fest (soll das von außerhalb möglich sein?)
+	 * Legt eine Messungenauigkeit fest (soll das von auÃŸerhalb mÃ¶glich sein?)
 	 * @param accuracy Bsp.: 0.5 -> Entfernung wird in 0,5er-Schritten gemessen,
 	 * 						10.0 -> Entfernung wird in 10er-Schritten gemessen,
-	 * 					 	 0.0 -> Es wird der exakte (ungerundete) Entfernungswert zurückgegeben,
-	 * 			Double.MAX_VALUE -> Es wird nur zurückgegeben, ob der Sensor ein Hindernis sieht (1) oder nicht (0)
+	 * 					 	 0.0 -> Es wird der exakte (ungerundete) Entfernungswert zurÃ¼ckgegeben,
+	 * 			Double.MAX_VALUE -> Es wird nur zurÃ¼ckgegeben, ob der Sensor ein Hindernis sieht (1) oder nicht (0)
 	 */
 	protected void setMeasurementAccuracy(double accuracy) {
 		if(Double.compare(accuracy, 0.0) < 0) {
@@ -254,7 +254,7 @@ public abstract class ASensor {
 	}
 	
 	/**
-	 * Gibt die kürzeste Entfernung in Metern zu einem Objekt an
+	 * Gibt die kÃ¼rzeste Entfernung in Metern zu einem Objekt an
 	 * @return Entfernung in Metern.
 	 */
 	public double getDistance() {
