@@ -1,5 +1,7 @@
 package de.thi.sensor;
 
+import de.thi.ufo.Drone;
+
 public abstract class ASensor {
 	
 	//TODO: -Beschreibung des Kegels
@@ -32,7 +34,7 @@ public abstract class ASensor {
 	protected double posY;
 	protected double posZ;
 		
-	public Sensor() {
+	public void initSensor() {
 		this.drone = null;
 		this.range = 1.0;
 		this.angleOfViewHorizontal = 0.0;
@@ -258,7 +260,7 @@ public abstract class ASensor {
 	 * @return Entfernung in Metern.
 	 */
 	public double getDistance() {
-		double measurement = /*TODO: Call Obstacle Team-Method*/;
+		double measurement = 0; /*TODO: Call Obstacle Team-Method*/;
 		
 		return this.handleMeasurementAccuracy(measurement);
 	}
