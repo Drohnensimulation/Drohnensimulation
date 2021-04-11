@@ -40,6 +40,18 @@ public class WindLayer implements Comparable<WindLayer> {
         this.windDirection = windDirection;
     }
 
+    public WindLayer copy() {
+        return new WindLayer(
+                windSpeed,
+                gustSpeed,
+                timeStart,
+                timeEnd,
+                altitudeBottom,
+                altitudeTop,
+                windDirection
+        );
+    }
+
     /**
      * Applies wind speeds to drone
      * @param location Current location
@@ -65,7 +77,7 @@ public class WindLayer implements Comparable<WindLayer> {
         // Calculate wind correction angle (wca) using sine law
         double wca = Math.toDegrees(Math.asin(ws * Math.sin(Math.toRadians(Math.abs(wa))) / gs));
         // Set correct sign for wca
-        if (wa < 0) wca *= -1;
+        if (wa > 0) wca *= -1;
         // Calculate resulting course
         return new Wind.WindChange(hdg + wca, gs);
     }
@@ -157,6 +169,42 @@ public class WindLayer implements Comparable<WindLayer> {
 
     public double getNextGustSpeed() {
         return nextGustSpeed;
+    }
+
+    public void setWindSpeed(double windSpeed) {
+        this.windSpeed = windSpeed;
+    }
+
+    public void setGustSpeed(double gustSpeed) {
+        this.gustSpeed = gustSpeed;
+    }
+
+    public void setTimeStart(double timeStart) {
+        this.timeStart = timeStart;
+    }
+
+    public void setTimeEnd(double timeEnd) {
+        this.timeEnd = timeEnd;
+    }
+
+    public void setAltitudeBottom(double altitudeBottom) {
+        this.altitudeBottom = altitudeBottom;
+    }
+
+    public void setAltitudeTop(double altitudeTop) {
+        this.altitudeTop = altitudeTop;
+    }
+
+    public void setWindDirection(double windDirection) {
+        this.windDirection = windDirection;
+    }
+
+    public void setNextGustStart(double nextGustStart) {
+        this.nextGustStart = nextGustStart;
+    }
+
+    public void setNextGustSpeed(double nextGustSpeed) {
+        this.nextGustSpeed = nextGustSpeed;
     }
 
     @Override
