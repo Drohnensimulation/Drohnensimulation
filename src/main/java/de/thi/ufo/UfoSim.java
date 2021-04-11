@@ -13,24 +13,24 @@
  * warranty of any kind, either expressed or implied.
  *
  * Version: 3.2.5mpro
- *              
- * The jars are created by Export... as JAR file 
- * (no main class required, resources should be 
+ *
+ * The jars are created by Export... as JAR file
+ * (no main class required, resources should be
  * in src\\de\\thi\\ufo) and can be started by
- * java -cp <all jars separated by ;> package.main_class_name 
- * 
- * Do not change this file! 
- *  
+ * java -cp <all jars separated by ;> package.main_class_name
+ *
+ * Do not change this file!
+ *
  * Use only the public interface:
- * 
+ *
  * public final static int VMAX
  * public final static double RADAR_RANGE
  * public final static int ACCELERATION
  * public static int SPEEDUP
- * 
+ *
  * public static Ufosim getInstance()
  * public void setSpeedup(int)
- * 
+ *
  * Methods for the View Window:
  * public void openViewWindow()
  * public boolean getTrigger()
@@ -45,16 +45,16 @@
  * public double getDist()
  * public double getRadar()
  * public double getTime()
- * 
+ *
  * Delta Requester:
  * public void requestDeltaV(int)
  * public void requestDeltaD(int)
  * public void requestDeltaI(int)
- * 
+ *
  * Setter:
  * public void setD(int)
  * public void setI(int)
- * 
+ *
  * Resetter:
  * public void reset()
  */
@@ -65,39 +65,28 @@ package de.thi.ufo;
 public final class UfoSim implements Runnable {
 
   // constants
-  public final static int VMAX = 50;                // maximal velocity [km/h]
+  public final static double VMAX = 50 / 3.6;                // maximal velocity [m/s]
   public final static double RADAR_RANGE = 50;      // range of the radar [m]
-  public final static int ACCELERATION = 1;         // constant acceleration [km/h/0.1s]
+  public final static double ACCELERATION = 10 / 3.6;         // constant acceleration [m/s^2]
   public static int SPEEDUP = 1;                    // real-time speedup factor > 0
-  
+
   // defines and detects the obstacles
   private double detectObstacleAdapter() {
-    double r =  detectObstacle(30, 50, 50, 65, 0, 30);  
-    r =  min(r, detectObstacle(50, 70, 50, 65, 0, 30)); 
-    
+    double r =  detectObstacle(30, 50, 50, 65, 0, 30);
+    r =  min(r, detectObstacle(50, 70, 50, 65, 0, 30));
+
     return r;
   }
 
   // attributes
   private static UfoSim instance;      // singleton instance
   private UfoMView view = null;        // UfoView instance
-  
-  private volatile double x;           // x coordinate [m]
-  private volatile double y;           // y coordinate [m]
-  private volatile double z;           // z coordinate [m]
-  private int v;                       // 0 <= velocity <= vMax [km/h]
-  private int d;                       // 0 <= direction <= 359 [deg]
-  private int i;                       // -90 <= inclination <= 90 [deg]
+
+  private final Location location = new Location(0, 0, 0);
+
   private volatile double dist;        // distance covered since reset [m]
   private volatile double radar;       // distance of radar detected ground or obstacle [m]
   private volatile double time;        // elapsed flight time with v > 0 since reset [s]
-  private double xvect;                // flight vector in x direction
-  private double yvect;                // flight vector in y direction
-  private double zvect;                // flight vector in z direction
-  private int deltaV;                  // requested change of v
-  private int deltaD;                  // requested change of d
-  private int deltaI;                  // requested change of i
-  private double vel;                  // velocity [m/s]
 
   // constructor
   private UfoSim() {
@@ -112,7 +101,7 @@ public final class UfoSim implements Runnable {
     if (instance == null) {
       instance = new UfoSim();
     }
-    
+
     return instance;
   }
 
@@ -130,7 +119,7 @@ public final class UfoSim implements Runnable {
   public void openViewWindow() {
     view = new UfoMView();
   }
-  
+
   // get the trigger from the view window and reset it if set
   public boolean getTrigger() {
     if (view != null)
@@ -138,32 +127,11 @@ public final class UfoSim implements Runnable {
     else
       return false;
   }
-  
-  // get and set
-  public double getX() {
-    return x;
-  }
 
-  public double getY() {
-    return y;
-  }
-
-  public double getZ() {
-    return z;
-  }
-
-  public int getV() {
-    return v;
-  }
-
-  public int getD() {
-    return d;
-  }
-
-  public int getI() {
-    return i;
-  }
-
+  /**
+   *
+   * @return Total travel distance in m
+   */
   public double getDist() {
     return dist;
   }
@@ -172,143 +140,221 @@ public final class UfoSim implements Runnable {
     return radar;
   }
 
+  /**
+   *
+   * @return Past simulation time in s
+   */
   public double getTime() {
     return time;
   }
 
+  /**
+   *
+   * @return Location of the UFO.
+   */
+  public Location getLocation() {
+    return location;
+  }
+
+  /* -------------------------------------------------------------------------------------------------------------------
+   * Mapper methods to support legacy methods. Use Location methods instead!
+   * -----------------------------------------------------------------------------------------------------------------*/
+
+  private int  i = 0; // Inclination in deg
+
+  /**
+   * @deprecated use {@link Location#getX()} instead
+   * @return X Position of UFO.
+   */
+  public double getX() {
+    return location.getX();
+  }
+
+  /**
+   * @deprecated use {@link Location#getY()} ()} instead
+   * @return X Position of UFO.
+   */
+  public double getY() {
+    return location.getY();
+  }
+
+  /**
+   * @deprecated use {@link Location#getZ()} instead
+   * @return Z Position of UFO.
+   */
+  public double getZ() {
+    return location.getZ();
+  }
+
+  /**
+   * @deprecated use {@link Location#getAirspeed()} instead
+   * @return The airspeed in km/h
+   */
+  public int getV() {
+    return (int) Math.round(Math.sqrt(Math.pow(location.getGroundSpeed(), 2)
+            + Math.pow(location.getVerticalSpeed(), 2)) * 3.6);
+  }
+
+  /**
+   * @deprecated use {@link Location#getHeading()} ()} instead
+   * @return The heading in deg.
+   */
+  public int getD() {
+    return (int) Math.round(location.getHeading());
+  }
+
+  /**
+   * @deprecated use {@link Location#getDeltaVerticalSpeed()} and {@link Location#getAirspeed()} instead.
+   * @return The inclination of the z-axis in deg.
+   */
+  public int getI() {
+    return i;
+  }
+
+  /**
+   * Requests a change im air speed.
+   * @deprecated use {@link Location#requestDeltaAirspeed(double)} instead.
+   *
+   * @param delta Change of air speed in km/h
+   */
   public void requestDeltaV(int delta) {
-    deltaV = deltaV + delta;
+    requestDeltaIV(0,  delta / 3.6);
   }
 
+  /**
+   * Requests a change in direction.
+   * @deprecated use {@link Location#requestDeltaHeading(double)} instead.
+   * @param delta Change of direction in deg
+   */
   public void requestDeltaD(int delta) {
-    deltaD = deltaD + delta;
+    location.requestDeltaHeading(delta);
   }
 
+  /**
+   * Requests a change of inclination.
+   * @deprecated use {@link Location#requestDeltaAirspeed(double)} and {@link Location#requestDeltaVerticalSpeed(double)}
+   *              instead.
+   * @param delta Change if inclination in deg
+   */
   public void requestDeltaI(int delta) {
-    deltaI = deltaI + delta;
+    requestDeltaIV(delta, 0);
   }
 
+  /**
+   * Converts delta of I and V into vs and tas to support legacy methods.
+   * @param deltaI Delta I in deg
+   * @param deltaV Delta V in km/h
+   */
+  private void requestDeltaIV(double deltaI, double deltaV) {
+    double tasCurr = location.getAirspeed() + location.getDeltaAirspeed();
+    // Calculate legacy d
+    double vsCurr = location.getVerticalSpeed() + location.getDeltaVerticalSpeed();
+    double v = Math.sqrt(Math.pow(tasCurr, 2) + Math.pow(vsCurr, 2));
+
+    // Apply delta
+    v += deltaV;
+    i += deltaI;
+
+    // Calculate resulting vs and tas
+    double vsNext = Math.sin(Math.toRadians(i)) * v;
+    double tasNext = Math.cos(Math.toRadians(i)) * v;
+
+    location.requestDeltaVerticalSpeed(vsNext - vsCurr);
+    location.requestDeltaAirspeed(tasNext - tasCurr);
+  }
+
+  /**
+   * Sets the heading.
+   * @deprecated use {@link Location#setHeading(double)} instead.
+   * @param d Heading in deg.
+   */
   public void setD(int d) {
     if (d >= 0 && d <= 359)
-      this.d = d;
+      location.setHeading(d);
   }
 
+  /**
+   * Sets the inclination.
+   * @deprecated use {@link Location#setVerticalSpeed(double)} and {@link Location#setAirspeed(double)} instead.
+   * @param i Inclination in deg.
+   */
   public void setI(int i) {
-    if (i >= -90 && i <= 90)
+    if (i >= -90 && i <= 90) {
       this.i = i;
+      // Recalculate speed vectors
+      requestDeltaIV(0, 0);
+    }
   }
 
   public void reset() {
-    x = 0;
-    y = 0;
-    z = 0;
-    v = 0;
-    d = 90;
-    i = 90;
+    location.reset();
     dist = 0;
     radar = -1;
     time = 0;
-    xvect = 0;
-    yvect = 0;
-    zvect = 0;
-    deltaV = 0;
-    deltaD = 0;
-    deltaI = 0;
-    vel = 0;
   }
+
+  /* -------------------------------------------------------------------------------------------------------------------
+   * Simulation threat
+   * ---------------------------------------------------------------------------------------------------------------- */
 
   // thread function
   public void run() {
     while (true) {
-      // update time if flying
-      if (z > 0)
-        time = time + 0.1;
+      // Sync over location to avoid race condition when calculating next position
+      synchronized (location) {
+        // update time if flying
+        if (location.getZ() > 0)
+          time += 0.1;
 
-      // update v, d, i, dist, x, y, z if not crashed
-      if (z >= 0) {
-        // update v
-        if (deltaV > 0) {
-          if (deltaV - ACCELERATION > 0) {
-            v = (v + ACCELERATION < VMAX ? v + ACCELERATION : VMAX);
-            deltaV = deltaV - ACCELERATION;
-          }
-          else {
-            v = (v + deltaV < VMAX ? v + deltaV : VMAX);
-            deltaV = 0;
-          }
+        // update location and dist if not crashed
+        if (location.getZ() >= 0) {
+          location.updateDelta(10);
+
+          // update distance
+          dist += location.getGroundSpeed() / 10;
+
+          // Do amy external updates on track and ground speed here
+
+          // update position
+          location.updatePosition(10);
         }
-        else if (deltaV < 0) { 
-          if (deltaV + ACCELERATION < 0) {
-            v = (v - ACCELERATION > 0 ? v - ACCELERATION : 0);
-            deltaV = deltaV + ACCELERATION;
+
+        // stop if landed or crashed
+        if (location.getZ() <= 0) {
+          if (location.getVerticalSpeed() > 1 / 3.6) {  // crashed to the ground
+            location.setZ(-1);
+          } else {  // landed with slow velocity
+            location.setZ(0);
           }
-          else {
-            v = (v + deltaV > 0 ? v + deltaV : 0);
-            deltaV = 0;
+          location.setVerticalSpeed(0);
+          location.setAirspeed(0);
+          radar = -1;
+
+        } else {
+          // detect obstacles with the radar
+          radar = detectObstacleAdapter();
+
+          if (radar == 0) {                        // crashed into obstacle
+            location.setZ(-1);
+            location.setAirspeed(0);
+            location.setVerticalSpeed(0);
+            radar = -1;
+          } else {                                   // detect ground with the radar
+            radar = min(radar, detectGround(location.getMovement().y));
           }
-        }  
-
-        // update d
-        if      (deltaD > 0 && d == 359) { deltaD--; d = 0; }
-        else if (deltaD > 0 && d < 359)  { deltaD--; d++; }
-        else if (deltaD < 0 && d == 0)   { deltaD++; d = 359; }
-        else if (deltaD < 0 && d > 0)    { deltaD++; d--; }
-        else                               deltaD = 0;
-     
-        // update i
-        if      (deltaI > 0 && i < 90)   { deltaI--; i++; }
-        else if (deltaI < 0 && i > -90)  { deltaI++; i--; }
-        else                               deltaI = 0;
-      
-        // update velocity in m/s
-        vel = v / 3.6;
-        
-        // update distance
-        dist = dist + vel / 10;
-
-        // convert flight vector from polar coordinates to cartesian coordinates
-        xvect = Math.sin((double)(-i+90)/180 * Math.PI) * Math.cos((double)d/180 * Math.PI);
-        yvect = Math.sin((double)(-i+90)/180 * Math.PI) * Math.sin((double)d/180 * Math.PI);
-        zvect = Math.cos((double)(-i+90)/180 * Math.PI);
-      
-        // calculate new position every 100 ms with 1/10 of v
-        x = x + vel / 10 * xvect;
-        y = y + vel / 10 * yvect;
-        z = z + vel / 10 * zvect;
-      }
-
-      // stop if landed or crashed
-      if (z <= 0) {
-        if (v == 1) {                            // landed with slow velocity
-          z = 0;
-          v = 0;
-          radar = -1;
-        }
-        else if (v > 1) {                        // crashed to the ground
-          v = 0;
-          radar = -1;
         }
       }
-      else {
-        // detect obstacles with the radar
-        radar = detectObstacleAdapter();  
-
-        if (radar == 0) {                        // crashed into obstacle
-          z = -1;
-          v = 0;
-          radar = -1;
-        }
-        else {                                   // detect ground with the radar
-          radar = min(radar, detectGround(zvect));
-        }
-      }
- 
       try  {
+        // FIXME actual task execution will be less then 10 times per second due to execution time. Is this ok?
         Thread.sleep(100/SPEEDUP);
       }
-      catch (InterruptedException ex) { }
+      catch (InterruptedException ignored) { }
     }
   }
+
+  /* -------------------------------------------------------------------------------------------------------------------
+   * Senor methods
+   * ---------------------------------------------------------------------------------------------------------------- */
 
   // private detection functions
 
@@ -318,6 +364,15 @@ public final class UfoSim implements Runnable {
   private double detectObstacle(double x1, double x2, 
                                 double y1, double y2, 
                                 double z1, double z2) {
+
+    // Mapping for old definitions
+    double x = location.getX();
+    double xvect = location.getMovement().x;
+    double y = location.getY();
+    double yvect = location.getMovement().y;
+    double z = location.getZ();
+    double zvect = location.getMovement().z;
+
     Interval parameter = new Interval(); // parameter interval of ufo radar
     Interval obstacle = new Interval();  // coordinate interval of obstacle
     Interval ufo = new Interval();       // coordinate interval of ufo radar
@@ -425,7 +480,7 @@ public final class UfoSim implements Runnable {
 
   // detect whether the ground is within the radar interval s = 0, t = radarRange
   private double detectGround(double zvect) {
-    double sz = (0 - z) / zvect;
+    double sz = (0 - location.getZ()) / zvect;
 
     if (0 <= sz && sz <= RADAR_RANGE)  // detected
       return sz;
