@@ -1,4 +1,6 @@
 package de.thi.hindernis.dto;
 
-public class HindernisDTO {
+import java.io.Serializable;
+
+public class HindernisDTO implements Serializable {
 }
