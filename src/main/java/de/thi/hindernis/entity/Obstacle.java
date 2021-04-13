@@ -1,4 +1,4 @@
 package de.thi.hindernis.entity;
 
-public class Hindernis {
+public class Obstacle {
 }

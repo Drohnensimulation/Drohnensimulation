@@ -1,18 +1,13 @@
 package de.thi.hindernis;
 
-import com.google.gson.Gson;
-import de.thi.hindernis.dto.HindernisDTO;
-import de.thi.hindernis.dto.HindernisJsonDTO;
-import de.thi.hindernis.entity.Hindernis;
+import de.thi.hindernis.dto.ObstacleDTO;
+import de.thi.hindernis.entity.Obstacle;
 import de.thi.hindernis.entity.HitMark;
 
 import javax.vecmath.Vector3f;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.Set;
 
 public class UfoObjs implements IUfoObjs {
-
     private static UfoObjs instance;
 
     private UfoObjs() {
@@ -27,55 +22,52 @@ public class UfoObjs implements IUfoObjs {
     }
 
     @Override
-    public Hindernis addHindernis(HindernisDTO hindernisDto) {
+    public Obstacle addObstacle(ObstacleDTO obstacleDto) {
         return null;
     }
 
     @Override
-    public boolean removeHindernis(HindernisDTO hindernisDTO) {
+    public boolean removeObstacle(ObstacleDTO obstacleDTO) {
         return false;
     }
 
     @Override
-    public boolean removeHindernis(Hindernis hindernisObj) {
+    public boolean removeObstacle(Obstacle obstacleObj) {
         return false;
     }
 
     @Override
-    public Set<Hindernis> getHindernisse() {
+    public Set<Obstacle> getObstacles() {
         return null;
     }
 
     @Override
-    public HitMark pruefeSensorKegel(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
+    public HitMark pruefeSensorCone(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
         return null;
     }
 
     @Override
-    public HitMark pruefeSensorPyramide(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
+    public HitMark checkSensorPyramid(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
         return null;
     }
 
     @Override
-    public HitMark pruefeSensorQuader(Vector3f origin, Vector3f orientation, Vector3f dimension) {
+    public HitMark checkSensorCuboid(Vector3f origin, Vector3f orientation, Vector3f dimension) {
         return null;
     }
 
     @Override
-    public HitMark pruefeSensorZylinder(Vector3f origin, Vector3f orientation, Vector3f dimension) {
+    public HitMark checkSensorCylinder(Vector3f origin, Vector3f orientation, Vector3f dimension) {
         return null;
     }
 
     @Override
-    public void loadFromJson(String filePath) throws FileNotFoundException {
-        FileReader fr = new FileReader(filePath);
-        Gson gson = new Gson();
-        HindernisJsonDTO jsonDto = gson.fromJson(fr, HindernisJsonDTO.class);
-        //TODO Clear old Physics Environment
-        //TODO Load JSON Objects into Physics
+    public void load(Object configHolder) {
+
     }
 
     @Override
-    public void saveToJson(String filePath) {
+    public Object save() {
+        return null;
     }
 }

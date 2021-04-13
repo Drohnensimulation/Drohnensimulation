@@ -6,10 +6,10 @@ public class HitMark {
     private final float distance;
     private final Vector3f worldPosition;
     private final Vector3f relativePosition;
-    private final Hindernis hindernis;
+    private final Obstacle obstacle;
 
-    public HitMark(Vector3f origin, Vector3f hit, Hindernis hindernis) {
-        this.hindernis = hindernis;
+    public HitMark(Vector3f origin, Vector3f hit, Obstacle obstacle) {
+        this.obstacle = obstacle;
 
         this.worldPosition = new Vector3f(hit);
 
@@ -31,7 +31,7 @@ public class HitMark {
         return relativePosition;
     }
 
-    public Hindernis getHindernis() {
-        return hindernis;
+    public Obstacle getHindernis() {
+        return obstacle;
     }
 }
