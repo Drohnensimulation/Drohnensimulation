@@ -1,4 +1,4 @@
-package de.thi.hindernis.dto;
+package de.thi.dronesim.obstacle.dto;
 
 import java.io.Serializable;
 

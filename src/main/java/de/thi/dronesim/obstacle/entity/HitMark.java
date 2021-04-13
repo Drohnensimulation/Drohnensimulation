@@ -1,4 +1,4 @@
-package de.thi.hindernis.entity;
+package de.thi.dronesim.obstacle.entity;
 
 import javax.vecmath.Vector3f;
 

@@ -1,8 +1,8 @@
-package de.thi.hindernis;
+package de.thi.dronesim.obstacle;
 
-import de.thi.hindernis.dto.ObstacleDTO;
-import de.thi.hindernis.entity.Obstacle;
-import de.thi.hindernis.entity.HitMark;
+import de.thi.dronesim.obstacle.dto.ObstacleDTO;
+import de.thi.dronesim.obstacle.entity.HitMark;
+import de.thi.dronesim.obstacle.entity.Obstacle;
 
 import javax.vecmath.Vector3f;
 import java.util.Set;
