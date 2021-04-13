@@ -17,8 +17,8 @@ public abstract class ASensor {
 	//Relative Ausrichtung zur Drohne.
 	//Eine Drehung der Drohne hat keinen Einfluss auf die folgenden Werte.
 	//Ausrichtung nach vorne (in Kopfrichtung): (x,y,z) = (1,0,0)
-	//Ausrichtung nach senkrecht nach oben: (x,y,z) = (0,0,1)
-	//Ausrichtung von Kopfrichtung nach links: (x,y,z) = (0,1,0)
+	//Ausrichtung nach senkrecht nach oben: (x,y,z) = (0,1,0)
+	//Ausrichtung von Kopfrichtung nach links: (x,y,z) = (0,0,1)
 	//Bildliche Vorstellung: Drohne schaut in x-Achsen-Richtung
 	protected double directionX;
 	protected double directionY;
@@ -27,8 +27,8 @@ public abstract class ASensor {
 	//Relative Anordnung zum Drohnenmittelpunkt.
 	//Eine Drehung der Drohne hat keinen Einfluss auf die folgenden Werte.
 	//Eine Einheit in Kopfrichtung bewegen: (x,y,z) = (1,0,0)
-	//Eine Einheit nach oben bewegen: (x,y,z) = (0,0,1)
-	//Eine Einheit von Kopfrichtung aus nach links bewegen: (x,y,z) = (0,1,0)
+	//Eine Einheit nach oben bewegen: (x,y,z) = (0,1,0)
+	//Eine Einheit von Kopfrichtung aus nach links bewegen: (x,y,z) = (0,0,1)
 	//Bildliche Vorstellung: Drohne schaut in x-Achsen-Richtung
 	protected double posX; 
 	protected double posY;
@@ -98,8 +98,8 @@ public abstract class ASensor {
 	 * Relative Anordnung zum Drohnenmittelpunkt.
 	 * Eine Drehung der Drohne hat keinen Einfluss auf die folgenden Werte.
 	 * Eine Einheit in Kopfrichtung bewegen: (x,y,z) = (1,0,0)
-	 * Eine Einheit nach oben bewegen: (x,y,z) = (0,0,1)
-	 * Eine Einheit von Kopfrichtung aus nach links bewegen: (x,y,z) = (0,1,0)
+	 * Eine Einheit nach oben bewegen: (x,y,z) = (0,1,0)
+	 * Eine Einheit von Kopfrichtung aus nach links bewegen: (x,y,z) = (0,0,1)
 	 * Bildliche Vorstellung: Drohne schaut in x-Achsen-Richtung
 	 * @param x
 	 * @param y
