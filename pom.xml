@@ -30,6 +30,20 @@
             <artifactId>gson</artifactId>
             <version>2.8.6</version>
         </dependency>
+
+        <!-- JBullet (Physics Enginge für Kollisionen) -->
+        <dependency>
+            <groupId>cz.advel.jbullet</groupId>
+            <artifactId>jbullet</artifactId>
+            <version>20101010-1</version>
+        </dependency>
+
+        <!-- VecMath Vektoren, Matrizen und co... (benötigt für JBullet) -->
+        <dependency>
+            <groupId>javax.vecmath</groupId>
+            <artifactId>vecmath</artifactId>
+            <version>1.5.2</version>
+        </dependency>
     </dependencies>
 
     <build>
