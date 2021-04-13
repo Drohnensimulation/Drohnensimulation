@@ -42,22 +42,22 @@ public class UfoObjs implements IUfoObjs {
     }
 
     @Override
-    public HitMark pruefeSensorCone(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
+    public Set<HitMark> pruefeSensorCone(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
         return null;
     }
 
     @Override
-    public HitMark checkSensorPyramid(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
+    public Set<HitMark> checkSensorPyramid(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
         return null;
     }
 
     @Override
-    public HitMark checkSensorCuboid(Vector3f origin, Vector3f orientation, Vector3f dimension) {
+    public Set<HitMark> checkSensorCuboid(Vector3f origin, Vector3f orientation, Vector3f dimension) {
         return null;
     }
 
     @Override
-    public HitMark checkSensorCylinder(Vector3f origin, Vector3f orientation, Vector3f dimension) {
+    public Set<HitMark> checkSensorCylinder(Vector3f origin, Vector3f orientation, Vector3f dimension) {
         return null;
     }
 
