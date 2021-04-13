@@ -1,4 +1,4 @@
-package de.thi.ufo;
+package de.thi.dronesim.ufo;
 
 public class Drone {
 

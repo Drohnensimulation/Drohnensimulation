@@ -1,4 +1,4 @@
-package de.thi.sensor;
+package de.thi.dronesim.sensor;
 
 import org.junit.jupiter.api.Test;
 

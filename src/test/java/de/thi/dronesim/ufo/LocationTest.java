@@ -1,6 +1,5 @@
-package de.thi.ufo;
+package de.thi.dronesim.ufo;
 
-import de.thi.ufo.Location;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

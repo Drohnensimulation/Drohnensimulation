@@ -65,7 +65,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        de.thi.example.UfoExample
+                                        de.thi.dronesim.example.UfoExample
                                     </mainClass>
                                 </manifest>
                             </archive>

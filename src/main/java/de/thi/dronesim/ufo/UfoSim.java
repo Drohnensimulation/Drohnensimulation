@@ -59,7 +59,7 @@
  * public void reset()
  */
 
-package de.thi.ufo;
+package de.thi.dronesim.ufo;
 
 // class for the simulation of an ufo
 public final class UfoSim implements Runnable {

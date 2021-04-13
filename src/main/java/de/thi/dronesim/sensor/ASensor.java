@@ -1,6 +1,6 @@
-package de.thi.sensor;
+package de.thi.dronesim.sensor;
 
-import de.thi.ufo.Drone;
+import de.thi.dronesim.ufo.Drone;
 
 public abstract class ASensor {
 	

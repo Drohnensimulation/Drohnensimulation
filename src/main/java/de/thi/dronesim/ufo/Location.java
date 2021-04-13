@@ -1,4 +1,4 @@
-package de.thi.ufo;
+package de.thi.dronesim.ufo;
 
 import de.thi.hindernis.math.Vector3;
 
