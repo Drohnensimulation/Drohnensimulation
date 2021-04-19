@@ -1,12 +1,10 @@
-package de.thi.wind;
+package de.thi.dronesim.wind;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-
-import de.thi.ufo.Location;
-import de.thi.ufo.UfoSim;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import de.thi.dronesim.ufo.Location;
+import de.thi.dronesim.ufo.UfoSim;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
