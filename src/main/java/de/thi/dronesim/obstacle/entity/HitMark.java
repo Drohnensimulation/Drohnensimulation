@@ -10,11 +10,11 @@ public class HitMark {
     private final Vector3f relativeHit;
     private final Obstacle obstacle;
 
-    public HitMark(JBulletHitMark hitBody, Obstacle obs) {
+    public HitMark(JBulletHitMark hitBody) {
         this.distance = hitBody.distance;
         this.worldHit = hitBody.worldHit;
         this.relativeHit = hitBody.relativeHit;
-        this.obstacle = obs;
+        this.obstacle = hitBody.body.getObstacle();
     }
 
     public float getDistance() {

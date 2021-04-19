@@ -1,25 +1,26 @@
 package de.thi.dronesim.obstacle;
 
-import com.bulletphysics.dynamics.RigidBody;
 import de.thi.dronesim.obstacle.dto.ObstacleDTO;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
+import de.thi.dronesim.obstacle.util.HitBoxRigidBody;
 import de.thi.dronesim.obstacle.util.JBulletContext;
 import de.thi.dronesim.obstacle.util.JBulletHitMark;
 
 import javax.vecmath.Vector3f;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
 
 public class UfoObjs implements IUfoObjs {
     private static UfoObjs instance;
     private final JBulletContext jBullet;
-    private final Map<RigidBody, Obstacle> bodyObstalceMap;
+    private final Set<Obstacle> obstacles;
+    private final Set<HitBoxRigidBody> hitBoxes;
 
     private UfoObjs() {
         jBullet = new JBulletContext();
-        bodyObstalceMap = new HashMap<>();
+        obstacles = new HashSet<>();
+        hitBoxes = new HashSet<>();
     }
 
     public static UfoObjs getInstance() {
@@ -39,9 +40,9 @@ public class UfoObjs implements IUfoObjs {
     private HitMark rayTest(Vector3f from, Vector3f direction, float range) {
         JBulletHitMark hitBody = jBullet.rayTest(from, direction, range);
         if (hitBody != null) {
-            Obstacle obs = bodyObstalceMap.get(hitBody.body);
-            if(obs != null){
-                return new HitMark(hitBody, obs);
+
+            if(hitBoxes.contains(hitBody.body)){
+                return new HitMark(hitBody);
             }else{
                 throw new RuntimeException("No Obstacle found for Provided HitBox");
             }
@@ -52,28 +53,30 @@ public class UfoObjs implements IUfoObjs {
     @Override
     public Obstacle addObstacle(ObstacleDTO obstacleDto) {
         //TODO Create Obstacle from DTO
-        //TODO Add Obstacle into bodyObstacleMap for each Created CollisionBox
+        //TODO Add Object to obstacles
+        //TODO Add Obstacle into hitBoxes for each Created CollisionBox
         return null;
     }
 
     @Override
     public boolean removeObstacle(ObstacleDTO obstacleDTO) {
         //TODO Remove All HitBoxes from JBullet
-        //TODO Remove All HitBoxes from bodyObstacleMap
+        //TODO Remove Object from obstacles
+        //TODO Remove All relevant HitBoxes from hitBoxes
         return false;
     }
 
     @Override
     public boolean removeObstacle(Obstacle obstacleObj) {
         //TODO Remove All HitBoxes from JBullet
-        //TODO Remove All HitBoxes from bodyObstacleMap
+        //TODO Remove Object from obstacles
+        //TODO Remove All relevant HitBoxes from hitBoxes
         return false;
     }
 
     @Override
     public Set<Obstacle> getObstacles() {
-        //TODO
-        return null;
+        return obstacles;
     }
 
     @Override

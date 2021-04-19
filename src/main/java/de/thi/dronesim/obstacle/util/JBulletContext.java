@@ -14,6 +14,7 @@ import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSo
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
+import de.thi.dronesim.obstacle.entity.Obstacle;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
@@ -34,7 +35,7 @@ public class JBulletContext {
             this.dynamicsWorld.setGravity(GRAVITY);
     }
 
-    public RigidBody addHitBox(Vector3f postition, Vector3f rotation, Vector3f dimension){
+    public HitBoxRigidBody addHitBox(Vector3f postition, Vector3f rotation, Vector3f dimension, Obstacle obstacle){
         CollisionShape boxShape = new BoxShape(dimension);
         MotionState boxMotionState = new DefaultMotionState(
                 new Transform(new Matrix4f(
@@ -44,7 +45,7 @@ public class JBulletContext {
                 )));
 
         RigidBodyConstructionInfo boxConstructionInfo = new RigidBodyConstructionInfo(0, boxMotionState, boxShape);
-        RigidBody boxRigidBody = new RigidBody(boxConstructionInfo);
+        HitBoxRigidBody boxRigidBody = new HitBoxRigidBody(boxConstructionInfo, obstacle);
 
         dynamicsWorld.addRigidBody(boxRigidBody);
         return boxRigidBody;
