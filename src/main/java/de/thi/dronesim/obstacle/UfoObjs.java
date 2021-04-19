@@ -15,6 +15,10 @@ public class UfoObjs implements IUfoObjs {
     private static UfoObjs instance;
     private final JBulletContext jBullet;
     private final Set<Obstacle> obstacles;
+
+    /**
+     * Actually this Set is just for "rechecking", it's totally useless
+     */
     private final Set<HitBoxRigidBody> hitBoxes;
 
     private UfoObjs() {

@@ -35,6 +35,14 @@ public class JBulletContext {
             this.dynamicsWorld.setGravity(GRAVITY);
     }
 
+    /**
+     * Use this Method to add new Hitboxes to the Physics world
+     * @param postition
+     * @param rotation
+     * @param dimension
+     * @param obstacle
+     * @return The gloryfied HitBox Object to persist in the List as Replica, actually never needed outside of Physics
+     */
     public HitBoxRigidBody addHitBox(Vector3f postition, Vector3f rotation, Vector3f dimension, Obstacle obstacle){
         CollisionShape boxShape = new BoxShape(dimension);
         MotionState boxMotionState = new DefaultMotionState(
