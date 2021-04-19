@@ -1,7 +1,5 @@
 package de.thi.dronesim.ufo;
 
-import de.thi.hindernis.math.Vector3;
-
 public class Location {
 
     private final Vector3 position;     // Vector of current position               [m]
