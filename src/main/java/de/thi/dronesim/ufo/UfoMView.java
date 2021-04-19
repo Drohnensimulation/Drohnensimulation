@@ -1,4 +1,4 @@
-package de.thi.ufo;
+package de.thi.dronesim.ufo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
