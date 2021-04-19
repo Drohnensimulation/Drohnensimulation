@@ -77,7 +77,7 @@ public class UfoObjs implements IUfoObjs {
     }
 
     @Override
-    public Set<HitMark> pruefeSensorCone(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
+    public Set<HitMark> checkSensorCone(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
         return null;
     }
 

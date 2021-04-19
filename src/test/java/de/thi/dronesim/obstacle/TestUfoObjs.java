@@ -117,7 +117,7 @@ public class TestUfoObjs {
     }
 
     /**
-     * Test method for {@link UfoObjs#pruefeSensorCone(Vector3f, Vector3f, float, Vector3f)}
+     * Test method for {@link UfoObjs#checkSensorCone(Vector3f, Vector3f, float, Vector3f)}
      */
     @Test
     public void pruefeSensorCone() {

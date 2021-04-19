@@ -46,7 +46,7 @@ public interface IUfoObjs {
      * @param opening Öffnungswinkel angegeben als Steigung
      * @return Referenz zu einem Getroffenen Objekt
      */
-    Set<HitMark> pruefeSensorCone(Vector3f origin, Vector3f orientation, float range, Vector3f opening);
+    Set<HitMark> checkSensorCone(Vector3f origin, Vector3f orientation, float range, Vector3f opening);
 
     /**
      * Prüft auf Kollisionen entlang einer 4 Seitigen Pyramide
