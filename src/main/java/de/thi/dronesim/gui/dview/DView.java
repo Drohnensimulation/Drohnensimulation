@@ -1,0 +1,246 @@
+package de.thi.dronesim.gui.dview;
+
+import com.jme3.app.SimpleApplication;
+import com.jme3.light.DirectionalLight;
+import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector3f;
+import com.jme3.post.FilterPostProcessor;
+import com.jme3.renderer.queue.RenderQueue;
+import com.jme3.scene.Spatial;
+import com.jme3.shadow.DirectionalLightShadowFilter;
+import com.jme3.system.AppSettings;
+import com.jme3.system.JmeCanvasContext;
+import de.thi.dronesim.gui.dview.objects.RenderableDrone;
+import de.thi.dronesim.gui.dview.objects.RenderableObject;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+/**
+ * DView for rendering the 3D-View into a canvas
+ *
+ * @author Michael Weichenrieder
+ */
+public class DView extends SimpleApplication {
+
+    /**
+     * Enum of possible perspectives
+     *
+     * @author Michael Weichenrieder
+     */
+    public enum Perspective {
+        THIRD_PERSON, FIRST_PERSON, BIRD_VIEW
+    }
+
+    // Ground
+    private volatile float xMin = 0, xMax = 0, zMin = 0, zMax = 0;
+    private Spatial ground;
+
+    // Objects
+    private final List<RenderableObject> objects = new ArrayList<>();
+    private final List<RenderableDrone> drones = new ArrayList<>();
+
+    // Render queue (because rendering needs to be done on render thread)
+    private final List<RenderableObject> renderQueue = new ArrayList<>();
+
+    // Params
+    private volatile Perspective perspective = Perspective.THIRD_PERSON;
+
+    // Frame update listeners
+    private final List<Runnable> frameUpdateListeners = new ArrayList<>();
+
+    /**
+     * Creates a new DView
+     *
+     * @param width Preferred width of the display canvas
+     * @param height Preferred height of the display canvas
+     */
+    public DView(int width, int height) {
+        super();
+        //Logger.getLogger("com.jme3").setLevel(Level.OFF);
+        AppSettings settings = new AppSettings(true);
+        settings.setWidth(width);
+        settings.setHeight(height);
+        settings.setSamples(8);
+        setSettings(settings);
+        setDisplayStatView(false);
+        setDisplayFps(true);
+        setPauseOnLostFocus(false);
+    }
+
+    /**
+     * Adds an renderable object/obstacle to the map
+     *
+     * @param object Object to add
+     */
+    public void addRenderableObject(RenderableObject object) {
+        if (object.getXMax() > xMax) {
+            xMax = object.getXMax();
+        }
+        if (object.getXMin() < xMin) {
+            xMin = object.getXMin();
+        }
+        if (object.getZMax() > zMax) {
+            zMax = object.getZMax();
+        }
+        if (object.getZMin() < zMin) {
+            zMin = object.getZMin();
+        }
+        renderQueue.add(object);
+    }
+
+    /**
+     * Adds multiple renderable objects/obstacles to the map
+     *
+     * @param objects Object to add
+     */
+    public void addRenderableObjects(Collection<RenderableObject> objects) {
+        for (RenderableObject object : objects) {
+            addRenderableObject(object);
+        }
+    }
+
+    /**
+     * Retrieve the display canvas
+     *
+     * @return Display canvas
+     */
+    public Canvas getCanvas() {
+        createCanvas();
+        JmeCanvasContext ctx = (JmeCanvasContext) getContext();
+        ctx.setSystemListener(this);
+        Dimension dim = new Dimension(settings.getWidth(), settings.getHeight());
+        ctx.getCanvas().setPreferredSize(dim);
+        return ctx.getCanvas();
+    }
+
+    /**
+     * Set the perspective shown in the canvas
+     *
+     * @param perspective Perspective
+     */
+    public void setPerspective(Perspective perspective) {
+        this.perspective = perspective;
+    }
+
+    /**
+     * Initializes the scene
+     */
+    @Override
+    public void simpleInitApp() {
+        // Setup camera
+        flyCam.setEnabled(false);
+        cam.setFrustumPerspective(60f, cam.getWidth() / (float) cam.getHeight(), .1f, cam.getFrustumFar());
+
+        // Setup map
+        viewPort.setBackgroundColor(ColorRGBA.Gray);
+        addLight();
+        updateGround();
+    }
+
+    /**
+     * Adds light and shadows to the world
+     */
+    private void addLight() {
+        // Main light
+        DirectionalLight sun = new DirectionalLight();
+        sun.setColor(ColorRGBA.White.mult(2));
+        sun.setDirection(new Vector3f(-1, -3, -2));
+        rootNode.addLight(sun);
+
+        // Helper light so that back sides have colors
+        DirectionalLight sun2 = new DirectionalLight();
+        sun2.setColor(ColorRGBA.White.mult(1));
+        sun2.setDirection(new Vector3f(1, -3, 2));
+        rootNode.addLight(sun2);
+
+        // Enable shadows
+        rootNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
+
+        // Render shadows according to main light
+        DirectionalLightShadowFilter shadowFilter = new DirectionalLightShadowFilter(assetManager, 4096, 1);
+        shadowFilter.setLight(sun);
+        shadowFilter.setEnabled(true);
+        shadowFilter.setShadowIntensity(.6f);
+        FilterPostProcessor postProcessor = new FilterPostProcessor(assetManager);
+        postProcessor.addFilter(shadowFilter);
+        viewPort.addProcessor(postProcessor);
+    }
+
+    /**
+     * Updates the ground position and size
+     */
+    private void updateGround() {
+        if (ground == null) {
+            ground = assetManager.loadModel("Objects/Obstacles/ground.obj");
+            rootNode.attachChild(ground);
+        }
+        ground.setLocalTranslation((xMax + xMin) / 2, 0, (zMax + zMin) / 2);
+        ground.setLocalScale(xMax - xMin + 2, 1, zMax - zMin + 2);
+    }
+
+    /**
+     * Renders a frame (auto-called)
+     */
+    @Override
+    public void simpleUpdate(float tpf) {
+        super.simpleUpdate(tpf);
+
+        // Render objects if in queue
+        addRenderableObjectsToDisplay();
+
+        // Do listeners
+        for(Runnable listener : frameUpdateListeners) {
+            listener.run();
+        }
+
+        // Update drone parameters
+        for(RenderableDrone drone : drones) {
+            drone.updateParameters();
+        }
+
+        // Set cam position/rotation according to perspective
+        if(!drones.isEmpty()) {
+            switch (perspective) {
+                case THIRD_PERSON:
+                    drones.get(0).adjustCamToThirdPerson(cam);
+                    break;
+                case BIRD_VIEW:
+                    drones.get(0).adjustCamToBirdView(cam);
+                    break;
+                case FIRST_PERSON:
+                    drones.get(0).adjustCamToFirstPerson(cam);
+            }
+        }
+    }
+
+    /**
+     * Helper to add all objects in render queue to scene
+     */
+    private void addRenderableObjectsToDisplay() {
+        if(renderQueue.isEmpty()) {
+            return;
+        }
+        while(!renderQueue.isEmpty()) {
+            RenderableObject renderableObject = renderQueue.remove(0);
+            rootNode.attachChild(renderableObject.getObject(assetManager));
+            if(renderableObject instanceof RenderableDrone) {
+                drones.add((RenderableDrone) renderableObject);
+            } else {
+                objects.add(renderableObject);
+            }
+        }
+        updateGround();
+    }
+
+    /**
+     * Adds a listener on frame updates
+     *
+     * @param listener Runnable to be called before every frame update
+     */
+    public void addFrameUpdateListener(Runnable listener) {
+        frameUpdateListeners.add(listener);
+    }
+}
