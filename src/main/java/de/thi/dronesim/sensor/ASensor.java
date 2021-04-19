@@ -1,6 +1,11 @@
 package de.thi.dronesim.sensor;
 
+import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.ufo.Drone;
+
+import javax.vecmath.Vector3f;
+import java.util.List;
+import java.util.Set;
 
 public abstract class ASensor {
 	
@@ -253,6 +258,22 @@ public abstract class ASensor {
 			throw new IllegalArgumentException("Accuracy may not be less than zero!");
 		}
 		this.measurementAccuracy = accuracy;
+	}
+
+	/**
+	 *Gets the Rays that hit an Obstacle
+	 *
+	 * @param origin coords of the drone
+	 * @param orientation Drone is heading this direction
+	 * @param range sensorrange
+	 * @param opening Example: if the angle is 45° the vector would be 	1 (x)
+	 *                													0 (y)
+	 *                													1 (z)
+	 * @return a Set of the rays that hit objects
+	 */
+	public Set<HitMark> getSensorHits(Vector3f origin, Vector3f orientation, float range, Vector3f opening){
+		//TODO: Dummywerte zurückliefern
+		return Set.of();
 	}
 	
 	/**
