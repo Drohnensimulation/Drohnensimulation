@@ -17,6 +17,13 @@ public class HitMark {
         this.obstacle = hitBody.body.getObstacle();
     }
 
+    public HitMark(float distance, Vector3f worldHit, Vector3f relativeHit, Obstacle obstacle){
+        this.distance = distance;
+        this.worldHit = worldHit;
+        this.relativeHit = relativeHit;
+        this.obstacle = obstacle;
+    }
+
     public float getDistance() {
         return distance;
     }
