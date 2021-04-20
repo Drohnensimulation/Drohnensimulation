@@ -1,5 +1,6 @@
 package de.thi.dronesim.sensor;
 
+import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 import de.thi.dronesim.ufo.Drone;
@@ -340,7 +341,7 @@ public abstract class ASensor {
 	 * @return Entfernung in Metern.
 	 */
 	public double getDistance() {
-		double measurement = 0; /*TODO: Call Obstacle Team-Method*/;
+		double measurement = 0; /*TODO: Call Obstacle Team-Method*/
 		
 		return this.handleMeasurementAccuracy(measurement);
 	}
@@ -360,11 +361,33 @@ public abstract class ASensor {
 		}
 	}
 	
-	public void loadFromJSON(String filepath) {
-		//TODO
+	public void loadFromConfig(SensorConfig config) {
+		range = config.getRange();
+		angleOfViewHorizontal = config.getAngleOfViewHorizontal();
+		angleOfViewVertical = config.getAngleOfViewVertical();
+		sensorRadius = config.getSensorRadius();
+		measurementAccuracy = config.getMeasurementAccuracy();
+		directionX = config.getDirectionX();
+		directionY = config.getDirectionY();
+		directionZ = config.getDirectionZ();
+		posX = config.getPosX();
+		posY = config.getPosY();
+		posZ = config.getPosZ();
 	}
 	
-	public void saveToJSON(String filepath) {
-		//TODO
+	public SensorConfig saveToConfig() {
+		SensorConfig config = new SensorConfig();
+		config.setRange(range);
+		config.setAngleOfViewHorizontal(angleOfViewHorizontal);
+		config.setAngleOfViewVertical(angleOfViewVertical);
+		config.setSensorRadius(sensorRadius);
+		config.setMeasurementAccuracy(measurementAccuracy);
+		config.setDirectionX(directionX);
+		config.setDirectionY(directionY);
+		config.setDirectionZ(directionZ);
+		config.setPosX(posX);
+		config.setPosY(posY);
+		config.setPosZ(posZ);
+		return config;
 	}
 }
