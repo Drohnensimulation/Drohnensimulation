@@ -1,9 +1,11 @@
 package de.thi.dronesim.ufo;
 
+import javax.vecmath.Vector3f;
+
 public class Location {
 
-    private final Vector3 position;     // Vector of current position               [m]
-    private final Vector3 movement;     // Vector of travel direction               [m/s]
+    private final Vector3f position;     // Vector of current position               [m]
+    private final Vector3f movement;     // Vector of travel direction               [m/s]
 
     private double track = 0;           // True movement direction                  [deg]
     private double hdg = 0;             // Direction in which the A/C faces         [deg]
@@ -16,9 +18,9 @@ public class Location {
     private double deltaTas = 0;        // Requested, not applied change of tas     [m/s]
     private double deltaVs = 0;         // Requested, not applied change of vas     [m/s]
 
-    public Location(double x, double y, double z) {
-        this.position = new Vector3(x, y, z);
-        this.movement = new Vector3(0, 0, 0);
+    public Location(float x, float y, float z) {
+        this.position = new Vector3f(x, y, z);
+        this.movement = new Vector3f(0, 0, 0);
     }
 
     /**
@@ -26,11 +28,13 @@ public class Location {
      * @param updateRate Updates per second.
      */
     public void updatePosition(int updateRate) {
-        movement.x = Math.cos(Math.toRadians((track + -90) % 360)) * gs;
-        movement.z = vs;
-        movement.y = Math.cos(Math.toRadians(track)) * gs;
+        movement.x = (float) (Math.cos(Math.toRadians((track + -90) % 360)) * gs);
+        movement.z = (float) vs;
+        movement.y = (float) (Math.cos(Math.toRadians(track)) * gs);
         // Apply updateRate to movement
-        movement.mul(1.0/updateRate);
+        movement.x *= 1.0/updateRate;
+        movement.z *= 1.0/updateRate;
+        movement.y *= 1.0/updateRate;
 
         // Calculate position based on movement
         position.add(movement);
@@ -135,7 +139,7 @@ public class Location {
      *
      * @return Position on x-axis in m
      */
-    public synchronized double getX() {
+    public synchronized float getX() {
         return position.x;
     }
 
@@ -143,7 +147,7 @@ public class Location {
      * Sets the position on x-axis.
      * @param x position in m
      */
-    public synchronized void setX(double x) {
+    public synchronized void setX(float x) {
         this.position.x = x;
     }
 
@@ -151,7 +155,7 @@ public class Location {
      *
      * @return Position on y-axis in m
      */
-    public synchronized double getY() {
+    public synchronized float getY() {
         return position.y;
     }
 
@@ -159,7 +163,7 @@ public class Location {
      * Sets the position on y-axis.
      * @param y position in m
      */
-    public synchronized void setY(double y) {
+    public synchronized void setY(float y) {
         this.position.y = y;
     }
 
@@ -167,7 +171,7 @@ public class Location {
      *
      * @return Position on z-axis in m
      */
-    public synchronized double getZ() {
+    public synchronized float getZ() {
         return position.z;
     }
 
@@ -175,7 +179,7 @@ public class Location {
      * Sets the position on z-axis.
      * @param z position in m
      */
-    public synchronized void setZ(double z) {
+    public synchronized void setZ(float z) {
         this.position.z = z;
     }
 
@@ -183,7 +187,7 @@ public class Location {
      *
      * @return The current direction of travel in m/s
      */
-    public synchronized Vector3 getMovement() {
+    public synchronized Vector3f getMovement() {
         return movement;
     }
 
