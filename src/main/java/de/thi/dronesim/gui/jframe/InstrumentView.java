@@ -1,4 +1,4 @@
-package de.thi.dronesim.gui;
+package de.thi.dronesim.gui.jframe;
 
 import javax.swing.*;
 
