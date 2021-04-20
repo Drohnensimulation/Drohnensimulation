@@ -2,10 +2,7 @@ package de.thi.dronesim.gui.dview;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.jme3.math.Vector3f;
-import de.thi.dronesim.gui.dview.objects.RenderableCuboid;
-import de.thi.dronesim.gui.dview.objects.RenderableDrone;
-import de.thi.dronesim.gui.dview.objects.RenderableSphere;
-import de.thi.dronesim.gui.dview.objects.RenderableObject;
+import de.thi.dronesim.gui.dview.objects.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -92,6 +89,7 @@ public class DViewTest extends JFrame {
         objects.add(new RenderableSphere(new Vector3f(0, .5f, 2)));
         objects.add(new RenderableSphere(new Vector3f(0, 1.5f, 2)));
         objects.add(new RenderableSphere(new Vector3f(-1, .5f, -2)));
+        objects.add(new RenderableMarker(new Vector3f(0, 1, 0)));
         return objects;
     }
 }
