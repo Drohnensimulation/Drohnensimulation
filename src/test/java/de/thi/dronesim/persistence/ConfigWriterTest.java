@@ -45,9 +45,9 @@ public class ConfigWriterTest {
         String expectedContent = "" +
                 "{\n" +
                 "  \"locationConfig\": null,\n" +
-                "  \"obstacleConfiList\": null,\n" +
+                "  \"obstacleConfigList\": null,\n" +
                 "  \"sensorConfigList\": null,\n" +
-                "  \"windConfiList\": null\n" +
+                "  \"windConfigList\": null\n" +
                 "}";
 
         assertEquals(content, expectedContent);
