@@ -1,7 +1,13 @@
 package de.thi.dronesim.sensor;
 
 import de.thi.dronesim.persistence.entity.SensorConfig;
+import de.thi.dronesim.obstacle.entity.HitMark;
+import de.thi.dronesim.obstacle.entity.Obstacle;
 import de.thi.dronesim.ufo.Drone;
+
+import javax.vecmath.Vector3f;
+import java.util.Random;
+import java.util.Set;
 
 public abstract class ASensor {
 	
@@ -254,6 +260,80 @@ public abstract class ASensor {
 			throw new IllegalArgumentException("Accuracy may not be less than zero!");
 		}
 		this.measurementAccuracy = accuracy;
+	}
+
+	/**
+	 *Gets the Rays that hit an Obstacle
+	 *
+	 * @param origin coords of the drone
+	 * @param orientation Drone is heading this direction
+	 * @param range sensorrange
+	 * @param opening Example: if the angle is 45° the vector would be 	1 (x)
+	 *                													0 (y)
+	 *                													1 (z)
+	 * @return a Set of the rays that hit objects
+	 */
+	public Set<HitMark> getSensorHits(Vector3f origin, Vector3f orientation, float range, Vector3f opening){
+
+		//returns only dummy data, no real reference to real data
+		Set<HitMark> hitMarks = Set.of();
+		Random random = new Random();
+
+		origin = new Vector3f(5,5,0);
+
+		Obstacle obstacle1 = new Obstacle();
+		Obstacle obstacle2 = new Obstacle();
+		Obstacle obstacle3 = new Obstacle();
+		Obstacle obstacle = new Obstacle();
+
+
+		Vector3f relativeHit = new Vector3f(5,7,0);
+
+		float x;
+		float y;
+		float z;
+
+		for(int i = 0; i<30; i++){
+			int xmax;
+			int xmin;
+			int ymax;
+			int ymin;
+			if(i<10){
+				xmax = 14;
+				xmin = 8;
+				ymax = 14;
+				ymin = 10;
+				obstacle = obstacle1;
+
+			}else if(i>10 && i<20){
+				xmax = 20;
+				xmin = 15;
+				ymax = 4;
+				ymin = 1;
+				obstacle = obstacle2;
+
+			}else{
+				xmax = 5;
+				xmin = 1;
+				ymax = 13;
+				ymin = 10;
+				obstacle = obstacle3;
+
+			}
+			x = Float.parseFloat(Integer.toString(random.nextInt(xmax - xmin + 1) + xmin));
+			y = Float.parseFloat(Integer.toString(random.nextInt(ymax - ymin + 1) + ymin));
+			z = 3;
+			Vector3f worldHit = new Vector3f(x,y,z);
+			relativeHit.x = x - origin.x;
+			relativeHit.y = y - origin.y;
+			relativeHit.z = y - origin.z;
+			float distance = relativeHit.length();
+			HitMark mark = new HitMark(distance, worldHit, relativeHit, obstacle3);
+
+			hitMarks.add(mark);
+		}
+
+		return hitMarks;
 	}
 	
 	/**

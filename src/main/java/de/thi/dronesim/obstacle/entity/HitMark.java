@@ -1,37 +1,42 @@
 package de.thi.dronesim.obstacle.entity;
 
+import de.thi.dronesim.obstacle.util.JBulletHitMark;
+
 import javax.vecmath.Vector3f;
 
 public class HitMark {
     private final float distance;
-    private final Vector3f worldPosition;
-    private final Vector3f relativePosition;
+    private final Vector3f worldHit;
+    private final Vector3f relativeHit;
     private final Obstacle obstacle;
 
-    public HitMark(Vector3f origin, Vector3f hit, Obstacle obstacle) {
+    public HitMark(JBulletHitMark hitBody) {
+        this.distance = hitBody.distance;
+        this.worldHit = hitBody.worldHit;
+        this.relativeHit = hitBody.relativeHit;
+        this.obstacle = hitBody.body.getObstacle();
+    }
+
+    public HitMark(float distance, Vector3f worldHit, Vector3f relativeHit, Obstacle obstacle){
+        this.distance = distance;
+        this.worldHit = worldHit;
+        this.relativeHit = relativeHit;
         this.obstacle = obstacle;
-
-        this.worldPosition = new Vector3f(hit);
-
-        this.relativePosition = new Vector3f(hit);
-        this.relativePosition.sub(origin);
-
-        this.distance = this.relativePosition.length();
     }
 
     public float getDistance() {
         return distance;
     }
 
-    public Vector3f getWorldPosition() {
-        return worldPosition;
+    public Vector3f worldHit() {
+        return worldHit;
     }
 
-    public Vector3f getRelativePosition() {
-        return relativePosition;
+    public Vector3f relativeHit() {
+        return relativeHit;
     }
 
-    public Obstacle getHindernis() {
+    public Obstacle getObstacle() {
         return obstacle;
     }
 }

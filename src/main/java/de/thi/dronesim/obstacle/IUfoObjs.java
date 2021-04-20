@@ -46,7 +46,7 @@ public interface IUfoObjs {
      * @param opening Öffnungswinkel angegeben als Steigung
      * @return Referenz zu einem Getroffenen Objekt
      */
-    HitMark pruefeSensorCone(Vector3f origin, Vector3f orientation, float range, Vector3f opening);
+    Set<HitMark> checkSensorCone(Vector3f origin, Vector3f orientation, float range, Vector3f opening);
 
     /**
      * Prüft auf Kollisionen entlang einer 4 Seitigen Pyramide
@@ -56,7 +56,7 @@ public interface IUfoObjs {
      * @param opening Öffnungswinkel angegeben als Steigung
      * @return Referenz zu einem Getroffenen Objekt
      */
-    HitMark checkSensorPyramid(Vector3f origin, Vector3f orientation, float range, Vector3f opening);
+    Set<HitMark> checkSensorPyramid(Vector3f origin, Vector3f orientation, float range, Vector3f opening);
 
     /**
      * Prüft auf Kollisionen entlang eines Quaders
@@ -65,7 +65,7 @@ public interface IUfoObjs {
      * @param dimension Dimension des Quaders (x, y, z/Reichweite)
      * @return Referenz zu einem Getroffenen Objekt
      */
-    HitMark checkSensorCuboid(Vector3f origin, Vector3f orientation, Vector3f dimension);
+    Set<HitMark> checkSensorCuboid(Vector3f origin, Vector3f orientation, Vector3f dimension);
 
     /**
      * Prüft auf Kollisionen entlang eines Zylinders
@@ -74,7 +74,7 @@ public interface IUfoObjs {
      * @param dimension Dimension des Zylinders (x/Durchmesser, y/Durchmesser, z/Reichweite)
      * @return Referenz zu einem Getroffenen Objekt
      */
-    HitMark checkSensorCylinder(Vector3f origin, Vector3f orientation, Vector3f dimension);
+    Set<HitMark> checkSensorCylinder(Vector3f origin, Vector3f orientation, Vector3f dimension);
 
 
     /**
