@@ -8,7 +8,7 @@ import java.awt.*;
 
 public class InstrumentView extends JFrame implements InstrumentInterface {
 
-    public JPanel mainPanel;
+    private JPanel mainPanel;
     private JLabel xCord;
     private JLabel yCord;
     private JLabel zCord;
@@ -16,7 +16,6 @@ public class InstrumentView extends JFrame implements InstrumentInterface {
     private JPanel coordinatePanel;
     private JPanel graphicPanel;
     private JPanel dataPanel;
-    private JPanel velocityPanel;
     private JPanel directionPanel;
     private JPanel airSpeedPanel;
     private JPanel zCordPanel;
@@ -36,23 +35,21 @@ public class InstrumentView extends JFrame implements InstrumentInterface {
     private JButton firstPersonButton;
 
     public InstrumentView(DView dView) {
-        JFrame frame = new JFrame("Ufo Simulation");
-        frame.setContentPane(mainPanel);
+        super("Ufo Simulation");
+        getContentPane().add(mainPanel);
         Canvas canvas = dView.getCanvas();
         graphicPanel.add(canvas);
         thirdPersonButton.addActionListener(e -> dView.setPerspective(DView.Perspective.THIRD_PERSON));
         birdViewButton.addActionListener(e -> dView.setPerspective(DView.Perspective.BIRD_VIEW));
         firstPersonButton.addActionListener(e -> dView.setPerspective(DView.Perspective.FIRST_PERSON));
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
-        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        pack();
+        setVisible(true);
 
         mainPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         coordinatePanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         graphicPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         dataPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        velocityPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         groundSpeedPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         airSpeedPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         directionPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
