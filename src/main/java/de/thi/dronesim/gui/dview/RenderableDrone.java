@@ -53,6 +53,7 @@ public class RenderableDrone extends RenderableObject {
     Spatial getObject(AssetManager assetManager) {
         if(object == null) {
             object = new Node("Drone");
+            object.setName("object-" + id);
             ((Node) object).attachChild(droneTilt);
 
             // Add drone body

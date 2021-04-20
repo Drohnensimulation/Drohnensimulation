@@ -54,7 +54,8 @@ public class DViewTest extends JFrame {
 
         // Create DView and add objects
         DView dView = new DView(width, height);
-        dView.addRenderableObjects(getMapObjects());
+        List<RenderableObject> mapObjects = getMapObjects();
+        dView.addRenderableObjects(mapObjects);
 
         // Add drone
         RenderableDrone drone = new RenderableDrone(new Vector3f(0, 1, 0));
@@ -70,7 +71,7 @@ public class DViewTest extends JFrame {
         dView.addRenderableObject(drone);
 
         // Open swing frame
-        new DViewTest(dView, drone, width, height);
+        new Thread(() -> new DViewTest(dView, drone, width, height)).start();
     }
 
     /**

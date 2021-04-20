@@ -13,7 +13,7 @@ import com.jme3.scene.Spatial;
 public class RenderableObject implements Comparable<RenderableObject> {
 
     private static int nextId = 0;
-    private final int id = nextId++;
+    protected final int id = nextId++;
 
     protected Spatial object;
 
@@ -65,6 +65,7 @@ public class RenderableObject implements Comparable<RenderableObject> {
     Spatial getObject(AssetManager assetManager) {
         if(object == null) {
             object = assetManager.loadModel(model);
+            object.setName("object-" + id);
             object.setLocalTranslation(center);
             object.setLocalScale(scale);
             object.setLocalRotation(new Quaternion().fromAngles(rotation.toArray(new float[3])));

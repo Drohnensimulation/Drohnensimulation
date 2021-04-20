@@ -14,6 +14,7 @@ import com.jme3.system.JmeCanvasContext;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -37,11 +38,12 @@ public class DView extends SimpleApplication {
     private Spatial ground;
 
     // Objects
-    private final List<RenderableObject> objects = new ArrayList<>();
-    private final List<RenderableDrone> drones = new ArrayList<>();
+    private final HashMap<Integer, RenderableObject> objects = new HashMap<>();
+    private final HashMap<Integer, RenderableDrone> drones = new HashMap<>();
 
     // Render queue (because rendering needs to be done on render thread)
     private final List<RenderableObject> renderQueue = new ArrayList<>();
+    private final List<Integer> removeQueue = new ArrayList<>();
 
     // Params
     private volatile Perspective perspective = Perspective.THIRD_PERSON;
@@ -70,9 +72,9 @@ public class DView extends SimpleApplication {
     }
 
     /**
-     * Adds an renderable object/obstacle to the map
+     * Adds a renderable object/obstacle to the map
      *
-     * @param object Object to add
+     * @param object Object to be added
      */
     public void addRenderableObject(RenderableObject object) {
         if (object.getXMax() > xMax) {
@@ -93,12 +95,30 @@ public class DView extends SimpleApplication {
     /**
      * Adds multiple renderable objects/obstacles to the map
      *
-     * @param objects Object to add
+     * @param objects Objects to be added
      */
     public void addRenderableObjects(Collection<RenderableObject> objects) {
         for (RenderableObject object : objects) {
             addRenderableObject(object);
         }
+    }
+
+    /**
+     * Removes a renderable object/obstacle from the map
+     *
+     * @param objectId Object id to be removed
+     */
+    public void removeRenderableObject(int objectId) {
+        removeQueue.add(objectId);
+    }
+
+    /**
+     * Removes a renderable object/obstacle from the map
+     *
+     * @param object Object to be removed
+     */
+    public void removeRenderableObject(RenderableObject object) {
+        removeRenderableObject(object.getId());
     }
 
     /**
@@ -200,7 +220,8 @@ public class DView extends SimpleApplication {
     public void simpleUpdate(float tpf) {
         super.simpleUpdate(tpf);
 
-        // Render objects if in queue
+        // Update objects if in queue
+        removeRenderableObjectsFromDisplay();
         addRenderableObjectsToDisplay();
 
         // Do listeners
@@ -210,7 +231,8 @@ public class DView extends SimpleApplication {
 
         // Update drone parameters
         RenderableDrone perspectiveDrone = null;
-        for(RenderableDrone drone : drones) {
+        for(int index : drones.keySet()) {
+            RenderableDrone drone = drones.get(index);
             drone.updateParameters();
             if(drone.getId() == dronePerspectiveId) {
                perspectiveDrone = drone;
@@ -243,15 +265,34 @@ public class DView extends SimpleApplication {
             RenderableObject renderableObject = renderQueue.remove(0);
             rootNode.attachChild(renderableObject.getObject(assetManager));
             if(renderableObject instanceof RenderableDrone) {
-                drones.add((RenderableDrone) renderableObject);
+                drones.put(renderableObject.getId(), (RenderableDrone) renderableObject);
                 if(dronePerspectiveId == -1) {
                     dronePerspectiveId = renderableObject.getId();
                 }
             } else {
-                objects.add(renderableObject);
+                objects.put(renderableObject.getId(), renderableObject);
             }
         }
         updateGround();
+    }
+
+    /**
+     * Helper to remove all objects in remove queue from scene
+     */
+    private void removeRenderableObjectsFromDisplay() {
+        if(removeQueue.isEmpty()) {
+            return;
+        }
+        while(!removeQueue.isEmpty()) {
+            int toRemove = removeQueue.remove(0);
+            if(drones.containsKey(toRemove)) {
+                drones.remove(toRemove);
+                rootNode.detachChildNamed("object-" + toRemove);
+            } else if(objects.containsKey(toRemove)) {
+                objects.remove(toRemove);
+                rootNode.detachChildNamed("object-" + toRemove);
+            }
+        }
     }
 
     /**
@@ -261,5 +302,14 @@ public class DView extends SimpleApplication {
      */
     public void addFrameUpdateListener(Runnable listener) {
         frameUpdateListeners.add(listener);
+    }
+
+    /**
+     * Removes a listener
+     *
+     * @param listener Listener to be removed
+     */
+    public void removeFrameUpdateListener(Runnable listener) {
+        frameUpdateListeners.remove(listener);
     }
 }
