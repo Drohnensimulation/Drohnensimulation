@@ -139,6 +139,16 @@ public class DView extends SimpleApplication {
      * Set the perspective shown in the canvas
      *
      * @param perspective Perspective
+     */
+    public void setPerspective(Perspective perspective) {
+        this.perspective = perspective;
+        dronePerspectiveId = drones.size() > 0 ? drones.get(0).getId() : -1;
+    }
+
+    /**
+     * Set the perspective shown in the canvas
+     *
+     * @param perspective Perspective
      * @param droneId ID of the perspectives drone
      */
     public void setPerspective(Perspective perspective, int droneId) {
