@@ -10,8 +10,6 @@ import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
-import de.thi.dronesim.gui.dview.objects.RenderableDrone;
-import de.thi.dronesim.gui.dview.objects.RenderableObject;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -47,6 +45,7 @@ public class DView extends SimpleApplication {
 
     // Params
     private volatile Perspective perspective = Perspective.THIRD_PERSON;
+    private volatile int dronePerspectiveId = -1;
 
     // Frame update listeners
     private final List<Runnable> frameUpdateListeners = new ArrayList<>();
@@ -59,14 +58,14 @@ public class DView extends SimpleApplication {
      */
     public DView(int width, int height) {
         super();
-        //Logger.getLogger("com.jme3").setLevel(Level.OFF);
+        //Logger.getLogger("com.jme3").setLevel(Level.OFF); // TODO: Remove for production
         AppSettings settings = new AppSettings(true);
         settings.setWidth(width);
         settings.setHeight(height);
         settings.setSamples(8);
         setSettings(settings);
         setDisplayStatView(false);
-        setDisplayFps(true);
+        setDisplayFps(true); // TODO: Set to false for production
         setPauseOnLostFocus(false);
     }
 
@@ -120,9 +119,22 @@ public class DView extends SimpleApplication {
      * Set the perspective shown in the canvas
      *
      * @param perspective Perspective
+     * @param droneId ID of the perspectives drone
      */
-    public void setPerspective(Perspective perspective) {
+    public void setPerspective(Perspective perspective, int droneId) {
         this.perspective = perspective;
+        dronePerspectiveId = droneId;
+    }
+
+    /**
+     * Set the perspective shown in the canvas
+     *
+     * @param perspective Perspective
+     * @param drone Drone thats perspective is requested
+     */
+    public void setPerspective(Perspective perspective, RenderableDrone drone) {
+        this.perspective = perspective;
+        dronePerspectiveId = drone.getId();
     }
 
     /**
@@ -197,21 +209,25 @@ public class DView extends SimpleApplication {
         }
 
         // Update drone parameters
+        RenderableDrone perspectiveDrone = null;
         for(RenderableDrone drone : drones) {
             drone.updateParameters();
+            if(drone.getId() == dronePerspectiveId) {
+               perspectiveDrone = drone;
+            }
         }
 
         // Set cam position/rotation according to perspective
-        if(!drones.isEmpty()) {
+        if(perspectiveDrone != null) {
             switch (perspective) {
                 case THIRD_PERSON:
-                    drones.get(0).adjustCamToThirdPerson(cam);
+                    perspectiveDrone.adjustCamToThirdPerson(cam);
                     break;
                 case BIRD_VIEW:
-                    drones.get(0).adjustCamToBirdView(cam);
+                    perspectiveDrone.adjustCamToBirdView(cam);
                     break;
                 case FIRST_PERSON:
-                    drones.get(0).adjustCamToFirstPerson(cam);
+                    perspectiveDrone.adjustCamToFirstPerson(cam);
             }
         }
     }
@@ -228,6 +244,9 @@ public class DView extends SimpleApplication {
             rootNode.attachChild(renderableObject.getObject(assetManager));
             if(renderableObject instanceof RenderableDrone) {
                 drones.add((RenderableDrone) renderableObject);
+                if(dronePerspectiveId == -1) {
+                    dronePerspectiveId = renderableObject.getId();
+                }
             } else {
                 objects.add(renderableObject);
             }

@@ -1,4 +1,4 @@
-package de.thi.dronesim.gui.dview.objects;
+package de.thi.dronesim.gui.dview;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.math.Quaternion;
@@ -50,7 +50,7 @@ public class RenderableDrone extends RenderableObject {
      * @return Created object
      */
     @Override
-    public Spatial getObject(AssetManager assetManager) {
+    Spatial getObject(AssetManager assetManager) {
         if(object == null) {
             object = new Node("Drone");
             ((Node) object).attachChild(droneTilt);
@@ -155,7 +155,7 @@ public class RenderableDrone extends RenderableObject {
     /**
      * Updates the drones parameters for render (called by rendering thread)
      */
-    public void updateParameters() {
+    void updateParameters() {
         droneTilt.setLocalRotation(new Quaternion().fromAngles(tilt.toArray(new float[3])));
         object.setLocalTranslation(center);
         object.setLocalRotation(new Quaternion().fromAngles(rotation.toArray(new float[3])));
@@ -175,7 +175,7 @@ public class RenderableDrone extends RenderableObject {
      *
      * @param cam Camera to adjust
      */
-    public void adjustCamToFirstPerson(Camera cam) {
+    void adjustCamToFirstPerson(Camera cam) {
         cam.setLocation(droneTilt.localToWorld(new Vector3f(0, .07f, .11f), null));
         cam.setRotation(droneTilt.getWorldRotation());
     }
@@ -185,7 +185,7 @@ public class RenderableDrone extends RenderableObject {
      *
      * @param cam Camera to adjust
      */
-    public void adjustCamToThirdPerson(Camera cam) {
+    void adjustCamToThirdPerson(Camera cam) {
         cam.setLocation(object.getWorldTranslation().add(new Vector3f(2, 4, 5)));
         cam.lookAt(object.getWorldTranslation(), Vector3f.UNIT_Y);
     }
@@ -195,7 +195,7 @@ public class RenderableDrone extends RenderableObject {
      *
      * @param cam Camera to adjust
      */
-    public void adjustCamToBirdView(Camera cam) {
+    void adjustCamToBirdView(Camera cam) {
         cam.setLocation(object.getWorldTranslation().add(new Vector3f(0, 5, 0)));
         cam.lookAt(object.getWorldTranslation(), Vector3f.UNIT_Y);
     }

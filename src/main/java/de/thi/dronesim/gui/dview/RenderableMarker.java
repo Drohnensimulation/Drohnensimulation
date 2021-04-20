@@ -1,4 +1,4 @@
-package de.thi.dronesim.gui.dview.objects;
+package de.thi.dronesim.gui.dview;
 
 import com.jme3.math.Vector3f;
 

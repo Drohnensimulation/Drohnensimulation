@@ -1,4 +1,4 @@
-package de.thi.dronesim.gui.dview.objects;
+package de.thi.dronesim.gui.dview;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.math.Quaternion;
@@ -10,7 +10,10 @@ import com.jme3.scene.Spatial;
  *
  * @author Michael Weichenrieder
  */
-public class RenderableObject {
+public class RenderableObject implements Comparable<RenderableObject> {
+
+    private static int nextId = 0;
+    private final int id = nextId++;
 
     protected Spatial object;
 
@@ -40,10 +43,7 @@ public class RenderableObject {
      * @param model Path to the object file
      */
     public RenderableObject(Vector3f center, Vector3f scale, String model) {
-        this.center = center;
-        this.scale = scale;
-        this.rotation = new Vector3f(0, 0, 0);
-        this.model = model;
+        this(center, scale, new Vector3f(0, 0, 0), model);
     }
 
     /**
@@ -53,10 +53,7 @@ public class RenderableObject {
      * @param model Path to the object file
      */
     public RenderableObject(Vector3f center, String model) {
-        this.center = center;
-        this.scale = new Vector3f(1, 1, 1);
-        this.rotation = new Vector3f(0, 0, 0);
-        this.model = model;
+        this(center, new Vector3f(1, 1, 1), new Vector3f(0, 0, 0), model);
     }
 
     /**
@@ -65,7 +62,7 @@ public class RenderableObject {
      * @param assetManager Asset manager
      * @return Spatial object
      */
-    public Spatial getObject(AssetManager assetManager) {
+    Spatial getObject(AssetManager assetManager) {
         if(object == null) {
             object = assetManager.loadModel(model);
             object.setLocalTranslation(center);
@@ -78,28 +75,48 @@ public class RenderableObject {
     /**
      * @return Maximum x-position overlapped by object
      */
-    public float getXMin() {
+    float getXMin() {
         return center.getX() - scale.getX() / 2;
     }
 
     /**
      * @return Minimum x-position overlapped by object
      */
-    public float getXMax() {
+    float getXMax() {
         return center.getX() + scale.getX() / 2;
     }
 
     /**
      * @return Minimum z-position overlapped by object
      */
-    public float getZMin() {
+    float getZMin() {
         return center.getZ() - scale.getZ() / 2;
     }
 
     /**
      * @return Maximum z-position overlapped by object
      */
-    public float getZMax() {
+    float getZMax() {
         return center.getZ() + scale.getZ() / 2;
+    }
+
+    /**
+     * @return Unique id of the object
+     */
+    public int getId() {
+        return id;
+    }
+
+    @Override
+    public int compareTo(RenderableObject o) {
+        return Integer.compare(id, o.id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof RenderableObject) {
+            return compareTo((RenderableObject) obj) == 0;
+        }
+        return super.equals(obj);
     }
 }

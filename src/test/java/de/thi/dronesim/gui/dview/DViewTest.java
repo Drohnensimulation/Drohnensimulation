@@ -2,7 +2,6 @@ package de.thi.dronesim.gui.dview;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.jme3.math.Vector3f;
-import de.thi.dronesim.gui.dview.objects.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,15 +30,15 @@ public class DViewTest extends JFrame {
      * @param width Display width
      * @param height Display height
      */
-    public DViewTest(final DView dView, int width, int height) {
+    public DViewTest(final DView dView, RenderableDrone drone, int width, int height) {
         super("DView-Test");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         getContentPane().add(rootPanel);
         dViewPanel.setMinimumSize(new Dimension(width, height));
         dViewPanel.add(dView.getCanvas());
-        thirdPersonButton.addActionListener(e -> dView.setPerspective(DView.Perspective.THIRD_PERSON));
-        birdViewButton.addActionListener(e -> dView.setPerspective(DView.Perspective.BIRD_VIEW));
-        firstPersonButton.addActionListener(e -> dView.setPerspective(DView.Perspective.FIRST_PERSON));
+        thirdPersonButton.addActionListener(e -> dView.setPerspective(DView.Perspective.THIRD_PERSON, drone));
+        birdViewButton.addActionListener(e -> dView.setPerspective(DView.Perspective.BIRD_VIEW, drone));
+        firstPersonButton.addActionListener(e -> dView.setPerspective(DView.Perspective.FIRST_PERSON, drone));
         pack();
         setVisible(true);
     }
@@ -47,7 +46,7 @@ public class DViewTest extends JFrame {
     /**
      * Init point
      *
-     * @param args Irrelevant
+     * @param args Irrelevant parameters
      */
     public static void main(String[] args) {
         // Dark gui theme for swing
@@ -67,11 +66,11 @@ public class DViewTest extends JFrame {
             drone.addRotation(new Vector3f(0, -.0005f, 0));
             drone.moveRelativeToDrone(new Vector3f(0, 0, .0006f));
         };
-        dView.addRenderableObject(drone);
         dView.addFrameUpdateListener(droneUpdater);
+        dView.addRenderableObject(drone);
 
         // Open swing frame
-        new DViewTest(dView, width, height);
+        new DViewTest(dView, drone, width, height);
     }
 
     /**
