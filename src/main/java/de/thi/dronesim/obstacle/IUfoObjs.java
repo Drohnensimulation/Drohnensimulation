@@ -5,7 +5,7 @@ import de.thi.dronesim.obstacle.dto.ObstacleJsonDTO;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 
-import javax.vecmath.Vector3f;
+import com.jme3.math.Vector3f;
 import java.util.Set;
 
 public interface IUfoObjs {

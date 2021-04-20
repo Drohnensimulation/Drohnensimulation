@@ -1,4 +1,4 @@
-package de.thi.dronesim.ufo;
+package de.thi.dronesim.drone;
 
 public class Vector3 {
 

@@ -1,4 +1,4 @@
-package de.thi.dronesim.ufo;
+package de.thi.dronesim.drone;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,7 @@
 package de.thi.dronesim.gui.jframe;
 
 import de.thi.dronesim.gui.dview.DView;
-import de.thi.dronesim.ufo.Location;
+import de.thi.dronesim.drone.Location;
 
 import javax.swing.*;
 import java.awt.*;

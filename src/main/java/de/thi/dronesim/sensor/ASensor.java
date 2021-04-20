@@ -3,9 +3,9 @@ package de.thi.dronesim.sensor;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
-import de.thi.dronesim.ufo.Drone;
+import de.thi.dronesim.drone.Drone;
 
-import javax.vecmath.Vector3f;
+import com.jme3.math.Vector3f;
 import java.util.Random;
 import java.util.Set;
 

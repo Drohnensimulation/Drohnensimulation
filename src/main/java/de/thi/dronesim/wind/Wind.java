@@ -1,7 +1,7 @@
 package de.thi.dronesim.wind;
 
-import de.thi.dronesim.ufo.Location;
-import de.thi.dronesim.ufo.UfoSim;
+import de.thi.dronesim.drone.Location;
+import de.thi.dronesim.drone.UfoSim;
 
 import java.util.Collections;
 import java.util.List;

@@ -14,6 +14,7 @@ import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSo
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
+import de.thi.dronesim.helpers.VecMathHelper;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 
 import javax.vecmath.Matrix4f;
@@ -63,21 +64,22 @@ public class JBulletContext {
         dynamicsWorld.removeRigidBody(hitBox);
     }
 
-    public JBulletHitMark rayTest(Vector3f from, Vector3f direction, float range){
+    public JBulletHitMark rayTest(com.jme3.math.Vector3f from, com.jme3.math.Vector3f direction, float range){
         //Parameters
         float maxDistance = 10;
-        Vector3f direction_clone = new Vector3f(direction);
+        Vector3f from_clone = VecMathHelper.of(from);
+        Vector3f direction_clone = VecMathHelper.of(direction);
 
         //Calculate EndPoint
         direction_clone.normalize();
         direction_clone.scale(maxDistance);
-        Vector3f to = new Vector3f(from);
+        Vector3f to = new Vector3f(from_clone);
         to.add(direction_clone);
 
-        CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(from, to);
-        this.dynamicsWorld.rayTest(from, to, rayCallback);
+        CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(from_clone, to);
+        this.dynamicsWorld.rayTest(from_clone, to, rayCallback);
         if (rayCallback.collisionObject instanceof RigidBody) {
-            return new JBulletHitMark(rayCallback, from);
+            return new JBulletHitMark(rayCallback, from_clone);
         } else {
             return null;
         }

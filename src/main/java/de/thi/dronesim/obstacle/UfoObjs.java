@@ -1,5 +1,7 @@
 package de.thi.dronesim.obstacle;
 
+import de.thi.dronesim.GenericSimulationChild;
+import de.thi.dronesim.Simulation;
 import de.thi.dronesim.obstacle.dto.ObstacleDTO;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
@@ -7,11 +9,11 @@ import de.thi.dronesim.obstacle.util.HitBoxRigidBody;
 import de.thi.dronesim.obstacle.util.JBulletContext;
 import de.thi.dronesim.obstacle.util.JBulletHitMark;
 
-import javax.vecmath.Vector3f;
+import com.jme3.math.Vector3f;
 import java.util.HashSet;
 import java.util.Set;
 
-public class UfoObjs implements IUfoObjs {
+public class UfoObjs extends GenericSimulationChild implements IUfoObjs{
     private static UfoObjs instance;
     private final JBulletContext jBullet;
     private final Set<Obstacle> obstacles;
@@ -21,17 +23,11 @@ public class UfoObjs implements IUfoObjs {
      */
     private final Set<HitBoxRigidBody> hitBoxes;
 
-    private UfoObjs() {
+    public UfoObjs(Simulation simulation) {
+        super(simulation);
         jBullet = new JBulletContext();
         obstacles = new HashSet<>();
         hitBoxes = new HashSet<>();
-    }
-
-    public static UfoObjs getInstance() {
-        if (instance == null) {
-            instance = new UfoObjs();
-        }
-        return instance;
     }
 
     /**

@@ -3,12 +3,14 @@ package de.thi.dronesim.wind;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import de.thi.dronesim.ufo.Location;
-import de.thi.dronesim.ufo.UfoSim;
+import de.thi.dronesim.drone.Location;
+import de.thi.dronesim.drone.UfoSim;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class WindTest {
 
