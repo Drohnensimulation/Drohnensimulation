@@ -6,14 +6,22 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SimulationTest {
 
-    public static class MyTestChild extends GenericSimulationChild {
+    public static class MyTestChild implements ISimulationChild {
 
-        public MyTestChild(Simulation simulation) {
-            super(simulation);
+        public MyTestChild(){
         }
 
         public String foo() {
             return "bar";
+        }
+
+        @Override
+        public void setSimulation(Simulation simulation) {
+        }
+
+        @Override
+        public Simulation getSimulation() {
+            return null;
         }
     }
 
@@ -21,7 +29,6 @@ public class SimulationTest {
     public void testChildDetection() {
         Simulation simulation = new Simulation();
         simulation.prepare();
-
 
         assertNotNull(simulation.getChild(MyTestChild.class));
     }

@@ -15,9 +15,9 @@ import java.util.*;
  * @author Christian Schmied
  */
 public class Simulation {
-    private static Set<Class<? extends GenericSimulationChild>> extendingChildren;
+    private static Set<Class<? extends ISimulationChild>> implementingChildren;
     private final SimulationConfig config;
-    private final Map<Class<? extends GenericSimulationChild>, GenericSimulationChild> children;
+    private final Map<Class<? extends ISimulationChild>, ISimulationChild> children;
     private final Drone drone;
 
     /**
@@ -62,11 +62,11 @@ public class Simulation {
         return this.config;
     }
 
-    public <T extends GenericSimulationChild> T getChild(Class<T> instanceClass) {
+    public <T extends ISimulationChild> T getChild(Class<T> instanceClass) {
         if (instanceClass == null) {
             throw new IllegalArgumentException();
         }
-        GenericSimulationChild foundChild = children.get(instanceClass);
+        ISimulationChild foundChild = children.get(instanceClass);
 
         // Jep it's hacky but it shouldWork ;D
         if (foundChild != null && foundChild.getClass().equals(instanceClass)) {
@@ -79,10 +79,10 @@ public class Simulation {
      * Invoke the Constructors of all Children
      */
     private void instantiateChildren() {
-        for (Class<? extends GenericSimulationChild> childClass : extendingChildren) {
+        for (Class<? extends ISimulationChild> childClass : implementingChildren) {
             try {
-                Constructor<? extends GenericSimulationChild> constructor = childClass.getConstructor(Simulation.class);
-                GenericSimulationChild instance = constructor.newInstance(this);
+                Constructor<? extends ISimulationChild> constructor = childClass.getConstructor();
+                ISimulationChild instance = constructor.newInstance();
                 this.children.put(childClass, instance);
             } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
@@ -92,9 +92,9 @@ public class Simulation {
 
     // Handle Reflection, to discover all the Simulation Children
     private synchronized static void scanForChildren() {
-        if (Simulation.extendingChildren == null) {
+        if (Simulation.implementingChildren == null) {
             Reflections reflections = new Reflections(Simulation.class.getPackageName());
-            Simulation.extendingChildren = reflections.getSubTypesOf(GenericSimulationChild.class);
+            Simulation.implementingChildren = reflections.getSubTypesOf(ISimulationChild.class);
         }
     }
 }
