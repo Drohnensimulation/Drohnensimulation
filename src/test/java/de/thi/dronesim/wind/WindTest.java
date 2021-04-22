@@ -23,6 +23,7 @@ class WindTest {
     final double altitudeTop = 10;
     final double windDirection = 30;
     final double altitudeBottom = 0;
+    final int timeMinDistance = 10;
 
     private Location location;
 
@@ -65,13 +66,7 @@ class WindTest {
     @Test
     void applyWindGustTop() throws NoSuchFieldException, IllegalAccessException {
         setUpLocation(5,5,5,10,330);
-
-        Field timeField = UfoSim.getInstance().getClass()
-                .getDeclaredField("time");
-        timeField.setAccessible(true);
-        byte time = 2;
-        timeField.setByte(UfoSim.getInstance(), time);
-
+        setSimulationTime(2);
         windGust.applyWind(location);
         assertEquals(310, location.getTrack(), 1, "check Track");
         assertEquals(9, location.getGroundSpeed(),1, "check ground speed");
@@ -85,28 +80,89 @@ class WindTest {
         assertEquals(11, location.getGroundSpeed(),1, "check ground speed");
     }
 
-
+    @ Test
     void applyWindGustStart() throws NoSuchFieldException, IllegalAccessException {
         setUpLocation(5,5,5,10,330);
-
-        Field timeField = UfoSim.getInstance().getClass()
-                .getDeclaredField("time");
-        timeField.setAccessible(true);
-        byte time = 1;
-        timeField.setByte(UfoSim.getInstance(), time);
-
+        setSimulationTime(1);
         windGust.applyWind(location);
         assertEquals(311, location.getTrack(), 1, "check Track");
         assertEquals(9, location.getGroundSpeed(),1, "check ground speed");
     }
 
+    @Test
+    void applyWindBetweenLayersTimeBasedMid() throws NoSuchFieldException, IllegalAccessException{
+        setUpLocation(5,5,10,10,330);
+        setSimulationTime(15);
+        wind.applyWind(location);
+        assertEquals(311, location.getTrack(), 1, "check Track");
+        assertEquals(9, location.getGroundSpeed(),1, "check ground speed");
+    }
 
+    @Test
+    void applyWindBetweenLayersTimeBasedLeft() throws NoSuchFieldException, IllegalAccessException{
+        setUpLocation(5,5,10,10,330);
+        setSimulationTime(12);
+        wind.applyWind(location);
+        assertEquals(311, location.getTrack(), 1, "check Track");
+        assertEquals(9, location.getGroundSpeed(),1, "check ground speed");
+    }
+
+    @Test
+    void applyWindBetweenLayersTimeBasedRight() throws NoSuchFieldException, IllegalAccessException{
+        setUpLocation(5,5,10,10,330);
+        setSimulationTime(17);
+        wind.applyWind(location);
+        assertEquals(311, location.getTrack(), 1, "check Track");
+        assertEquals(9, location.getGroundSpeed(),1, "check ground speed");
+    }
+
+    @Test
+    void loadWindLayerTest(){
+        wind.load();
+        List<WindLayer> layers = wind.getWindLayers();
+        boolean result = true;
+        for(int i = 0; i < layers.size(); i++){
+            if(i != layers.size() -1){
+                if (layers.get(i + 1).getTimeStart() - layers.get(i).getTimeEnd() < 10)
+                    result = false;
+            }
+        }
+        assertTrue(result);
+    }
+
+    /**
+     * method to set the simulation time
+     * @param input set the simulation to that time
+     * @throws NoSuchFieldException throws if time is not accessible
+     * @throws IllegalAccessException throws if illegal expression
+     */
+    void setSimulationTime(int input) throws NoSuchFieldException, IllegalAccessException{
+        Field timeField = UfoSim.getInstance().getClass()
+                .getDeclaredField("time");
+        timeField.setAccessible(true);
+        byte time = (byte) input;
+        timeField.setByte(UfoSim.getInstance(), time);
+    }
+
+
+    /**
+     * method to set the location of the drone
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param z z coordinate
+     * @param airspeed airspeed of the drone
+     * @param heading heading of the drone
+     */
     public void setUpLocation(int  x, int y, int z, int airspeed, int heading){
         location = new Location(x,y,z);
         location.setAirspeed(airspeed);
         location.setHeading(heading);
     }
 
+    /**
+     * creates amount of windlayers specified in amountWindLayer
+     * @return List<WindLayer>
+     */
     public List<WindLayer> createWindLayerList(){
         List<WindLayer> layer = new ArrayList<WindLayer>();
         for(int i = 0; i < amountWindLayer; i++){
@@ -115,6 +171,10 @@ class WindTest {
         return layer;
     }
 
+    /**
+     * creates amount of windlayers with gustwinds specified in amountWindLayer
+     * @return List<WindLayer>
+     */
     public List<WindLayer> createWindGustLayerList(){
         List<WindLayer> layer = new ArrayList<WindLayer>();
         for(int i = 0; i < amountWindLayer; i++){
@@ -123,23 +183,33 @@ class WindTest {
         return layer;
     }
 
+    /**
+     * method creates a single windlayer
+     * @param pos
+     * @return Windlayer
+     */
     public WindLayer createWindLayer(int pos){
         pos *= 10;
-        return new WindLayer(windSpeed + pos,  gustSpeed + pos,  timeStart + pos,
-                timeEnd + pos,  altitudeBottom + pos, altitudeTop + pos,
+
+        return new WindLayer(windSpeed + pos,  gustSpeed + pos,  timeStart + (pos + timeMinDistance),
+                timeEnd + (pos + timeMinDistance),  altitudeBottom + pos, altitudeTop + pos,
                 windDirection+ pos);
     }
 
+    /**
+     * method creates windlayer with gustwinds
+     * @param pos
+     * @param gust gustwind speed
+     * @return Windlayer
+     */
     public WindLayer createWindGustLayer(int pos, double gust){
         pos *= 10;
-        WindLayer wind = new WindLayer(windSpeed + pos,  gust + pos,  timeStart + pos,
-                timeEnd + pos,  altitudeBottom + pos, altitudeTop + pos,
+        WindLayer wind = new WindLayer(windSpeed + pos,  gust,  timeStart + (pos + timeMinDistance),
+                timeEnd + (pos + timeMinDistance),  altitudeBottom + pos, altitudeTop + pos,
                 windDirection+ pos);
         wind.setNextGustStart(0);
         wind.setNextGustSpeed(gust);
         return wind;
     }
-
-
 
 }
