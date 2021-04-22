@@ -33,9 +33,9 @@ public class Location {
      * @param updateRate Updates per second.
      */
     public void updatePosition(int updateRate) {
-        movement.x = (float) (Math.cos(Math.toRadians((track + -90) % 360)) * gs);
-        movement.z = (float) vs;
-        movement.y = (float) (Math.cos(Math.toRadians(track)) * gs);
+        movement.x = (float) (Math.cos(Math.toRadians((track + 90) % 360)) * gs);
+        movement.z = (float) (Math.cos(Math.toRadians(track)) * gs);
+        movement.y = (float) vs;
         // Apply updateRate to movement
         movement.x *= 1.0/updateRate;
         movement.z *= 1.0/updateRate;
