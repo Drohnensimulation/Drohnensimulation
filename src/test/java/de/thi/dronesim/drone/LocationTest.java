@@ -34,7 +34,8 @@ class LocationTest {
             location.updatePosition(1);
 
             // Test if vector length matches speed
-            assertEquals(gs, Math.sqrt( Math.pow(location.getX(),2) + Math.pow(location.getY(),2)), 0.001);
+            assertEquals(gs, Math.sqrt( Math.pow(location.getX(),2) + Math.pow(location.getY(),2)), 0.001,
+                    "Position does not match speed at track "+tracks[t]);
             // Test if x y z matches
             assertEquals(resultX[t], location.getX(), 0.001,"Wrong X for track "+tracks[t]);
             assertEquals(resultZ[t], location.getY(), 0.001,"Wrong Z for track "+tracks[t]);

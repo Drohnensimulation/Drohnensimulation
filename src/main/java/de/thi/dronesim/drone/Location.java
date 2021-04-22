@@ -42,7 +42,7 @@ public class Location {
         movement.y *= 1.0/updateRate;
 
         // Calculate position based on movement
-        position.add(movement);
+        position = position.add(movement);
     }
 
     /**
