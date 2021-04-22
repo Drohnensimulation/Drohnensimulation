@@ -1,13 +1,12 @@
 package de.thi.dronesim.persistence.entity;
 
+import de.thi.dronesim.obstacle.dto.ObstacleJsonDTO;
+
 /**
  * Object that holds all Configurations to a Obstacle.
+ * @see ObstacleJsonDTO
  */
-public class ObstacleConfig {
-
-    // TODO: add attributes, overwrite equals and hashcode
-
-    private int dummy;
+public class ObstacleConfig extends ObstacleJsonDTO {
 
     // /////////////////////////////////////////////////////////////////////////////
     // Object Methods
@@ -25,11 +24,11 @@ public class ObstacleConfig {
 
         ObstacleConfig that = (ObstacleConfig) o;
 
-        return dummy == that.dummy;
+        return this.hashCode() == that.hashCode();
     }
 
     @Override
     public int hashCode() {
-        return dummy;
+        return this.obstacles.hashCode() * 8969 + this.config.rayDensity;
     }
 }

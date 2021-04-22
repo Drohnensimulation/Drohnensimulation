@@ -6,7 +6,7 @@ import de.thi.dronesim.obstacle.dto.ObstacleDTO;
 import de.thi.dronesim.obstacle.dto.ObstacleJsonDTO;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 import org.junit.jupiter.api.*;
-import javax.vecmath.Vector3f;
+import com.jme3.math.Vector3f;
 import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -156,6 +156,8 @@ public class TestUfoObjs {
     /**
      * Test method for {@link UfoObjs#load(Object)}
      */
+    // TODO: Actually use the SimulationContext to load the Configuration...
+    // Slight Improvement for code readability load the JSON from the Resources (this can also be done for test Resources)
     @Disabled // TODO: Enable, if class Obstacle have a constructor and the methods getObstacles() and addObstacles() are implemented
     @Test
     public void load() {
@@ -177,7 +179,7 @@ public class TestUfoObjs {
 
         Gson gson = new Gson();
         ObstacleJsonDTO jsonDTO = gson.fromJson(jsonObj, ObstacleJsonDTO.class);
-        instance.load(jsonDTO);
+        //instance.load(jsonDTO);
 
         // Create a test obstacle to compare it with the return value from addObstacle()
         Obstacle o3 = new Obstacle(); // TODO: Add parameters

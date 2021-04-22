@@ -1,5 +1,6 @@
 package de.thi.dronesim.obstacle;
 
+import de.thi.dronesim.obstacle.dto.ObstacleConfigurationDTO;
 import de.thi.dronesim.obstacle.dto.ObstacleDTO;
 import de.thi.dronesim.obstacle.dto.ObstacleJsonDTO;
 import de.thi.dronesim.obstacle.entity.HitMark;
@@ -76,15 +77,8 @@ public interface IUfoObjs {
      */
     Set<HitMark> checkSensorCylinder(Vector3f origin, Vector3f orientation, Vector3f dimension);
 
-
     /**
-     * Loads Environmental Context into the Simulation
-     * @param configHolder Config Holder containing the obstacle config {@link ObstacleJsonDTO}
+     * Extracts the current state into the ConfigDTO
      */
-    void load(Object configHolder);
-
-    /**
-     * Speichert den Aktuellen Umgebungskontext in die angegebene Datei
-     */
-    Object save();
+    ObstacleJsonDTO save();
 }
