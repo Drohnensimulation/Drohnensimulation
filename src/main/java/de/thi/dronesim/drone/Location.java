@@ -1,10 +1,15 @@
 package de.thi.dronesim.drone;
 
-import  com.jme3.math.Vector3f;
+import com.jme3.math.Vector3f;
 
 public class Location {
 
-    private final Vector3f position;     // Vector of current position               [m]
+    private static final double ACCELERATION_HORIZONTAL = 10 / 3.6;     // Constant horizontal acceleration     [m/s^2]
+    private static final double ACCELERATION_VERTICAL = 10 / 3.6;       // Constant vertical acceleration       [m/s^2]
+    private static final double V_HORIZONTAL_MAX = 50 / 3.6;            // Maximum horizontal speed             [m/s]
+    private static final double V_VERTICAL_MAX = 50 / 3.6;              // Maximum horizontal speed             [m/s]
+
+    private Vector3f position;     // Vector of current position               [m]
     private final Vector3f movement;     // Vector of travel direction               [m/s]
 
     private double track = 0;           // True movement direction                  [deg]
@@ -49,17 +54,11 @@ public class Location {
      * @param updateRate Amount of updates per second
      */
     public void updateDelta(int updateRate) {
-        // Acceleration
-        double zAcceleration = UfoSim.ACCELERATION / updateRate;
-        double xyAcceleration = UfoSim.ACCELERATION / updateRate;
-        // Max speed
-        double yVMax = UfoSim.VMAX;
-        double xzVMax = UfoSim.VMAX;
-
         DeltaUpdate speedUpdate;
         // True Air Speed
         if (deltaTas != 0) {
-            speedUpdate = updateSpeed(tas, deltaTas, 0, xzVMax, xyAcceleration);
+            double acceleration = ACCELERATION_HORIZONTAL / updateRate;
+            speedUpdate = updateSpeed(tas, deltaTas, 0, V_HORIZONTAL_MAX, acceleration);
             tas = speedUpdate.value;
             deltaTas = speedUpdate.delta;
             // Set airspeed as ground speed
@@ -68,7 +67,8 @@ public class Location {
 
         // Vertical Speed
         if (deltaVs != 0) {
-            speedUpdate = updateSpeed(vs, deltaVs, -UfoSim.VMAX, yVMax, zAcceleration);
+            double acceleration = ACCELERATION_VERTICAL / updateRate;
+            speedUpdate = updateSpeed(vs, deltaVs, -V_VERTICAL_MAX, V_VERTICAL_MAX, acceleration);
             vs = speedUpdate.value;
             deltaVs = speedUpdate.delta;
         }
