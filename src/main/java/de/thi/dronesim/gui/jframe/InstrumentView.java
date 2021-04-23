@@ -6,7 +6,7 @@ import de.thi.dronesim.drone.Location;
 import javax.swing.*;
 import java.awt.*;
 
-public class InstrumentView extends JFrame implements InstrumentInterface {
+public class InstrumentView extends JFrame implements IInstrumentView {
 
     private JPanel mainPanel;
     private JLabel xCord;

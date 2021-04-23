@@ -10,6 +10,8 @@ import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
+import de.thi.dronesim.ISimulationChild;
+import de.thi.dronesim.Simulation;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ import java.util.List;
  *
  * @author Michael Weichenrieder
  */
-public class DView extends SimpleApplication {
+public class DView extends SimpleApplication implements ISimulationChild {
 
     /**
      * Enum of possible perspectives
@@ -33,17 +35,18 @@ public class DView extends SimpleApplication {
         THIRD_PERSON, FIRST_PERSON, BIRD_VIEW
     }
 
+    // Main simulation
+    private Simulation simulation;
+
     // Ground
     private volatile float xMin = 0, xMax = 0, zMin = 0, zMax = 0;
     private Spatial ground;
 
     // Objects
-    private final HashMap<Integer, RenderableObject> objects = new HashMap<>();
     private final HashMap<Integer, RenderableDrone> drones = new HashMap<>();
 
     // Render queue (because rendering needs to be done on render thread)
     private final List<RenderableObject> renderQueue = new ArrayList<>();
-    private final List<Integer> removeQueue = new ArrayList<>();
 
     // Params
     private volatile Perspective perspective = Perspective.THIRD_PERSON;
@@ -54,16 +57,13 @@ public class DView extends SimpleApplication {
 
     /**
      * Creates a new DView
-     *
-     * @param width Preferred width of the display canvas
-     * @param height Preferred height of the display canvas
      */
-    public DView(int width, int height) {
+    public DView() {
         super();
         //Logger.getLogger("com.jme3").setLevel(Level.OFF); // TODO: Remove for production
         AppSettings settings = new AppSettings(true);
-        settings.setWidth(width);
-        settings.setHeight(height);
+        settings.setWidth(1280);
+        settings.setHeight(720);
         settings.setSamples(8);
         setSettings(settings);
         setDisplayStatView(false);
@@ -101,24 +101,6 @@ public class DView extends SimpleApplication {
         for (RenderableObject object : objects) {
             addRenderableObject(object);
         }
-    }
-
-    /**
-     * Removes a renderable object/obstacle from the map
-     *
-     * @param objectId Object id to be removed
-     */
-    public void removeRenderableObject(int objectId) {
-        removeQueue.add(objectId);
-    }
-
-    /**
-     * Removes a renderable object/obstacle from the map
-     *
-     * @param object Object to be removed
-     */
-    public void removeRenderableObject(RenderableObject object) {
-        removeRenderableObject(object.getId());
     }
 
     /**
@@ -231,7 +213,6 @@ public class DView extends SimpleApplication {
         super.simpleUpdate(tpf);
 
         // Update objects if in queue
-        removeRenderableObjectsFromDisplay();
         addRenderableObjectsToDisplay();
 
         // Do listeners
@@ -279,30 +260,9 @@ public class DView extends SimpleApplication {
                 if(dronePerspectiveId == -1) {
                     dronePerspectiveId = renderableObject.getId();
                 }
-            } else {
-                objects.put(renderableObject.getId(), renderableObject);
             }
         }
         updateGround();
-    }
-
-    /**
-     * Helper to remove all objects in remove queue from scene
-     */
-    private void removeRenderableObjectsFromDisplay() {
-        if(removeQueue.isEmpty()) {
-            return;
-        }
-        while(!removeQueue.isEmpty()) {
-            int toRemove = removeQueue.remove(0);
-            if(drones.containsKey(toRemove)) {
-                drones.remove(toRemove);
-                rootNode.detachChildNamed("object-" + toRemove);
-            } else if(objects.containsKey(toRemove)) {
-                objects.remove(toRemove);
-                rootNode.detachChildNamed("object-" + toRemove);
-            }
-        }
     }
 
     /**
@@ -321,5 +281,15 @@ public class DView extends SimpleApplication {
      */
     public void removeFrameUpdateListener(Runnable listener) {
         frameUpdateListeners.remove(listener);
+    }
+
+    @Override
+    public void setSimulation(Simulation simulation) {
+        this.simulation = simulation;
+    }
+
+    @Override
+    public Simulation getSimulation() {
+        return simulation;
     }
 }
