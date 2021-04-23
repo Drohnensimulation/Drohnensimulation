@@ -14,8 +14,6 @@ import java.util.List;
  */
 public class InstrumentViewTest {
 
-    private static final int width = 1280, height = 720;
-
     /**
      * Init point
      *
@@ -26,7 +24,7 @@ public class InstrumentViewTest {
         FlatDarkLaf.install();
 
         // Create DView and add objects
-        DView dView = new DView(width, height);
+        DView dView = new DView();
         List<RenderableObject> mapObjects = getMapObjects();
         dView.addRenderableObjects(mapObjects);
 

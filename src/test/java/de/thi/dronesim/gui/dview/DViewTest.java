@@ -15,8 +15,6 @@ import java.util.List;
  */
 public class DViewTest extends JFrame {
 
-    private static final int width = 1280, height = 720;
-
     private JButton thirdPersonButton;
     private JButton birdViewButton;
     private JButton firstPersonButton;
@@ -53,7 +51,7 @@ public class DViewTest extends JFrame {
         FlatDarkLaf.install();
 
         // Create DView and add objects
-        DView dView = new DView(width, height);
+        DView dView = new DView();
         List<RenderableObject> mapObjects = getMapObjects();
         dView.addRenderableObjects(mapObjects);
 
@@ -71,7 +69,7 @@ public class DViewTest extends JFrame {
         dView.addRenderableObject(drone);
 
         // Open swing frame
-        new Thread(() -> new DViewTest(dView, drone, width, height)).start();
+        new Thread(() -> new DViewTest(dView, drone, 1280, 720)).start();
     }
 
     /**
