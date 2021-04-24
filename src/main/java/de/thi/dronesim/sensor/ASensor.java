@@ -420,6 +420,18 @@ public abstract class ASensor {
 
 		return hitMarks;
 	}
+
+	/**
+	 * Method to get the angle between the orientation of the drone and a hitpoint
+	 *
+	 * @param hitMark 	the hitpoint of an ray
+	 * @param origin 	the position of the drone
+	 * @return 			the angel of the orientation of the drone and the hitpoint
+	 */
+	private float getHitAngle(HitMark hitMark, Vector3f origin){
+		Vector3f relativ = hitMark.relativeHit();
+		return checkAngel(origin, relativ);
+	}
 	
 	/**
 	 * Gibt die kürzeste Entfernung in Metern zu einem Objekt an
