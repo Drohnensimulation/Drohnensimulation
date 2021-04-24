@@ -1,4 +1,4 @@
-package de.thi.dronesim.ufo;
+package de.thi.dronesim.drone;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ class LocationTest {
         location.setGroundSpeed(gs);
 
         double[] tracks = {0, 20, 73, 90, 180, 241, 270, 322};
-        double[] resultX = {0, 5.814, 16.257, 17, 0, -14.869, -17, -10.466};
+        double[] resultX = {0, -5.814, -16.257, -17, 0, 14.869, 17, 10.466};
         double[] resultZ = {17, 15.975, 4.9703, 0, -17, -8.242, 0, 13.396};
         for (int t = 0; t < tracks.length; t++) {
             location.setX(0);
@@ -34,10 +34,11 @@ class LocationTest {
             location.updatePosition(1);
 
             // Test if vector length matches speed
-            assertEquals(gs, Math.sqrt( Math.pow(location.getX(),2) + Math.pow(location.getY(),2)), 0.001);
+            assertEquals(gs, Math.sqrt( Math.pow(location.getX(),2) + Math.pow(location.getZ(),2)), 0.001,
+                    "Position does not match speed at track "+tracks[t]);
             // Test if x y z matches
             assertEquals(resultX[t], location.getX(), 0.001,"Wrong X for track "+tracks[t]);
-            assertEquals(resultZ[t], location.getY(), 0.001,"Wrong Z for track "+tracks[t]);
+            assertEquals(resultZ[t], location.getZ(), 0.001,"Wrong Z for track "+tracks[t]);
         }
 
         // Test total x any z
@@ -53,7 +54,7 @@ class LocationTest {
             z += resultZ[t];
         }
         assertEquals(x, location.getX(), 0.001, "Failed test for total x");
-        assertEquals(z, location.getY(), 0.001, "Failed test for total z");
+        assertEquals(z, location.getZ(), 0.001, "Failed test for total z");
 
         // Test y
         double[] speeds = {0, 1.2, 2.5, -2.7};
@@ -65,7 +66,7 @@ class LocationTest {
             location.updatePosition(1);
             y += v;
         }
-        assertEquals(y, location.getZ(), 0.001, "Failed test for y");
+        assertEquals(y, location.getY(), 0.001, "Failed test for y");
     }
 
     @Test

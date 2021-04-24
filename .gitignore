@@ -36,3 +36,9 @@ hs_err_pid*
 # Target Verzeichnis
 out
 target
+
+# JMonkey Engine
+*.dll
+
+# Some AttachPids
+.attach_pid*

@@ -4,6 +4,6 @@ import java.io.Serializable;
 import java.util.Set;
 
 public class ObstacleJsonDTO implements Serializable {
-    public Set<ObstacleDTO> hindernisse;
+    public Set<ObstacleDTO> obstacles;
     public ObstacleConfigurationDTO config;
 }

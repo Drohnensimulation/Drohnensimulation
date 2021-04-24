@@ -1,13 +1,14 @@
 package de.thi.dronesim.persistence.entity;
 
+import com.jme3.math.Vector3f;
+
 /**
  * Object that holds all Configurations to a Sensor.
  */
 public class SensorConfig {
 
     private double range;
-    private double angleOfViewHorizontal;
-    private double angleOfViewVertical;
+    private double sensorAngle;
     private double sensorRadius;
     private double measurementAccuracy;
     private double directionX;
@@ -35,10 +36,7 @@ public class SensorConfig {
         if (Double.compare(that.range, range) != 0) {
             return false;
         }
-        if (Double.compare(that.angleOfViewHorizontal, angleOfViewHorizontal) != 0) {
-            return false;
-        }
-        if (Double.compare(that.angleOfViewVertical, angleOfViewVertical) != 0) {
+        if (Double.compare(that.sensorAngle, sensorAngle) != 0) {
             return false;
         }
         if (Double.compare(that.sensorRadius, sensorRadius) != 0) {
@@ -71,9 +69,7 @@ public class SensorConfig {
         long temp;
         temp = Double.doubleToLongBits(range);
         result = (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(angleOfViewHorizontal);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(angleOfViewVertical);
+        temp = Double.doubleToLongBits(sensorAngle);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(sensorRadius);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
@@ -106,20 +102,12 @@ public class SensorConfig {
         this.range = range;
     }
 
-    public double getAngleOfViewHorizontal() {
-        return angleOfViewHorizontal;
+    public double getSensorAngle() {
+        return sensorAngle;
     }
 
-    public void setAngleOfViewHorizontal(double angleOfViewHorizontal) {
-        this.angleOfViewHorizontal = angleOfViewHorizontal;
-    }
-
-    public double getAngleOfViewVertical() {
-        return angleOfViewVertical;
-    }
-
-    public void setAngleOfViewVertical(double angleOfViewVertical) {
-        this.angleOfViewVertical = angleOfViewVertical;
+    public void setSensorAngle(double sensorAngle) {
+        this.sensorAngle = sensorAngle;
     }
 
     public double getSensorRadius() {

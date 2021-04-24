@@ -1,6 +1,7 @@
 package de.thi.dronesim.obstacle;
 
 import com.google.gson.Gson;
+import de.thi.dronesim.Simulation;
 import de.thi.dronesim.obstacle.dto.ObstacleDTO;
 import de.thi.dronesim.obstacle.dto.ObstacleJsonDTO;
 import de.thi.dronesim.obstacle.entity.Obstacle;
@@ -21,7 +22,11 @@ public class TestUfoObjs {
 
     @BeforeEach
     public void setup() {
-        instance = UfoObjs.getInstance();
+        Simulation simulation = new Simulation();
+        simulation.prepare();
+
+        instance = simulation.getChild(UfoObjs.class);
+        //TODO Go through the Config Provider (Simulation.config)
         Gson gson = new Gson();
 
         if(obsDTO1 == null && obsDTO2 == null) {
