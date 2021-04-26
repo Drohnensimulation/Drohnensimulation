@@ -2,6 +2,7 @@ package de.thi.dronesim.obstacle;
 
 import de.thi.dronesim.ISimulationChild;
 import de.thi.dronesim.Simulation;
+import de.thi.dronesim.obstacle.dto.HitBoxDTO;
 import de.thi.dronesim.obstacle.dto.ObstacleDTO;
 import de.thi.dronesim.obstacle.dto.ObstacleJsonDTO;
 import de.thi.dronesim.obstacle.entity.HitMark;
@@ -14,7 +15,6 @@ import com.jme3.math.Vector3f;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Vector;
 
 public class UfoObjs implements ISimulationChild, IUfoObjs {
     private final JBulletContext jBullet;
@@ -57,26 +57,75 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
     @Override
     public Obstacle addObstacle(ObstacleDTO obstacleDto) {
-        //TODO Create Obstacle from DTO
-        //TODO Add Object to obstacles
-        //TODO Add Obstacle into hitBoxes for each Created CollisionBox
-        return null;
+        // Create new Obstacle from DTO
+        Obstacle obstacle = new Obstacle(obstacleDto.modelName,obstacleDto.modelPath,obstacleDto.id,obstacleDto.position,obstacleDto.rotation,obstacleDto.scale);
+
+        Set<HitBoxRigidBody> objectHitBoxes = new HashSet<>();
+
+        // Get all hit boxes from obstacleDTO
+        for(HitBoxDTO hit : obstacleDto.hitboxes) {
+            float[] position = {hit.position[0],hit.position[1],hit.position[2]};
+            float[] rotation = {hit.rotation[0],hit.rotation[1],hit.rotation[2]};
+            float[] dimension = {hit.dimension[0],hit.dimension[1],hit.dimension[2]};
+
+            // Add hit boxes to the jBullet context
+            HitBoxRigidBody hitBoxRigidBody = jBullet.addHitBox(new javax.vecmath.Vector3f(position),new javax.vecmath.Vector3f(rotation), new javax.vecmath.Vector3f(dimension),obstacle);
+
+            // Add hit boxes into a set for Obstacle setter method
+            objectHitBoxes.add(hitBoxRigidBody);
+
+            // Add Obstacle into "hitBoxes" set
+            hitBoxes.add(hitBoxRigidBody);
+        }
+
+        // Set the hit boxes into the new Obstacle Object
+        obstacle.setHitBoxRigidBodys(objectHitBoxes);
+
+        // Add Object to obstacle set
+        this.obstacles.add(obstacle);
+
+        return obstacle;
     }
 
     @Override
     public boolean removeObstacle(ObstacleDTO obstacleDTO) {
-        //TODO Remove All HitBoxes from JBullet
-        //TODO Remove Object from obstacles
-        //TODO Remove All relevant HitBoxes from hitBoxes
-        return false;
+        // Get the obstacle to delete by id
+        Obstacle obstacleToDelete = null;
+        for(Obstacle o : obstacles) {
+            if(o.getID().equals(obstacleDTO.id)) {
+                obstacleToDelete = o;
+            }
+        }
+
+        if(obstacleToDelete != null) {
+            Set<HitBoxRigidBody> hitBoxRigidBodies = obstacleToDelete.getHitboxes();
+            for (HitBoxRigidBody h : hitBoxRigidBodies) {
+                // Remove all hit boxes of the obstacle from jBullet and the "hitBoxes" set
+                jBullet.removeHitBox(h);
+                hitBoxes.remove(h);
+            }
+            // Remove the obstacle from the set
+            obstacles.remove(obstacleToDelete);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
     public boolean removeObstacle(Obstacle obstacleObj) {
-        //TODO Remove All HitBoxes from JBullet
-        //TODO Remove Object from obstacles
-        //TODO Remove All relevant HitBoxes from hitBoxes
-        return false;
+        if(obstacles.contains(obstacleObj)) {
+            Set<HitBoxRigidBody> hitBoxRigidBodies = obstacleObj.getHitboxes();
+            for(HitBoxRigidBody h : hitBoxRigidBodies) {
+                // Remove all hit boxes of the obstacle from jBullet and the "hitBoxes" set
+                jBullet.removeHitBox(h);
+                hitBoxes.remove(h);
+            }
+            obstacles.remove(obstacleObj);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

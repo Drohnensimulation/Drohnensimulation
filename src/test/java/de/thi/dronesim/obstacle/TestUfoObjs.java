@@ -4,10 +4,10 @@ import com.google.gson.Gson;
 import com.jme3.math.Vector3f;
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.helpers.Jme3MathHelper;
-import de.thi.dronesim.obstacle.dto.HitBoxDTO;
 import de.thi.dronesim.obstacle.dto.ObstacleDTO;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
+import de.thi.dronesim.obstacle.util.HitBoxRigidBody;
 import de.thi.dronesim.persistence.entity.ObstacleConfig;
 import de.thi.dronesim.persistence.entity.SimulationConfig;
 import org.junit.jupiter.api.*;
@@ -53,10 +53,8 @@ public class TestUfoObjs {
         assertEquals("testAddDTO", o1.getModelName());
         assertEquals("./test5", o1.getModelPath());
         assertEquals(5L, o1.getID());
-        HitBoxDTO hitbox = o1.getHitboxes().stream().findFirst().get();
-        assertArrayEquals(new Float[]{2.0f,2.0f,2.0f},hitbox.position);
-        assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},hitbox.rotation);
-        assertArrayEquals(new Float[]{0.5f,0.5f,0.5f},hitbox.dimension);
+        HitBoxRigidBody hitbox = o1.getHitboxes().stream().findFirst().get();
+        assertEquals(o1,hitbox.getObstacle());
         assertArrayEquals(new Float[]{2.0f,2.0f,2.0f}, o1.getPosition());
         assertArrayEquals(new Float[]{0.0f,0.0f,0.0f}, o1.getRotation());
         assertArrayEquals(new Float[]{0.5f,0.5f,0.5f}, o1.getScale());
@@ -75,8 +73,8 @@ public class TestUfoObjs {
      */
     @Test
     public void removeObstacleDTO() {
-        SimulationConfig confing = simulation.getConfig();
-        List<ObstacleConfig> configList = confing.getObstacleConfigList();
+        SimulationConfig config = simulation.getConfig();
+        List<ObstacleConfig> configList = config.getObstacleConfigList();
         ObstacleConfig obstacleConfig = configList.get(0);
         ObstacleDTO obstacleToRemove = obstacleConfig.obstacles.stream().findFirst().get(); // Get the first element from obstacleDTO set, to remove it
         Long removedID = obstacleToRemove.id;
@@ -191,7 +189,7 @@ public class TestUfoObjs {
                         "      \"hitboxes\":[{\"position\":[2.5,1.0,3.5], \"rotation\":[0.0,0.0,0.0], \"dimension\":[0.5,0.5,0.5]}]," +
                         "      \"position\":[2.5,1.0,3.5]," +
                         "      \"rotation\":[0.0,0.0,0.0]," +
-                        "      \"scale\":[0.5,0.5,0.5]" +
+                        "      \"scale\":[0.25,0.25,0.25]" +
                         "    }," +
                         "    {" +
                         "      \"modelName\":\"testObj2\"," +
@@ -200,7 +198,7 @@ public class TestUfoObjs {
                         "      \"hitboxes\":[{\"position\":[-0.5,1.0,3.5], \"rotation\":[0.0,0.0,0.0], \"dimension\":[0.5,0.5,0.5]}]," +
                         "      \"position\":[-0.5,1.0,3.5]," +
                         "      \"rotation\":[0.0,0.0,0.0]," +
-                        "      \"scale\":[0.5,0.5,0.5]" +
+                        "      \"scale\":[0.25,0.25,0.25]" +
                         "    }," +
                         "    {" +
                         "      \"modelName\":\"testObj3\"," +
@@ -209,7 +207,7 @@ public class TestUfoObjs {
                         "      \"hitboxes\":[{\"position\":[1.0,1.0,5.0], \"rotation\":[0.0,0.0,0.0], \"dimension\":[0.5,0.5,0.5]}]," +
                         "      \"position\":[1.0,1.0,5.0]," +
                         "      \"rotation\":[0.0,0.0,0.0]," +
-                        "      \"scale\":[0.5,0.5,0.5]" +
+                        "      \"scale\":[0.25,0.25,0.25]" +
                         "    }," +
                         "    {" +
                         "      \"modelName\":\"testObj4\"," +
@@ -218,8 +216,8 @@ public class TestUfoObjs {
                         "      \"hitboxes\":[{\"position\":[4.0,10.0,1.0], \"rotation\":[0.0,0.0,0.0], \"dimension\":[0.5,0.5,0.5]}]," +
                         "      \"position\":[4.0,10.0,1.0]," +
                         "      \"rotation\":[0.0,0.0,0.0]," +
-                        "      \"scale\":[0.5,0.5,0.5]" +
-                        "    }," +
+                        "      \"scale\":[0.25,0.25,0.25]" +
+                        "    }" +
                         "  ]," +
                         "  \"config\":{\"rayDensity\":100}" +
                         "}";
@@ -234,6 +232,12 @@ public class TestUfoObjs {
         config.setObstacleConfigList(configList);
 
         instance.setSimulation(simulation);
+
+        // Add all obstacles
+        Set<ObstacleDTO> obstacleSet = obstacleConfig.obstacles;
+        for(ObstacleDTO obstacle : obstacleSet) {
+            instance.addObstacle(obstacle);
+        }
     }
 
     /**
@@ -275,6 +279,7 @@ public class TestUfoObjs {
 
         if(hits != null) {
             for (HitMark h : hits) {
+                // TODO: Maybe don´t use the values of the exact edges, because the rays could not hit them exactly
                 if (h.getObstacle().getID().equals(1L)) {
                     assertEquals(2.236068f, h.getDistance());
                     assertEquals(Jme3MathHelper.of(2.0f, 1.0f, 3.0f), h.worldHit());

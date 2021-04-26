@@ -1,6 +1,6 @@
 package de.thi.dronesim.obstacle.entity;
 
-import de.thi.dronesim.obstacle.dto.HitBoxDTO;
+import de.thi.dronesim.obstacle.util.HitBoxRigidBody;
 
 import java.util.Set;
 
@@ -8,23 +8,26 @@ public class Obstacle {
     private String modelName;
     private String modelPath;
     private Long id;
-    private Set<HitBoxDTO> hitboxes;
     private Float[] position;
     private Float[] rotation;
     private Float[] scale;
+    private Set<HitBoxRigidBody> hitboxes;
 
     public Obstacle() {
 
     }
 
-    public Obstacle(String modelName, String modelPath, Long id, Set<HitBoxDTO> hitboxes, Float[] position, Float[] rotation, Float[] scale) {
+    public Obstacle(String modelName, String modelPath, Long id,  Float[] position, Float[] rotation, Float[] scale) {
         this.modelName = modelName;
         this.modelPath = modelPath;
         this. id = id;
-        this.hitboxes = hitboxes;
         this.position = position;
         this.rotation = rotation;
         this.scale = scale;
+    }
+
+    public void setHitBoxRigidBodys(Set<HitBoxRigidBody> rigidBody) {
+        this.hitboxes = rigidBody;
     }
 
     public String getModelName() {
@@ -39,7 +42,7 @@ public class Obstacle {
         return this.id;
     }
 
-    public Set<HitBoxDTO> getHitboxes() {
+    public Set<HitBoxRigidBody> getHitboxes() {
         return this.hitboxes;
     }
 
