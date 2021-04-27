@@ -208,6 +208,20 @@ public abstract class ASensor {
 	}
 	
 	/**
+	 * calculate the Point where the vectorAngle and the directionVector cross 
+	 * 
+	 * Methoden Author: Moris Breitenborn
+	 *  
+	 * @return Vector3f
+	 */
+	public Vector3f getOrigin() {
+		
+		Vector3f dummy = new Vector3f(0, 0, 0);
+		return dummy;
+		
+	}
+	
+	/**
 	 * Berechnet die richtung (orientation) des Sensors
 	 * 
 	 * Methoden Author: Moris Breitenborn

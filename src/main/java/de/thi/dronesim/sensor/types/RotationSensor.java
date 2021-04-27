@@ -21,7 +21,7 @@ public class RotationSensor extends ASensor {
 	
 	public double rotationVelocity; // Winkelgeschwindigkeit 2Pi/2s == Eine Umdrehung in 2s Sekunden
 	public int callTimerForSensorValues;
-	public HitMark values;
+	public Set<HitMark> values;
 	public Timer callTimerValues = new Timer( );
 	public Timer repositoinTimer = new Timer( );
 	public long startRotationTime;
@@ -44,7 +44,7 @@ public class RotationSensor extends ASensor {
 		startRotationTime = System.currentTimeMillis();
 	}
 	
-	public void getAktualSensorPosition() {
+	public void getAktualSensorDirection() {
 		//calculate traveled time
 		endRotationTime = System.currentTimeMillis();
 		long travaledTime = endRotationTime - startRotationTime;
@@ -63,13 +63,13 @@ public class RotationSensor extends ASensor {
 	
 	public void callSensorValues() {
 		
-		UfoObjs cone = UfoObjs();
+		UfoObjs cone = new UfoObjs();
 		callTimerValues.scheduleAtFixedRate(new TimerTask() {
 
 		    @Override
 		    public void run() {
-		    	getAktualSensorPosition();
-		    	values =  cone.pruefeSensorCone(origin, getOrientation(), range, getVectorAngel());
+		    	getAktualSensorDirection();
+		    	values =  cone.checkSensorCone(getOrigin(), getOrientation(), range, getVectorAngel());
 		    }
 		}, 0, callTimerForSensorValues);
 	}
