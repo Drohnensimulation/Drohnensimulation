@@ -8,6 +8,8 @@ public class SimulationTest {
 
     public static class MyTestChild implements ISimulationChild {
 
+        private Simulation simulation;
+
         public MyTestChild(){
         }
 
@@ -17,11 +19,12 @@ public class SimulationTest {
 
         @Override
         public void setSimulation(Simulation simulation) {
+            this.simulation = simulation;
         }
 
         @Override
         public Simulation getSimulation() {
-            return null;
+            return simulation;
         }
     }
 
@@ -54,6 +57,10 @@ public class SimulationTest {
 
     @Test
     public void hasSimulation(){
-        assertNotNull(null);
+        Simulation simulation = new Simulation();
+        simulation.prepare();
+
+        MyTestChild childA = simulation.getChild(MyTestChild.class);
+        assertNotNull(childA.getSimulation());
     }
 }
