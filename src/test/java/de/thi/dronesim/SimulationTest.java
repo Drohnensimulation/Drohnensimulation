@@ -51,4 +51,9 @@ public class SimulationTest {
         MyTestChild childA = simulation.getChild(MyTestChild.class);
         assertEquals("bar", childA.foo());
     }
+
+    @Test
+    public void hasSimulation(){
+        assertNotNull(null);
+    }
 }

@@ -135,6 +135,7 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
     @Override
     public Set<HitMark> checkSensorCone(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
+        //TODO wichtig
         return null;
     }
 
@@ -209,6 +210,7 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
     @Override
     public Set<HitMark> checkSensorCylinder(Vector3f origin, Vector3f orientation, Vector3f dimension) {
+        // TODO wichtig
         return null;
     }
 
