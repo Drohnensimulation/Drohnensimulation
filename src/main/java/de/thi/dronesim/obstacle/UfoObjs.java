@@ -147,8 +147,12 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
     @Override
     public Set<HitMark> checkSensorCuboid(Vector3f origin, Vector3f orientation, Vector3f dimension) {
 
-        //TODO calc the rotation from the orientation
+        // TODO: calc the rotation from the orientation
         // Orientation isn't a normal, orientation is more the angles creating the normal...
+        // So its possible to add a Facing Direction to an object...
+        // Think of the Direction your Phone is facing to.
+        // Attach a barbecuescrew to your phone, marking the origin at one end and the Vector being the screw.
+        // You can freely spin your phone around it like a "Spanferkel" while its still having the same vector.
 
         float rotation = 0;
 
@@ -210,7 +214,7 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
     @Override
     public Set<HitMark> checkSensorCylinder(Vector3f origin, Vector3f orientation, Vector3f dimension) {
-        // TODO wichtig
+        // TODO important
         return null;
     }
 
