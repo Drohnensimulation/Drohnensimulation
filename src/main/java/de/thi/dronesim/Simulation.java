@@ -10,7 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
- * Holds the whole Context of an Simulation
+ * Holds the whole Context of a Simulation
  *
  * @author Christian Schmied
  */
@@ -77,6 +77,7 @@ public class Simulation {
 
     /**
      * Invoke the Constructors of all Children
+     * and assign the Simulation to it
      */
     private void instantiateChildren() {
         for (Class<? extends ISimulationChild> childClass : implementingChildren) {

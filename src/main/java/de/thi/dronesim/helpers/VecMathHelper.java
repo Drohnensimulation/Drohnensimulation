@@ -4,6 +4,8 @@ import javax.vecmath.Vector3f;
 
 /**
  * Contains Helper Methods to generate VecMath Vectors
+ *
+ * @author Christian Schmied
  */
 public class VecMathHelper {
     public static Vector3f of(float x, float y, float z){
