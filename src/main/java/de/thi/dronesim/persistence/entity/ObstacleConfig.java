@@ -12,6 +12,9 @@ public class ObstacleConfig extends ObstacleJsonDTO {
     // Object Methods
     // /////////////////////////////////////////////////////////////////////////////
 
+    public ObstacleConfig(){
+        super();
+    }
 
     @Override
     public boolean equals(Object o) {

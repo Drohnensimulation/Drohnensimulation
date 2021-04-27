@@ -40,7 +40,7 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
      * @param from
      * @param direction
      * @param range
-     * @return
+     * @return the HitMark or Null
      */
     private HitMark rayTest(Vector3f from, Vector3f direction, float range) {
         JBulletHitMark hitBody = jBullet.rayTest(from, direction, range);
@@ -223,7 +223,11 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
     @Override
     public void setSimulation(Simulation simulation) {
         this.simulation = simulation;
-        this.config = simulation.getConfig().getObstacleConfigList().get(0);
+        try {
+            this.config = simulation.getConfig().getObstacleConfigList().get(0);
+        }catch (NullPointerException exception){
+            // TODO load default config
+        }
     }
 
     @Override

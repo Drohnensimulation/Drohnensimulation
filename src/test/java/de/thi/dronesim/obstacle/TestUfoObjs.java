@@ -8,8 +8,8 @@ import de.thi.dronesim.obstacle.dto.ObstacleDTO;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 import de.thi.dronesim.obstacle.util.HitBoxRigidBody;
-import de.thi.dronesim.persistence.entity.ObstacleConfig;
 import de.thi.dronesim.persistence.entity.SimulationConfig;
+import de.thi.dronesim.persistence.entity.ObstacleConfig;
 import org.junit.jupiter.api.*;
 
 import java.util.*;

@@ -1,12 +1,11 @@
 package de.thi.dronesim.obstacle;
 
-import de.thi.dronesim.obstacle.dto.ObstacleConfigurationDTO;
+import com.jme3.math.Vector3f;
 import de.thi.dronesim.obstacle.dto.ObstacleDTO;
 import de.thi.dronesim.obstacle.dto.ObstacleJsonDTO;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 
-import com.jme3.math.Vector3f;
 import java.util.Set;
 
 public interface IUfoObjs {
