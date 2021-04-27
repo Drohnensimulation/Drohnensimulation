@@ -6,10 +6,7 @@ import de.thi.dronesim.obstacle.UfoObjs;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import javax.vecmath.Vector3f;
+
 //import com.jme3.math.Vector3f;
 
 
@@ -21,7 +18,7 @@ public class RotationSensor extends ASensor {
 	
 	public double rotationVelocity; // Winkelgeschwindigkeit 2Pi/2s == Eine Umdrehung in 2s Sekunden
 	public int callTimerForSensorValues;
-	public HitMark values;
+	public Set<HitMark> values;
 	public Timer callTimerValues = new Timer( );
 	public Timer repositoinTimer = new Timer( );
 	public long startRotationTime;
@@ -63,13 +60,13 @@ public class RotationSensor extends ASensor {
 	
 	public void callSensorValues() {
 		
-		UfoObjs cone = UfoObjs();
+		UfoObjs cone = new UfoObjs();
 		callTimerValues.scheduleAtFixedRate(new TimerTask() {
 
 		    @Override
 		    public void run() {
 		    	getAktualSensorPosition();
-		    	values =  cone.pruefeSensorCone(origin, getOrientation(), range, getVectorAngel());
+		    	//values =  cone.pruefeSensorCone(origin, getOrientation(), range, getVectorAngel());
 		    }
 		}, 0, callTimerForSensorValues);
 	}
