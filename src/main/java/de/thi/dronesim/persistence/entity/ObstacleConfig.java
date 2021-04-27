@@ -2,6 +2,8 @@ package de.thi.dronesim.persistence.entity;
 
 /**
  * Object that holds all Configurations to a Obstacle.
+ *
+ * @author Daniel Stolle
  */
 public class ObstacleConfig {
 

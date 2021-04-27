@@ -6,6 +6,8 @@ import java.io.IOException;
 
 /**
  * Class to read the configuration from a file.
+ *
+ * @author Daniel Stolle
  */
 public final class ConfigReader {
 

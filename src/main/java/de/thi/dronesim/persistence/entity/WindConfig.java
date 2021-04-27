@@ -2,6 +2,8 @@ package de.thi.dronesim.persistence.entity;
 
 /**
  * Object that holds all configurations to a Wind-Layer.
+ *
+ * @author Daniel Stolle
  */
 public class WindConfig {
 
