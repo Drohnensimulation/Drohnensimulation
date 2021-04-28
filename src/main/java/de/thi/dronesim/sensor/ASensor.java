@@ -208,7 +208,8 @@ public abstract class ASensor {
 	}
 	
 	/**
-	 * calculate the Point where the vectorAngle and the directionVector cross 
+	 * calculate the origni vector from drone center to sensor cone origin point
+	 * by using intercept theorems.
 	 * 
 	 * Methoden Author: Moris Breitenborn
 	 *  
@@ -216,36 +217,59 @@ public abstract class ASensor {
 	 */
 	public Vector3f getOrigin() {
 		
-		Vector3f dummy = new Vector3f(0, 0, 0);
-		return dummy;
+		
+		// normalzie the vector to multiplie it with the range and get the neede vector
+		Vector3f normalziedOrientationVector = getOrientation().normalize();
+		// calculate the length of the hypotenuse
+		float hypoLength = (float) (this.range/Math.cos(Math.toRadians(this.sensorAngle)));
+		// use the Pythagorean theorem to calculate bottomShort
+		float bottomShort  = (float) Math.sqrt((hypoLength*hypoLength)-(this.range*this.range));
+		// the relation from range to bottomShort is equaly to the relation bottomLong to range+x. 
+		// x = the length between the sensor origin point and the sensor position point
+		float bottomLong = bottomShort + this.sensorRadius;
+		float originToPositionLength = (bottomLong*this.sensorRadius)/bottomShort;
+		// rotate the normalziedOrientation vector in the opposit direction with scale(-1)
+		normalziedOrientationVector = normalziedOrientationVector.mult(-1);
+		// get the normalized Vector on the calculated length with scale(originToPositionLength)
+		normalziedOrientationVector = normalziedOrientationVector.mult(originToPositionLength);
+		// with this vector we can calculate the origing point by simply adding the normalziedOrientationVector
+		// to the position point of the Sensor
+		float originPointX = this.posX + normalziedOrientationVector.getX();
+		float originPointY = this.posY + normalziedOrientationVector.getY();
+		float originPointZ = this.posZ + normalziedOrientationVector.getZ();
+		//calculate vector from drone center to originPoint and return
+		//Vector3f origin = new Vector3f(originPointX-this.drone.positionX, originPointY-this.drone.positionY, originPointZ-his.drone.positionZ);
+		
+		
+		//Dummy vector until this.drone.actuall position is aviable
+		Vector3f origin = new Vector3f(1,1,1);
+		
+		return origin;
 		
 	}
 	
 	/**
-	 * Berechnet die richtung (orientation) des Sensors
+	 * calculate the direction vector in with the sensor is pointing to. 
 	 * 
-	 * Methoden Author: Moris Breitenborn
+	 * @author: Moris Breitenborn
 	 * 
 	 * @return Vector3f
 	 */
 	public Vector3f getOrientation() {
 		
-		float directionVectorX = directionX -  posX;
-		float directionVectorY = directionY -  posY;
-		float directionVectorZ = directionZ -  posZ;
+		float directionVectorX = this.directionX -  this.posX;
+		float directionVectorY = this.directionY -  this.posY;
+		float directionVectorZ = this.directionZ -  this.posZ;
 		Vector3f directionVector = new Vector3f(directionVectorX, directionVectorY, directionVectorZ); 
 		return directionVector;
 		
 	}
 	
-	/**
-	 * Um den Körper berechnen zu können wird ein Vektor auf der Kegelwand benötigt.
-	 * Um diesen zu berechnen wird der Richtungsvektor des Sensors (Direction - Position)
-	 * um eine Gradzahl "phi" die Zwischen 0 und 90 liegt mit hilfe einer Transfomrmationsmatrix gedreht.
-	 * Dabei wird der Vektor mit hilfe von matritzen auf die X-Achse gelegt, um die gewünschte Gradzahl
-	 * gedreht und anschließend zurück multipliziert. 
+	/** 
+	 * This method calculates a vector that is lying on the cone surface. This vector is needed 
+	 * to calculate the entire cone.
 	 * 
-	 * Methoden Author: Moris Breitenborn
+	 * @author: Moris Breitenborn
 	 * 
 	 * @return Vector3f
 	 */
@@ -308,10 +332,9 @@ public abstract class ASensor {
 		
 	}
 	/**
-	 *Um die Letzte Rotation auf die X-Achse zu berechnen, is es nötig den Winkel zwischen dem Vektor auf der XY-Ebene
-	 *und der X-Achse zu berechnen. zurückgegeben wird der Winkel als Radiant. 
+	 *Returns the angle between two vectors
 	 * 
-	 * Methoden Author: Moris Breitenborn
+	 * @author: Moris Breitenborn
 	 * 
 	 * @return float
 	 */
