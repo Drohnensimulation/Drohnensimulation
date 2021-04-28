@@ -69,7 +69,7 @@ public class RotationSensor extends ASensor {
 		    @Override
 		    public void run() {
 		    	getAktualSensorDirection();
-		    	values =  cone.checkSensorCone(getOrigin(), getOrientation(), range, getVectorAngel());
+		    	values =  cone.checkSensorCone(getOrigin(), getOrientation(), getConeHeight(), getVectorAngel());
 		    }
 		}, 0, callTimerForSensorValues);
 	}

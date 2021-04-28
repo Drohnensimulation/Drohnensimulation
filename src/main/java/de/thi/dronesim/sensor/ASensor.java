@@ -16,10 +16,8 @@ public abstract class ASensor {
 	//		-Vervollständigung der Methodenimplementierung
 	
 	protected Drone drone;
-	protected float range;
-	/**
-	 * Da die Methode pruefeSensorCone() als �ffnungswinkel einen Vektor haben m�chte, wurde angleOfViewHorizontal und angleOfViewVertical durch vectorAngel ersetzt
-	 */
+	protected float range; // range from sensor position to cone bottom
+	protected float coneHeight; // range from Cone origin point to cone bottom
 	protected float sensorAngle;
 	protected Vector3f vectorAngle;
 	protected float sensorRadius;
@@ -208,18 +206,29 @@ public abstract class ASensor {
 	}
 	
 	/**
-	 * calculate the origni vector from drone center to sensor cone origin point
-	 * by using intercept theorems.
+	 * calculates the lenght from origin point to range end. This length is needed to
+	 * create the cone-object. This Method is needed in the "check"-methods (UfoObjs.java)
 	 * 
-	 * Methoden Author: Moris Breitenborn
+	 * @author: Moris Breitenborn
 	 *  
-	 * @return Vector3f
+	 * @return float
 	 */
-	public Vector3f getOrigin() {
+	
+	public float getConeHeight() {
 		
-		// normalzie the vector to multiplie it with the range and get the neede vector
-		Vector3f normalziedOrientationVector = getOrientation().normalize();
-		// calculate the length of the hypotenuse
+		return this.range + originToPositionLength();
+	}
+	
+	/**
+	 * calculates the length from origin point to sensor position end. This length is needed to
+	 * create the cone-object 
+	 * 
+	 * @author: Moris Breitenborn
+	 *  
+	 * @return float
+	 */
+	
+	public float originToPositionLength(){
 		float hypoLength = (float) (this.range/Math.cos(Math.toRadians(this.sensorAngle)));
 		// use the Pythagorean theorem to calculate bottomShort
 		float bottomShort  = (float) Math.sqrt((hypoLength*hypoLength)-(this.range*this.range));
@@ -227,6 +236,23 @@ public abstract class ASensor {
 		// x = the length between the sensor origin point and the sensor position point
 		float bottomLong = bottomShort + this.sensorRadius;
 		float originToPositionLength = (bottomLong*this.sensorRadius)/bottomShort;
+		return originToPositionLength;
+	}
+	
+	/**
+	 * calculate the origin vector from drone center to sensor cone origin point
+	 * by using intercept theorems.
+	 * 
+	 * @author: Moris Breitenborn
+	 *  
+	 * @return Vector3f
+	 */
+	public Vector3f getOrigin() {
+		
+		// normalzie the vector to multiplie it with the range and get the neede vector
+		Vector3f normalziedOrientationVector = getOrientation().normalize();
+		
+		float originToPositionLength = originToPositionLength();
 		// rotate the normalziedOrientation vector in the opposit direction with scale(-1)
 		normalziedOrientationVector = normalziedOrientationVector.mult(-1);
 		// get the normalized Vector on the calculated length with scale(originToPositionLength)
@@ -237,12 +263,8 @@ public abstract class ASensor {
 		float originPointY = this.posY + normalziedOrientationVector.getY();
 		float originPointZ = this.posZ + normalziedOrientationVector.getZ();
 		//calculate vector from drone center to originPoint and return
-		//Vector3f origin = new Vector3f(originPointX-this.drone.positionX, originPointY-this.drone.positionY, originPointZ-his.drone.positionZ);
-		
-		
-		//Dummy vector until this.drone.actuallPosition is available 
-		Vector3f origin = new Vector3f(1,1,1);
-		
+		Vector3f origin = new Vector3f(originPointX, originPointY, originPointZ);
+	
 		return origin;
 		
 	}
