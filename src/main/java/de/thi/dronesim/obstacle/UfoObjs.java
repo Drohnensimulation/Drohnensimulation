@@ -135,7 +135,46 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
     @Override
     public Set<HitMark> checkSensorCone(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
-        //TODO wichtig
+    	Set<Vector3f> Rays = new HashSet<Vector3f>();
+    	
+    	orientation.normalizeLocal();
+    	opening.normalizeLocal();
+    	Vector3f testingVector = new Vector3f(0, 0, 0);
+    	float distance = orientation.distance(opening);
+
+        float goldenRatio = (1 + (float) Math.sqrt(5)) / 2;
+        float angleIncrement = 2 * (float) Math.PI * goldenRatio;
+        
+    	int MAX_POINTS = 100;
+    	int totalNumOfPoints = MAX_POINTS;
+        int numPoints = 0;
+        double sin;
+        float x, y, z;
+        
+        for (int k = 0; k < 2; k++) {
+            for (int i = 0; i < totalNumOfPoints; i++) {
+                double inclination = Math.acos(1 - 2 * i / (float) totalNumOfPoints);
+                float azimuth = angleIncrement * i;
+
+                sin = Math.sin(inclination);
+                x = (float) (sin * Math.cos(azimuth));
+                y = (float) (sin * Math.sin(azimuth));
+                z = (float) Math.cos(inclination);
+
+                if (orientation.distance(testingVector.set(x, y, z)) <= distance) {
+                    numPoints++;
+
+                    if (k == 1) {
+                    	//TODO: plug ray;
+                    }
+                }
+            }
+
+            if (numPoints < MAX_POINTS * 9 / 10 && k == 0) {
+                int q = (int) (0.98f * totalNumOfPoints / (numPoints + 1));
+                totalNumOfPoints *= q;
+            }
+        }
         return null;
     }
 
