@@ -216,7 +216,7 @@ public abstract class ASensor {
 	
 	public float getConeHeight() {
 		
-		return this.range + originToPositionLength();
+		return this.range + getOriginToPositionLength();
 	}
 	
 	/**
@@ -228,7 +228,7 @@ public abstract class ASensor {
 	 * @return float
 	 */
 	
-	public float originToPositionLength(){
+	public float getOriginToPositionLength(){
 		float hypoLength = (float) (this.range/Math.cos(Math.toRadians(this.sensorAngle)));
 		// use the Pythagorean theorem to calculate bottomShort
 		float bottomShort  = (float) Math.sqrt((hypoLength*hypoLength)-(this.range*this.range));
@@ -252,7 +252,7 @@ public abstract class ASensor {
 		// normalzie the vector to multiplie it with the range and get the neede vector
 		Vector3f normalziedOrientationVector = getOrientation().normalize();
 		
-		float originToPositionLength = originToPositionLength();
+		float originToPositionLength = getOriginToPositionLength();
 		// rotate the normalziedOrientation vector in the opposit direction with scale(-1)
 		normalziedOrientationVector = normalziedOrientationVector.mult(-1);
 		// get the normalized Vector on the calculated length with scale(originToPositionLength)
