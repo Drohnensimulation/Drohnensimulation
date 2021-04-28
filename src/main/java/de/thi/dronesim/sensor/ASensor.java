@@ -217,7 +217,6 @@ public abstract class ASensor {
 	 */
 	public Vector3f getOrigin() {
 		
-		
 		// normalzie the vector to multiplie it with the range and get the neede vector
 		Vector3f normalziedOrientationVector = getOrientation().normalize();
 		// calculate the length of the hypotenuse
@@ -241,7 +240,7 @@ public abstract class ASensor {
 		//Vector3f origin = new Vector3f(originPointX-this.drone.positionX, originPointY-this.drone.positionY, originPointZ-his.drone.positionZ);
 		
 		
-		//Dummy vector until this.drone.actuall position is aviable
+		//Dummy vector until this.drone.actuallPosition is available 
 		Vector3f origin = new Vector3f(1,1,1);
 		
 		return origin;
