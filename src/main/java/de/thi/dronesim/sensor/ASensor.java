@@ -235,7 +235,7 @@ public abstract class ASensor {
 		// the relation from range to bottomShort is equaly to the relation bottomLong to range+x. 
 		// x = the length between the sensor origin point and the sensor position point
 		float bottomLong = bottomShort + this.sensorRadius;
-		float originToPositionLength = (bottomLong*this.sensorRadius)/bottomShort;
+		float originToPositionLength = ((bottomLong*this.sensorRadius)/bottomShort)-this.range;
 		return originToPositionLength;
 	}
 	
