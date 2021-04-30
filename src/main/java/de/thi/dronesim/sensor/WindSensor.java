@@ -105,13 +105,14 @@ public class WindSensor {
 	 * Gets the sensor measurement
 	 * @return
 	 */
-	public WindStats getMeasurement() {
-		double droneHeadingDeg;
-		double droneMovementDeg;
-		double windDirectionDeg;
-		double windSpeed;
-		double droneHorizontalSpeed;
-		double droneVerticalSpeed; //Speed >0 means drone goes upwards, <0 drone goes downwards => -20 means drone goes down with 20 m/s 
+	public String getMeasurement() {
+		//Dummy values for compiling.
+		double droneHeadingDeg = 225;
+		double droneMovementDeg = 225;
+		double windDirectionDeg = 135; //Direction in which the wind blows
+		double windSpeed = 200;
+		double droneHorizontalSpeed = 50;
+		double droneVerticalSpeed = 0; //Speed >0 means drone goes upwards, <0 drone goes downwards => -20 means drone goes down with 20 m/s 
 		//TODO: which direction is 0 deg?
 		
 		//TODO: Get values from Drone / Wind interface
@@ -182,22 +183,22 @@ public class WindSensor {
 		
 		if(Double.compare(this.getLength(measuredWindVec), 0) == 0) {
 			//If no wind is measured, we return a default value
-			return new WindStats(-1, 0);
+			return "{\"direction\": -1, \"strength\": 0}";
 		} else {
 			double measuredWindAngle;
 			
 			//We compute the angle between the measured wind direction and the default direction. 
 			//This will always give us an angle <180 degrees
 			double smallAngle = Math.acos( 
-					this.scalarProduct(measuredWindVec, this.zeroDegreeDirection) / 
-					(this.getLength(measuredWindVec) * this.getLength(this.zeroDegreeDirection))
+					this.scalarProduct(measuredWindVec, absZeroDegreeVec) / 
+					(this.getLength(measuredWindVec) * this.getLength(absZeroDegreeVec))
 					);
 			
 			//But the true angle could be >180. In that case, our 90-degree-vector and the wind vector must have
 			//an angle of more than 90 degrees
 			double angleToNintyDegreeDirection = Math.acos( 
-					this.scalarProduct(measuredWindVec, this.nintyDegreeDirection) / 
-					(this.getLength(measuredWindVec) * this.getLength(this.nintyDegreeDirection))
+					this.scalarProduct(measuredWindVec, absNintyDegreeVec) / 
+					(this.getLength(measuredWindVec) * this.getLength(absNintyDegreeVec))
 					);
 			
 			if(Double.compare(angleToNintyDegreeDirection, 0.5 * Math.PI) > 0) {
@@ -206,7 +207,7 @@ public class WindSensor {
 				measuredWindAngle = Math.toDegrees(smallAngle);
 			}
 			
-			return new WindStats(measuredWindAngle, this.getLength(measuredWindVec));
+			return "{\"direction\": " + Double.toString(measuredWindAngle) + ", \"strength\": " + Double.toString(this.getLength(measuredWindVec)) + "}";
 		}
 	}
 	
@@ -380,51 +381,5 @@ public class WindSensor {
 					Math.pow(vector.getY(), 2) +
 					Math.pow(vector.getZ(), 2)
 				);
-	}
-	
-	class WindStats {
-		private final double direction;
-		private final double strength;
-		
-		public WindStats(double direction, double strength) {
-			this.direction = direction;
-			this.strength = strength;
-		}
-		
-		public double getWindDirection() {
-			return this.direction;
-		}
-		
-		public double getWindStrength() {
-			return this.strength;
-		}
-	}
-	
-	class Vector3d {
-		private final double x;
-		private final double y;
-		private final double z;
-		
-		public Vector3d(double x, double y, double z) {
-			this.x = x;
-			this.y = y;
-			this.z = z;
-		}
-		
-		public double getX() {
-			return this.x;
-		}
-		
-		public double getY() {
-			return this.y;
-		}
-		
-		public double getZ() {
-			return this.z;
-		}
-		
-		public Vector3d copy() {
-			return new Vector3d(this.getX(), this.getY(), this.getZ());
-		}
 	}
 }
