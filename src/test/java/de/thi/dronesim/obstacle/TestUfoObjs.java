@@ -245,9 +245,10 @@ public class TestUfoObjs {
      * @param hits
      *
      *                   (1.0,1.0,1.0)
-     *                      Drone
-     *                        *
-     *                      | | |
+     *                      Drone         ------
+     *                        *           | o4 |
+     *                      | | |         ------
+     *                     |     |     (4.0,10.0,1.0)
      *                   |    |    |
      *            ------      |     ------
      *            | o2 |      |     | o1 |
@@ -273,35 +274,31 @@ public class TestUfoObjs {
             }
         }
 
-        // The values were calculated with our JBullet Sandbox project. That should actually be the shortest hits
-        // See a sketch above!
-        int numberHitObj = 0;
+        int numberHitObj1 = 0; // Number of hits on obstacle 1
+        int numberHitObj2 = 0; // Number of hits on obstacle 2
+        int numberHitObj3 = 0; // Number of hits on obstacle 3
+        int numberHitObj4 = 0; // Number of hits on obstacle 4
 
         if(hits != null) {
             for (HitMark h : hits) {
-                // TODO: Maybe don´t use the values of the exact edges, because the rays could not hit them exactly
-                if (h.getObstacle().getID().equals(1L)) {
-                    assertEquals(2.236068f, h.getDistance());
-                    assertEquals(Jme3MathHelper.of(2.0f, 1.0f, 3.0f), h.worldHit());
-                    assertEquals(Jme3MathHelper.of(1.0f, 0.0f, 2.0f), h.relativeHit());
-                    assertEquals(hitObs1, h.getObstacle());
-                    numberHitObj++;
-                } else if (h.getObstacle().getID().equals(2L)) {
-                    assertEquals(2.236068f, h.getDistance());
-                    assertEquals(Jme3MathHelper.of(-5.9604645E-8f, 1, 3.0000002f), h.worldHit());
-                    assertEquals(Jme3MathHelper.of(-1, 0, 2.0000002f), h.relativeHit());
-                    assertEquals(hitObs2, h.getObstacle());
-                    numberHitObj++;
-                } else if (h.getObstacle().getID().equals(3L)) {
-                    assertEquals(3.500000f, h.getDistance());
-                    assertEquals(Jme3MathHelper.of(1.0f, 1.0f, 4.5f), h.worldHit());
-                    assertEquals(Jme3MathHelper.of(0.0f, 0.0f, 3.5f), h.relativeHit());
-                    assertEquals(hitObs3, h.getObstacle());
-                    numberHitObj++;
+                if (h.getObstacle().equals(hitObs1)) {
+                    numberHitObj1++;
+                } else if (h.getObstacle().equals(hitObs2)) {
+                    numberHitObj2++;
+                } else if (h.getObstacle().equals(hitObs3)) {
+                    numberHitObj3++;
+                } else if (h.getObstacle().equals(hitObs4)) {
+                    numberHitObj4++; // Check a obstacle which is out of range. It´s on position (4.0, 10.0, 1.0)
                 }
-                assertNotEquals(h.getObstacle(), hitObs4); // Check a obstacle which is out of range. It´s on position (4.0, 10.0, 1.0)
             }
-            assertEquals(3, numberHitObj, "Not all obstacles were hitted");
+            if(numberHitObj1+numberHitObj2+numberHitObj3+numberHitObj4 == 0) {
+                fail("No obstacle was hitted!");
+            } else {
+                assertTrue(numberHitObj1 > 0, "Obstacle 1 on position (2.5, 1.0, 3.5) was not hitted!");
+                assertTrue(numberHitObj2 > 0, "Obstacle 2 on position (-0.5, 1.0, 3.5) was not hitted!");
+                assertTrue(numberHitObj3 > 0, "Obstacle 3 on position (1.0, 1.0, 5.0 was not hitted!");
+                assertEquals(numberHitObj4, 0, "Obstacle 4 on position (4.0, 10.0, 1.0) which should be out of range was hitted!");
+            }
         } else {
             fail("The returned HitMark set is null");
         }
