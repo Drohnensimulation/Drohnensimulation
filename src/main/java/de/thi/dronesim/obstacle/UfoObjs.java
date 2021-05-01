@@ -135,47 +135,41 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
     @Override
     public Set<HitMark> checkSensorCone(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
-    	Set<Vector3f> Rays = new HashSet<Vector3f>();
+    	Set<HitMark> hits = new HashSet<>();
     	
-    	orientation.normalizeLocal();
-    	opening.normalizeLocal();
-    	Vector3f testingVector = new Vector3f(0, 0, 0);
-    	float distance = orientation.distance(opening);
-
-        float goldenRatio = (1 + (float) Math.sqrt(5)) / 2;
-        float angleIncrement = 2 * (float) Math.PI * goldenRatio;
+    	float goldenRatio = (1f + (float) Math.sqrt(5)) / 2;
+        float angle = 2 * (float) Math.PI * goldenRatio;
+        float dist;
         
-    	int MAX_POINTS = 100;
-    	int totalNumOfPoints = MAX_POINTS;
-        int numPoints = 0;
-        double sin;
-        float x, y, z;
+        Vector3f angleVec = opening.normalize();
+        Vector3f direction = orientation.normalize();
+        Vector3f rangeProjOnDir = direction.mult(angleVec.dot(direction));
         
-        for (int k = 0; k < 2; k++) {
-            for (int i = 0; i < totalNumOfPoints; i++) {
-                double inclination = Math.acos(1 - 2 * i / (float) totalNumOfPoints);
-                float azimuth = angleIncrement * i;
+        Vector3f i = rangeProjOnDir.subtract(angleVec);
+        float radius = i.length();
+        i.normalizeLocal();
+        Vector3f j = i.cross(direction).normalizeLocal();
+        
+        Vector3f x = new Vector3f();
+        Vector3f y = new Vector3f();
+        Vector3f ray = new Vector3f();
+        int rayCount = 300;
+        
+        for (int l = 0; l < rayCount; l++) {
+            dist = (float) Math.sqrt(l / (rayCount - 1f)) * radius;
 
-                sin = Math.sin(inclination);
-                x = (float) (sin * Math.cos(azimuth));
-                y = (float) (sin * Math.sin(azimuth));
-                z = (float) Math.cos(inclination);
-
-                if (orientation.distance(testingVector.set(x, y, z)) <= distance) {
-                    numPoints++;
-
-                    if (k == 1) {
-                    	//TODO: plug ray;
-                    }
-                }
-            }
-
-            if (numPoints < MAX_POINTS * 9 / 10 && k == 0) {
-                int q = (int) (0.98f * totalNumOfPoints / (numPoints + 1));
-                totalNumOfPoints *= q;
+            x.set(i.mult(dist * (float) Math.cos(angle * l)));
+            y.set(j.mult(dist * (float) Math.sin(angle * l)));
+            ray.set(rangeProjOnDir.x + x.x + y.x,
+                    rangeProjOnDir.y + x.y + y.y,
+                    rangeProjOnDir.z + x.z + y.z).normalizeLocal();
+            
+            HitMark hit = this.rayTest(origin, ray, range);
+            if(hit != null) {
+            	hits.add(hit);
             }
         }
-        return null;
+        return hits;
     }
 
     @Override
