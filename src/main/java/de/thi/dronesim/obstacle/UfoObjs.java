@@ -14,6 +14,7 @@ import de.thi.dronesim.obstacle.util.JBulletHitMark;
 import com.jme3.math.Vector3f;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 public class UfoObjs implements ISimulationChild, IUfoObjs {
@@ -137,6 +138,7 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
     public Set<HitMark> checkSensorCone(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
     	Set<HitMark> hits = new HashSet<>();
     	
+    	//TODO: Document algorithm process
     	float goldenRatio = (1f + (float) Math.sqrt(5)) / 2;
         float angle = 2 * (float) Math.PI * goldenRatio;
         float dist;
@@ -150,19 +152,19 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         i.normalizeLocal();
         Vector3f j = i.cross(direction).normalizeLocal();
         
-        Vector3f x = new Vector3f();
-        Vector3f y = new Vector3f();
+        Vector3f dI = new Vector3f();
+        Vector3f dJ = new Vector3f();
         Vector3f ray = new Vector3f();
         int rayCount = 300;
         
         for (int l = 0; l < rayCount; l++) {
             dist = (float) Math.sqrt(l / (rayCount - 1f)) * radius;
 
-            x.set(i.mult(dist * (float) Math.cos(angle * l)));
-            y.set(j.mult(dist * (float) Math.sin(angle * l)));
-            ray.set(rangeProjOnDir.x + x.x + y.x,
-                    rangeProjOnDir.y + x.y + y.y,
-                    rangeProjOnDir.z + x.z + y.z).normalizeLocal();
+            dI.set(i.mult(dist * (float) Math.cos(angle * l)));
+            dJ.set(j.mult(dist * (float) Math.sin(angle * l)));
+            ray.set(rangeProjOnDir.x + dI.x + dJ.x,
+                    rangeProjOnDir.y + dI.y + dJ.y,
+                    rangeProjOnDir.z + dI.z + dJ.z).normalizeLocal();
             
             HitMark hit = this.rayTest(origin, ray, range);
             if(hit != null) {
@@ -247,8 +249,50 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
     @Override
     public Set<HitMark> checkSensorCylinder(Vector3f origin, Vector3f orientation, Vector3f dimension) {
-        // TODO important
-        return null;
+    	Set<HitMark> hits = new HashSet<>();
+    	Random rand = new Random();
+
+    	//TODO: Document algorithm process
+    	//if dimensions of the cylinder base differs take the biggest one (error forgiving)
+    	float radius = (dimension.x >= dimension.y)? dimension.x : dimension.y;
+        float range = dimension.z;
+        //calculate needed rays count based on cylinder base area = PI * r^2
+        int density = config.config.rayDensity;
+        int rayCount = (int) ((radius *density) * (radius * density) * Math.PI);
+        float dist;
+
+    	//using golden Ration Distribution to equally distribute rays
+    	float goldenRatio = (1f + (float) Math.sqrt(5)) / 2;
+        float angle = 2 * (float) Math.PI * goldenRatio;
+        
+        //create a random Point to generate a vector perpendicular to direction 
+        Vector3f direction = orientation.normalize();
+        Vector3f randomPoint = new Vector3f(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
+        Vector3f pointProjOnDir = direction.mult(randomPoint.dot(direction));
+        
+        //Vectors needed to generate Rays
+        Vector3f i = randomPoint.subtract(pointProjOnDir).normalizeLocal();
+        Vector3f j = i.cross(direction).normalizeLocal();
+        Vector3f dI = new Vector3f();
+        Vector3f dJ = new Vector3f();
+        //Ray starting Point
+        Vector3f startPoint = new Vector3f();
+        
+        for (int l = 0; l < rayCount; l++) {
+            dist = (float) Math.sqrt(l / (rayCount - 1f)) * radius;
+
+            dI.set(i.mult(dist * (float) Math.cos(angle * l)));
+            dJ.set(j.mult(dist * (float) Math.sin(angle * l)));
+            startPoint.set(origin.x + dI.x + dJ.x,
+            		origin.y + dI.y + dJ.y,
+            		origin.z + dI.z + dJ.z).normalizeLocal();
+            
+            HitMark hit = this.rayTest(startPoint, direction, range);
+            if(hit != null) {
+            	hits.add(hit);
+            }
+        }
+        return hits;
     }
 
     @Override
