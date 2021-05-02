@@ -285,7 +285,7 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
             dJ.set(j.mult(dist * (float) Math.sin(angle * l)));
             startPoint.set(origin.x + dI.x + dJ.x,
             		origin.y + dI.y + dJ.y,
-            		origin.z + dI.z + dJ.z).normalizeLocal();
+            		origin.z + dI.z + dJ.z);
             
             HitMark hit = this.rayTest(startPoint, direction, range);
             if(hit != null) {

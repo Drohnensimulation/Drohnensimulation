@@ -4,7 +4,10 @@ import com.google.gson.Gson;
 import com.jme3.math.Vector3f;
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.helpers.Jme3MathHelper;
+import de.thi.dronesim.obstacle.dto.HitBoxDTO;
+import de.thi.dronesim.obstacle.dto.ObstacleConfigurationDTO;
 import de.thi.dronesim.obstacle.dto.ObstacleDTO;
+import de.thi.dronesim.obstacle.dto.ObstacleJsonDTO;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 import de.thi.dronesim.obstacle.util.HitBoxRigidBody;
@@ -160,7 +163,7 @@ public class TestUfoObjs {
     public void checkSensorCylinder() {
         Vector3f sensorPos = Jme3MathHelper.of(1,1,1);
         Vector3f direction = Jme3MathHelper.of(0,0,1);
-        Vector3f dimension = Jme3MathHelper.of(3,2,3);
+        Vector3f dimension = Jme3MathHelper.of(5,5,10);
 
         Set<HitMark> hits = instance.checkSensorCylinder(sensorPos,direction,dimension);
         checkRayTestValues(hits); // See this method below
@@ -169,10 +172,74 @@ public class TestUfoObjs {
     /**
      * Test method for {@link UfoObjs#save()}
      */
-    @Disabled
     @Test
     public void save() {
-        // TODO: Write test method for save the actual environmental context into file
+        ObstacleJsonDTO testDTO = instance.save();
+
+        if(testDTO == null) {
+            fail("The returned ObstacleJsonDTO is null!");
+        }
+
+        // Check the value of rayDensity
+        ObstacleConfigurationDTO testConfDTO = testDTO.config;
+        assertEquals(100,testConfDTO.rayDensity);
+
+        Set<ObstacleDTO> obstacles = testDTO.obstacles;
+        int numberObstacles = 0;
+
+        // Check the values of the different obstacles
+        for(ObstacleDTO o : obstacles) {
+            if(o.id == 1L) {
+                assertEquals("testObj1", o.modelName);
+                assertEquals("/test1", o.modelPath);
+                assertArrayEquals(new Float[]{2.5f,1.0f,3.5f},o.position);
+                assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},o.rotation);
+                assertArrayEquals(new Float[]{0.25f,0.25f,0.25f},o.scale);
+                Set<HitBoxDTO> hitbox = o.hitboxes;
+                HitBoxDTO h = hitbox.stream().findFirst().get(); // Get the first element from hitbox set
+                assertArrayEquals(new Float[]{2.5f,1.0f,3.5f},h.position);
+                assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},h.rotation);
+                assertArrayEquals(new Float[]{0.5f,0.5f,0.5f},h.dimension);
+                numberObstacles++;
+            } else if(o.id == 2L) {
+                assertEquals("testObj2", o.modelName);
+                assertEquals("/test2", o.modelPath);
+                assertArrayEquals(new Float[]{-0.5f,1.0f,3.5f},o.position);
+                assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},o.rotation);
+                assertArrayEquals(new Float[]{0.25f,0.25f,0.25f},o.scale);
+                Set<HitBoxDTO> hitbox = o.hitboxes;
+                HitBoxDTO h = hitbox.stream().findFirst().get(); // Get the first element from hitbox set
+                assertArrayEquals(new Float[]{-0.5f,1.0f,3.5f},h.position);
+                assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},h.rotation);
+                assertArrayEquals(new Float[]{0.5f,0.5f,0.5f},h.dimension);
+                numberObstacles++;
+            } else if(o.id == 3L) {
+                assertEquals("testObj3", o.modelName);
+                assertEquals("/test3", o.modelPath);
+                assertArrayEquals(new Float[]{1.0f,1.0f,5.0f},o.position);
+                assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},o.rotation);
+                assertArrayEquals(new Float[]{0.25f,0.25f,0.25f},o.scale);
+                Set<HitBoxDTO> hitbox = o.hitboxes;
+                HitBoxDTO h = hitbox.stream().findFirst().get(); // Get the first element from hitbox set
+                assertArrayEquals(new Float[]{1.0f,1.0f,5.0f},h.position);
+                assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},h.rotation);
+                assertArrayEquals(new Float[]{0.5f,0.5f,0.5f},h.dimension);
+                numberObstacles++;
+            } else if(o.id == 4L) {
+                assertEquals("testObj4", o.modelName);
+                assertEquals("/test4", o.modelPath);
+                assertArrayEquals(new Float[]{4.0f,10.0f,1.0f},o.position);
+                assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},o.rotation);
+                assertArrayEquals(new Float[]{0.25f,0.25f,0.25f},o.scale);
+                Set<HitBoxDTO> hitbox = o.hitboxes;
+                HitBoxDTO h = hitbox.stream().findFirst().get(); // Get the first element from hitbox set
+                assertArrayEquals(new Float[]{4.0f,10.0f,1.0f},h.position);
+                assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},h.rotation);
+                assertArrayEquals(new Float[]{0.5f,0.5f,0.5f},h.dimension);
+                numberObstacles++;
+            }
+        }
+        assertEquals(4,numberObstacles, "The returned ObstacleJsonDTO contains not all obstacles!");
     }
 
     /**
