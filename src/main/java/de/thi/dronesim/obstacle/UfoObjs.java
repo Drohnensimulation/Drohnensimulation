@@ -149,13 +149,14 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         
         Vector3f i = rangeProjOnDir.subtract(angleVec);
         float radius = i.length();
+        float r = radius / rangeProjOnDir.length() * range * config.config.rayDensity;
         i.normalizeLocal();
         Vector3f j = i.cross(direction).normalizeLocal();
         
         Vector3f dI = new Vector3f();
         Vector3f dJ = new Vector3f();
         Vector3f ray = new Vector3f();
-        int rayCount = 300;
+        int rayCount = (int) (r * r * Math.PI);
         
         for (int l = 0; l < rayCount; l++) {
             dist = (float) Math.sqrt(l / (rayCount - 1f)) * radius;
