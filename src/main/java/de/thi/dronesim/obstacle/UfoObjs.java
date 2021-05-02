@@ -254,7 +254,7 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
     	//TODO: Document algorithm process
     	//if dimensions of the cylinder base differs take the biggest one (error forgiving)
-    	float radius = (dimension.x >= dimension.y)? dimension.x : dimension.y;
+    	float radius = (dimension.x >= dimension.y)? dimension.x/2f : dimension.y/2f;
         float range = dimension.z;
         //calculate needed rays count based on cylinder base area = PI * r^2
         int density = config.config.rayDensity;
