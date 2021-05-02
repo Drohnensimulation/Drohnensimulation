@@ -4,6 +4,8 @@ import com.jme3.math.Vector3f;
 
 /**
  * Contains Helper Methods to generate jMonkey3 Vectors
+ *
+ * @author Christian Schmied
  */
 public class Jme3MathHelper {
     public static Vector3f of(float x, float y, float z){

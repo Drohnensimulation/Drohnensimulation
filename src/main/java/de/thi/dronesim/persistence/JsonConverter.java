@@ -6,6 +6,8 @@ import de.thi.dronesim.persistence.entity.SimulationConfig;
 
 /**
  * Class for Conversion of a {@link SimulationConfig} to/from a Json-String.
+ *
+ * @author Daniel Stolle
  */
 final class JsonConverter {
 

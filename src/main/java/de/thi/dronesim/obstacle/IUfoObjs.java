@@ -1,11 +1,11 @@
 package de.thi.dronesim.obstacle;
 
+import com.jme3.math.Vector3f;
 import de.thi.dronesim.obstacle.dto.ObstacleDTO;
 import de.thi.dronesim.obstacle.dto.ObstacleJsonDTO;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 
-import com.jme3.math.Vector3f;
 import java.util.Set;
 
 public interface IUfoObjs {
@@ -76,15 +76,8 @@ public interface IUfoObjs {
      */
     Set<HitMark> checkSensorCylinder(Vector3f origin, Vector3f orientation, Vector3f dimension);
 
-
     /**
-     * Loads Environmental Context into the Simulation
-     * @param configHolder Config Holder containing the obstacle config {@link ObstacleJsonDTO}
+     * Extracts the current state into the ConfigDTO
      */
-    void load(Object configHolder);
-
-    /**
-     * Speichert den Aktuellen Umgebungskontext in die angegebene Datei
-     */
-    Object save();
+    ObstacleJsonDTO save();
 }
