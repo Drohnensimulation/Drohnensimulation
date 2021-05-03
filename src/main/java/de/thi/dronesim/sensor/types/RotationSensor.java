@@ -1,5 +1,7 @@
 package de.thi.dronesim.sensor.types;
 
+import de.thi.dronesim.ISimulationChild;
+import de.thi.dronesim.Simulation;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.sensor.ASensor;
 import de.thi.dronesim.obstacle.UfoObjs;
@@ -10,7 +12,7 @@ import java.util.TimerTask;
 //import com.jme3.math.Vector3f;
 
 
-public class RotationSensor extends ASensor {
+public class RotationSensor extends ASensor implements ISimulationChild {
 	/**
 	 * Man kan sich die Rotation wie die Bewegung wie die Bewegung eines Blaulichts vorstellen
 	 * 
@@ -23,10 +25,17 @@ public class RotationSensor extends ASensor {
 	public Timer repositoinTimer = new Timer( );
 	public long startRotationTime;
 	public long endRotationTime;
+
+	//Main simulation
+	private Simulation simulation;
 	
 	public RotationSensor(double rotationVelcity, int callTimerForSensorValues) {
 		this.rotationVelocity = rotationVelcity;
 		this.callTimerForSensorValues = callTimerForSensorValues;
+	}
+
+	public RotationSensor() {
+
 	}
 	
 	@Override
@@ -74,9 +83,17 @@ public class RotationSensor extends ASensor {
 	public void stopCallingSensorValues() {
 		callTimerValues.cancel();
 	}
-	
-	
 
+
+	@Override
+	public void setSimulation(Simulation simulation) {
+		this.simulation = simulation;
+	}
+
+	@Override
+	public Simulation getSimulation() {
+		return this.simulation;
+	}
 	
 	
 
