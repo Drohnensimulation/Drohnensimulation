@@ -17,14 +17,11 @@ public class GpsSensor {
 	private final List<Long, Float> lastHorizontalDistanceDeltas;
 	private final List<Long, Float> lastVerticalDistanceDeltas;
 	
-	private Coordinates posLastFrame;
+	private Coordinates posLastFrame = null;
 	
 	//approx speed in meters per second
 	private Float hSpeed = null;
 	private Float vSpeed = null;
-	
-	//position
-	private Coordinates pos = null;
 	
 	private String lastResult;
 	
@@ -80,18 +77,17 @@ public class GpsSensor {
 		//Build the result string
 		StringBuilder resultString = new StringBuilder();
 		resultString.append("\"pos\": {");
-		if(vals == null && this.pos == null) {
+		if(vals == null && this.posLastFrame == null) {
 			//Valid coordinates never existed
 			resultString.append("\"x\": \"NaN\", \"y\": \"NaN\", \"z\": \"NaN\"");
 		} else {
-			if(vals == null && this.pos != null) {
+			if(vals == null && this.posLastFrame != null) {
 				//last valid coordinates should be shown
-				vals = this.pos;
+				vals = this.posLastFrame;
 			}
 			resultString.append("\"x\": ").append(vals.x)
 			.append(", \"y: \"").append(vals.y)
 			.append(", \"z: \"").append(vals.z);
-			this.pos = vals;
 			
 			//calculate the position deltas relative to the positions last frame
 			if(this.posLastFrame != null) {
@@ -99,7 +95,7 @@ public class GpsSensor {
 						(float)Math.sqrt(Math.pow(vals.x-posLastFrame.x, 2) + Math.pow(vals.z-posLastFrame.z, 2)));
 					this.lastVerticalDistanceDeltas.addBack(currentTime, Math.abs(vals.y-this.posLastFrame.y));
 			}
-			this.posLastFrame = new Coordinates(vals.x, vals.y, vals.z);
+			this.posLastFrame = vals;
 		}
 		resultString.append("}, \"speed\": {");
 		
