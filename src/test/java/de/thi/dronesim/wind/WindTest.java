@@ -118,7 +118,7 @@ class WindTest {
 
     @Test
     void loadWindLayerTest(){
-        wind.load();
+        wind.load('windlayer.json');
         List<WindLayer> layers = wind.getWindLayers();
         boolean result = true;
         for(int i = 0; i < layers.size(); i++){

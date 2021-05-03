@@ -37,6 +37,10 @@ public class Wind {
         normalize();
     }
 
+    /**
+     * This function is loading a JSON File and converts it into a List<WindLayer>
+     * @param configPath path to the WindLayer configuration File
+     */
     private void loadFromConfig(String configPath){
         List windConfigList = ConfigReader.readConfig(configPath);
         for(int i =0; i < windConfigList.size(); i++) {
@@ -48,11 +52,18 @@ public class Wind {
         }
     }
 
+    /**
+     * This function sorts the given WindLayer by Time
+     * @param windLayers List of unsorted WindLayer
+     */
     private void sortWindLayer(List<WindLayer> windLayers){
         windLayers.sort(Comparator.comparing(WindLayer::getTimeStart));
         sortWindLayerAltitudeBased();
     }
 
+    /**
+     * This function sorts the given WindLayer by Altitude
+     */
     private void sortWindLayerAltitudeBased(){
         for (int i =0; i < windLayers.size() - 1; i++){
             for(int x = 0; x < windLayers.size() - i - 1; x++){
@@ -66,6 +77,9 @@ public class Wind {
         }
     }
 
+    /**
+     * This Method normalizes the WindLayer already sorted, as defined in function load
+     */
     private void normalize() {
         double altDistance = 2 * WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE;
         double timeDistance = 2 * WIND_LAYER_INTERPOLATION_TIME_RANGE;
