@@ -8,6 +8,8 @@ import java.util.List;
 
 /**
  * Class to generate an example for a config file.
+ *
+ * @author Daniel Stolle
  */
 public class ConfigExample {
 
@@ -21,8 +23,7 @@ public class ConfigExample {
         SensorConfig sensorConfig = new SensorConfig();
 
         sensorConfig.setRange(10);
-        sensorConfig.setAngleOfViewHorizontal(11);
-        sensorConfig.setAngleOfViewVertical(12);
+        sensorConfig.setSensorAngle(11);
         sensorConfig.setSensorRadius(13);
         sensorConfig.setMeasurementAccuracy(14);
         sensorConfig.setDirectionX(15);

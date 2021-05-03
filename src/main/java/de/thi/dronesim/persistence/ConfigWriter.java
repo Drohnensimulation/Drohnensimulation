@@ -7,6 +7,8 @@ import java.io.IOException;
 /**
  * Class to write the Configuration in a file.
  * This is only a convenience function to create the config-file and is not needed for the simulation.
+ *
+ * @author Daniel Stolle
  */
 public final class ConfigWriter {
 

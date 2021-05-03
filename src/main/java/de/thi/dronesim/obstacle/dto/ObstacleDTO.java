@@ -7,7 +7,7 @@ public class ObstacleDTO implements Serializable {
     public String modelName;
     public String modelPath;
     public Long id;
-    Set<HitBoxDTO> hitboxes;
+    public Set<HitBoxDTO> hitboxes;
     public Float[] position;
     public Float[] rotation;
     public Float[] scale;
