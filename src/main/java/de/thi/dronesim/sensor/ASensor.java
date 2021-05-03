@@ -17,7 +17,6 @@ public abstract class ASensor {
 	
 	protected Drone drone;
 	protected float range; // range from sensor position to cone bottom
-	protected float coneHeight; // range from Cone origin point to cone bottom
 	protected float sensorAngle;
 	protected Vector3f vectorAngle;
 	protected float sensorRadius;
@@ -218,74 +217,55 @@ public abstract class ASensor {
 		
 		return this.range + getOriginToPositionLength();
 	}
-	
+
 	/**
-	 * calculates the length from origin point to sensor position end. This length is needed to
-	 * create the cone-object 
-	 * 
-	 * @author: Moris Breitenborn
-	 *  
-	 * @return float
+	 * Calculates the length from origin point to sensor position. This length is needed to
+	 * create the cone-object.
+	 *
+	 * @author Daniel Stolle
+	 * @return length between origin and sensor position
 	 */
-	
 	public float getOriginToPositionLength(){
-		float hypoLength = (float) (this.range/Math.cos(Math.toRadians(this.sensorAngle)));
-		// use the Pythagorean theorem to calculate bottomShort
-		float bottomShort  = (float) Math.sqrt((hypoLength*hypoLength)-(this.range*this.range));
-		// the relation from range to bottomShort is equaly to the relation bottomLong to range+x. 
-		// x = the length between the sensor origin point and the sensor position point
-		float bottomLong = bottomShort + this.sensorRadius;
-		float originToPositionLength = ((bottomLong*this.sensorRadius)/bottomShort)-this.range;
-		return originToPositionLength;
+		return sensorRadius / (float) Math.tan(Math.toRadians(this.sensorAngle));
 	}
-	
+
 	/**
-	 * calculate the origin vector from drone center to sensor cone origin point
+	 * Calculate the origin vector from drone center to sensor cone origin point
 	 * by using intercept theorems.
 	 * 
-	 * @author: Moris Breitenborn
+	 * @author Moris Breitenborn
 	 *  
 	 * @return Vector3f
 	 */
 	public Vector3f getOrigin() {
-		
-		// normalzie the vector to multiplie it with the range and get the neede vector
-		Vector3f normalziedOrientationVector = getOrientation().normalize();
-		
+
+		// get the distance between origin and position
 		float originToPositionLength = getOriginToPositionLength();
-		// rotate the normalziedOrientation vector in the opposit direction with scale(-1)
-		normalziedOrientationVector = normalziedOrientationVector.mult(-1);
+
+		// normalize the direction vector to multiply it with the range later to get the needed vector
+		Vector3f normalizedOrientationVector = getOrientation().normalize();
+
+		// rotate the normalized direction vector in the opposite direction with scale(-1)
+		normalizedOrientationVector = normalizedOrientationVector.negate();
+
 		// get the normalized Vector on the calculated length with scale(originToPositionLength)
-		normalziedOrientationVector = normalziedOrientationVector.mult(originToPositionLength);
-		// with this vector we can calculate the origing point by simply adding the normalziedOrientationVector
+		normalizedOrientationVector = normalizedOrientationVector.mult(originToPositionLength);
+
+		// with this vector we can calculate the origin point by simply adding the normalizedOrientationVector
 		// to the position point of the Sensor
-		float originPointX = this.posX + normalziedOrientationVector.getX();
-		float originPointY = this.posY + normalziedOrientationVector.getY();
-		float originPointZ = this.posZ + normalziedOrientationVector.getZ();
-		//calculate vector from drone center to originPoint and return
-		Vector3f origin = new Vector3f(originPointX, originPointY, originPointZ);
-	
-		return origin;
-		
+		return new Vector3f(posX, posY, posZ).add(normalizedOrientationVector);
 	}
-	
+
 	/**
-	 * calculate the direction vector in with the sensor is pointing to. 
-	 * 
-	 * @author: Moris Breitenborn
-	 * 
-	 * @return Vector3f
+	 * Return the direction as a vector.
+	 *
+	 * @author Daniel Stolle
+	 * @return directionX, directionY and directionZ as a vector
 	 */
 	public Vector3f getOrientation() {
-		
-		float directionVectorX = this.directionX -  this.posX;
-		float directionVectorY = this.directionY -  this.posY;
-		float directionVectorZ = this.directionZ -  this.posZ;
-		Vector3f directionVector = new Vector3f(directionVectorX, directionVectorY, directionVectorZ); 
-		return directionVector;
-		
+		return new Vector3f(directionX, directionY, directionZ);
 	}
-	
+
 	/** 
 	 * This method calculates a vector that is lying on the cone surface. This vector is needed 
 	 * to calculate the entire cone.
@@ -384,8 +364,8 @@ public abstract class ASensor {
 		if(Double.compare(deg, 0.0) < 0) {
 			throw new IllegalArgumentException("Horizontal angle of view must not be less than zero!");
 		}
-		if(Double.compare(deg, 90.0) > 0) {
-			throw new IllegalArgumentException("Horizontal angle of view must not be greater than 90!");
+		if(Double.compare(deg, 90.0) >= 0) {
+			throw new IllegalArgumentException("Horizontal angle of view must not be greater or equal than 90!");
 		}
 		this.sensorAngle = deg;
 	}

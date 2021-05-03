@@ -1,6 +1,7 @@
 package de.thi.dronesim.sensor;
 
-import de.thi.dronesim.ufo.Drone;
+
+import de.thi.dronesim.drone.Drone;
 
 /**
  * The wind sensor can measure the wind direction and strength for a two dimensional plain.
