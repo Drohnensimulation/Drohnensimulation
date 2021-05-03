@@ -5,7 +5,9 @@ import de.thi.dronesim.Simulation;
 import de.thi.dronesim.drone.Location;
 import de.thi.dronesim.drone.UfoSim;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class Wind implements ISimulationChild {
@@ -33,13 +35,78 @@ public class Wind implements ISimulationChild {
      * </p>
      *
      */
-    public void load() {
+    public void load(String configPath) {
         // TODO check for overlapping and small gaps
+        loadFromConfig(configPath);
+        sortWindLayer(windLayers);
+        normalize();
     }
 
+    /**
+     * This function is loading a JSON File and converts it into a List<WindLayer>
+     * @param configPath path to the WindLayer configuration File
+     */
+    private void loadFromConfig(String configPath){
+        List windConfigList = ConfigReader.readConfig(configPath);
+        for(int i =0; i < windConfigList.size(); i++) {
+            WindLayer windLayer = new WindLayer(windConfigList.get(i).windspeed,
+                    windConfigList.get(i).gustspeed, windConfigList.get(i).timeStart,
+                    windConfigList.get(i).timeEnd, windConfigList.get(i).altitudeBottom,
+                    windConfigList.get(i).altitudeTop, windConfigList.get(i).windDirection);
+            windLayers.add(windLayer);
+        }
+    }
+
+    /**
+     * This function sorts the given WindLayer by Time
+     * @param windLayers List of unsorted WindLayer
+     */
+    private void sortWindLayer(List<WindLayer> windLayers){
+        windLayers.sort(Comparator.comparing(WindLayer::getTimeStart));
+        sortWindLayerAltitudeBased();
+    }
+
+    /**
+     * This function sorts the given WindLayer by Altitude
+     */
+    private void sortWindLayerAltitudeBased(){
+        for (int i =0; i < windLayers.size() - 1; i++){
+            for(int x = 0; x < windLayers.size() - i - 1; x++){
+                if(windLayers.get(x).getAltitudeBottom() > windLayers.get(x+1).getAltitudeBottom()
+                        && windLayers.get(x).getTimeEnd() >= windLayers.get(x + 1).getTimeStart()){
+                    WindLayer tempLayer = windLayers.get(x);
+                    windLayers.set(x, windLayers.get(x + 1));
+                    windLayers.set(x + 1, tempLayer);
+                }
+            }
+        }
+    }
+
+    /**
+     * This Method normalizes the WindLayer already sorted, as defined in function load
+     */
     private void normalize() {
-        // TODO change height and time here according to definition #load
-        // TODO round time to WIND_LAYER_INTERPOLATION_TIME_RANGE * 2
+        double altDistance = 2 * WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE;
+        double timeDistance = 2 * WIND_LAYER_INTERPOLATION_TIME_RANGE;
+
+        for (int i =0; i < windLayers.size() - 1; i++){
+            for(int x = i + 1; x < windLayers.size() - 1; x++){
+                WindLayer oldLayer = windLayers.get(i);
+                WindLayer nextLayer = windLayers.get(x);
+                if(oldLayer.getAltitudeTop() < nextLayer.getAltitudeBottom() + altDistance
+                        &&(oldLayer.getTimeEnd() > nextLayer.getTimeStart() ||
+                        oldLayer.getTimeEnd() + timeDistance <= nextLayer.getTimeEnd() &&
+                                nextLayer.getTimeStart()  - oldLayer.getTimeEnd() <= timeDistance)){
+                    nextLayer.setAltitudeBottom(oldLayer.getAltitudeTop() + altDistance);
+                } else if(oldLayer.getTimeEnd() < nextLayer.getTimeStart() + timeDistance
+                        &&(oldLayer.getAltitudeTop() > nextLayer.getAltitudeBottom() ||
+                        oldLayer.getAltitudeTop() + altDistance <= nextLayer.getAltitudeTop() &&
+                                nextLayer.getAltitudeBottom()  - oldLayer.getAltitudeTop() <= altDistance)){
+                    nextLayer.setTimeStart(oldLayer.getTimeEnd() + timeDistance);
+                }
+            }
+        }
+
     }
 
     private WindLayer findWindLayer(double alt, double time) {
@@ -60,7 +127,7 @@ public class Wind implements ISimulationChild {
      * @param location
      */
     public void applyWind(Location location){
-        double time = UfoSim.getInstance().getTime();
+        double time = UfoSim.getInstance().getTime(); // TODO needs to be adjusted because it is desperate
 
         // TODO introduce caching
         WindLayer lowerPrevLayer = findWindLayer(location.getZ() - WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
@@ -118,10 +185,6 @@ public class Wind implements ISimulationChild {
                     WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE);
         }
         return null;
-    }
-
-    public void sortWindLayer(){
-        Collections.sort(windLayers);
     }
 
     private WindChange interpolate(WindChange first, WindChange second, double x, double range) {

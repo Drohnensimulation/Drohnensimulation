@@ -1,0 +1,38 @@
+{
+  "0": {
+    "windSpeed": 0,
+    "gustSpeed": 0,
+    "timeStart": 0,
+    "timeEnd": 10,
+    "altitudeBottom": 0,
+    "altitudeTop": 10,
+    "windDirection": 90
+  },
+  "1": {
+    "windSpeed": 0,
+    "gustSpeed": 0,
+    "timeStart": 0,
+    "timeEnd": 10,
+    "altitudeBottom": 0,
+    "altitudeTop": 10,
+    "windDirection": 90
+  },
+  "2": {
+    "windSpeed": 0,
+    "gustSpeed": 0,
+    "timeStart": 0,
+    "timeEnd": 10,
+    "altitudeBottom": 0,
+    "altitudeTop": 10,
+    "windDirection": 90
+  },
+  "3": {
+    "windSpeed": 0,
+    "gustSpeed": 0,
+    "timeStart": 0,
+    "timeEnd": 10,
+    "altitudeBottom": 0,
+    "altitudeTop": 10,
+    "windDirection": 90
+  }
+}
