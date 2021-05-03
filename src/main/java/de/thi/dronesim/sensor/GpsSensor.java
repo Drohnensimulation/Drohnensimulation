@@ -23,6 +23,9 @@ public class GpsSensor {
 	private Float hSpeed = null;
 	private Float vSpeed = null;
 	
+	//position
+	private Coordinates pos = null;
+	
 	private String lastResult;
 	
 	private Drone drone;
@@ -71,29 +74,34 @@ public class GpsSensor {
 		//Adds the measurement to the queue
 		this.measurements.addBack(currentTime, new Coordinates(xCoord, yCoord, zCoord));
 		
+		//Get the measurement from the queue that was delayed long enough
+		Coordinates vals = this.getDelayedMeasurementAndClearEntries(this.measurements, currentTime, this.measurementDelayInMS);
+		
 		//Build the result string
 		StringBuilder resultString = new StringBuilder();
 		resultString.append("\"pos\": {");
-		//Get the measurement from the queue that was delayed long enough
-		Coordinates vals = this.getDelayedMeasurementAndClearEntries(this.measurements, currentTime, this.measurementDelayInMS);
-		if(vals == null) {
+		if(vals == null && this.pos == null) {
+			//Valid coordinates never existed
 			resultString.append("\"x\": \"NaN\", \"y\": \"NaN\", \"z\": \"NaN\"");
 		} else {
+			if(vals == null && this.pos != null) {
+				//last valid coordinates should be shown
+				vals = this.pos;
+			}
 			resultString.append("\"x\": ").append(vals.x)
 			.append(", \"y: \"").append(vals.y)
 			.append(", \"z: \"").append(vals.z);
-		}
-		resultString.append("}, \"speed\": {");
-	
-		//calculate the position deltas relative to the positions last frame
-		if(vals != null) {
+			this.pos = vals;
+			
+			//calculate the position deltas relative to the positions last frame
 			if(this.posLastFrame != null) {
 				this.lastHorizontalDistanceDeltas.addBack(currentTime, 
 						(float)Math.sqrt(Math.pow(vals.x-posLastFrame.x, 2) + Math.pow(vals.z-posLastFrame.z, 2)));
-				this.lastVerticalDistanceDeltas.addBack(currentTime, Math.abs(vals.y-this.posLastFrame.y));
+					this.lastVerticalDistanceDeltas.addBack(currentTime, Math.abs(vals.y-this.posLastFrame.y));
 			}
 			this.posLastFrame = new Coordinates(vals.x, vals.y, vals.z);
 		}
+		resultString.append("}, \"speed\": {");
 		
 		//approx the speed
 		Float newHorizontalSpeed = this.getApproxSpeedAndClearEntries(lastHorizontalDistanceDeltas, 
