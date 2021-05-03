@@ -71,9 +71,9 @@ public class Wind {
         double timeDistance = 2 * WIND_LAYER_INTERPOLATION_TIME_RANGE;
 
         for (int i =0; i < windLayers.size() - 1; i++){
-            for(int x = 0; x < windLayers.size() - i - 1; x++){
-                WindLayer oldLayer = windLayers.get(x);
-                WindLayer nextLayer = windLayers.get(x + 1);
+            for(int x = i + 1; x < windLayers.size() - 1; x++){
+                WindLayer oldLayer = windLayers.get(i);
+                WindLayer nextLayer = windLayers.get(x);
                 if(oldLayer.getAltitudeTop() < nextLayer.getAltitudeBottom() + altDistance
                         &&(oldLayer.getTimeEnd() > nextLayer.getTimeStart() ||
                         oldLayer.getTimeEnd() + timeDistance <= nextLayer.getTimeEnd() &&
