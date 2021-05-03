@@ -319,15 +319,15 @@ public abstract class ASensor {
 	
 
 	/**
-	 * Legt den horizontalen Bildwinkel des Sensors im Gradmaß fest
+	 * Legt den Bildwinkel des Sensors im Gradmaß fest
 	 * @param deg Gültiges Interval [0;90]
 	 */
-	protected void setAngleOfViewHorizontal(float deg) {
+	protected void setSensorAngle(float deg) {
 		if(Double.compare(deg, 0.0) < 0) {
-			throw new IllegalArgumentException("Horizontal angle of view must not be less than zero!");
+			throw new IllegalArgumentException("angle of view must not be less than zero!");
 		}
-		if(Double.compare(deg, 90.0) > 0) {
-			throw new IllegalArgumentException("Horizontal angle of view must not be greater than 90!");
+		if(Double.compare(deg, 90.0) >= 0) {
+			throw new IllegalArgumentException("angle of view must not be greater or equal than 90!");
 		}
 		this.sensorAngle = deg;
 	}

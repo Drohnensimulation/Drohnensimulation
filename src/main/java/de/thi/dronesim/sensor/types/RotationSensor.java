@@ -1,19 +1,18 @@
 package de.thi.dronesim.sensor.types;
 
+import de.thi.dronesim.ISimulationChild;
+import de.thi.dronesim.Simulation;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.sensor.ASensor;
 import de.thi.dronesim.obstacle.UfoObjs;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import javax.vecmath.Vector3f;
+
 //import com.jme3.math.Vector3f;
 
 
-public class RotationSensor extends ASensor {
+public class RotationSensor extends ASensor implements ISimulationChild {
 	/**
 	 * Man kan sich die Rotation wie die Bewegung wie die Bewegung eines Blaulichts vorstellen
 	 * 
@@ -21,15 +20,22 @@ public class RotationSensor extends ASensor {
 	
 	public double rotationVelocity; // Winkelgeschwindigkeit 2Pi/2s == Eine Umdrehung in 2s Sekunden
 	public int callTimerForSensorValues;
-	public HitMark values;
+	public Set<HitMark> values;
 	public Timer callTimerValues = new Timer( );
 	public Timer repositoinTimer = new Timer( );
 	public long startRotationTime;
 	public long endRotationTime;
+
+	//Main simulation
+	private Simulation simulation;
 	
 	public RotationSensor(double rotationVelcity, int callTimerForSensorValues) {
 		this.rotationVelocity = rotationVelcity;
 		this.callTimerForSensorValues = callTimerForSensorValues;
+	}
+
+	public RotationSensor() {
+
 	}
 	
 	@Override
@@ -63,13 +69,13 @@ public class RotationSensor extends ASensor {
 	
 	public void callSensorValues() {
 		
-		UfoObjs cone = UfoObjs();
+		UfoObjs cone = new UfoObjs();
 		callTimerValues.scheduleAtFixedRate(new TimerTask() {
 
 		    @Override
 		    public void run() {
 		    	getAktualSensorPosition();
-		    	values =  cone.pruefeSensorCone(origin, getOrientation(), range, getVectorAngel());
+		    	//values =  cone.pruefeSensorCone(origin, getOrientation(), range, getVectorAngel());
 		    }
 		}, 0, callTimerForSensorValues);
 	}
@@ -77,9 +83,17 @@ public class RotationSensor extends ASensor {
 	public void stopCallingSensorValues() {
 		callTimerValues.cancel();
 	}
-	
-	
 
+
+	@Override
+	public void setSimulation(Simulation simulation) {
+		this.simulation = simulation;
+	}
+
+	@Override
+	public Simulation getSimulation() {
+		return this.simulation;
+	}
 	
 	
 
