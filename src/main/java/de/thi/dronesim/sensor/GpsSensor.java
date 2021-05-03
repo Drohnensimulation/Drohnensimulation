@@ -1,5 +1,7 @@
 package de.thi.dronesim.sensor;
 
+import de.thi.dronesim.drone.Drone;
+
 public class GpsSensor {
 	//How long the measured values should be delayed until they are displayed
 	private final int measurementDelayInMS = 100;
