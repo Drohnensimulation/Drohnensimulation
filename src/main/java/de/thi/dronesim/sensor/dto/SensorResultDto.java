@@ -3,12 +3,12 @@ package de.thi.dronesim.sensor.dto;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 import de.thi.dronesim.sensor.ASensor;
 
-import java.util.Set;
+import java.util.List;
 
 public class SensorResultDto {
     private ASensor sensor;
     private Obstacle obstacle;
-    private Set<Float> values;
+    private List<Float> values;
 
     public ASensor getSensor() {
         return sensor;
@@ -26,11 +26,11 @@ public class SensorResultDto {
         this.obstacle = obstacle;
     }
 
-    public Set<Float> getValues() {
+    public List<Float> getValues() {
         return values;
     }
 
-    public void setValues(Set<Float> values) {
+    public void setValues(List<Float> values) {
         this.values = values;
     }
 }
