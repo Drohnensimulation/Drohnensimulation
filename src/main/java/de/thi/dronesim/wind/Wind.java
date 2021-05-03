@@ -4,9 +4,10 @@ import de.thi.dronesim.ISimulationChild;
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.drone.Location;
 import de.thi.dronesim.drone.UfoSim;
+import de.thi.dronesim.persistence.ConfigReader;
+import de.thi.dronesim.persistence.entity.SimulationConfig;
+import de.thi.dronesim.persistence.entity.WindConfig;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -47,12 +48,13 @@ public class Wind implements ISimulationChild {
      * @param configPath path to the WindLayer configuration File
      */
     private void loadFromConfig(String configPath){
-        List windConfigList = ConfigReader.readConfig(configPath);
+        SimulationConfig windSimulationConfig =  ConfigReader.readConfig(configPath);
+        List<WindConfig> windConfigList = windSimulationConfig.getWindConfigList();
         for(int i =0; i < windConfigList.size(); i++) {
-            WindLayer windLayer = new WindLayer(windConfigList.get(i).windspeed,
-                    windConfigList.get(i).gustspeed, windConfigList.get(i).timeStart,
-                    windConfigList.get(i).timeEnd, windConfigList.get(i).altitudeBottom,
-                    windConfigList.get(i).altitudeTop, windConfigList.get(i).windDirection);
+            WindLayer windLayer = new WindLayer(windConfigList.get(i).getWindSpeed(),
+                    windConfigList.get(i).getGustSpeed(), windConfigList.get(i).getTimeStart(),
+                    windConfigList.get(i).getTimeEnd(), windConfigList.get(i).getAltitudeBottom(),
+                    windConfigList.get(i).getAltitudeTop(), windConfigList.get(i).getWindDirection());
             windLayers.add(windLayer);
         }
     }
