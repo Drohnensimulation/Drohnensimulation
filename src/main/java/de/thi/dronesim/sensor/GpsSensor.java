@@ -245,6 +245,9 @@ public class GpsSensor {
 		void removeFront() {
 			if(this.front != null) {
 				this.front = this.front.getNext();
+				if(this.front == null) {
+					this.back = null;
+				}
 			}
 		}
 		
