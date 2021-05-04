@@ -29,24 +29,30 @@ public class Wind implements ISimulationChild {
         load();
     }
 
-    public Wind(List<WindLayer> layers){
+    public Wind(List<WindLayer> layers) {
         this.configLoaded = true;
         this.windLayers = layers;
     }
 
     /**
      * Interface for receiving Wind data based on the current location and simulation time
+     * @deprecated
      * @param location current Location
      * @param time current Simulation Time
      * @return return WindChange if configLoaded, returns null if Config not loaded
      */
-    public WindChange getCurrentWind(Location location, int time){
-        if(this.configLoaded){
+    public WindChange getCurrentWind(Location location, int time) {
+        if (this.configLoaded) {
             applyWind(location);
             return new WindChange(location.getTrack(), location.getGroundSpeed());
-        }else {
+        } else {
             return null;
         }
+    }
+
+    public static Wind.CurrentWind getWindAt(Location location) {
+
+        return new CurrentWind(0, 0);
     }
 
     /**
@@ -54,7 +60,6 @@ public class Wind implements ISimulationChild {
      * <p>
      * By definition, each layer must be adjacent or at least 2 * WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE apart from each other. Same applies for time.
      * </p>
-     *
      */
     private void load() {
         // TODO check for overlapping and small gaps
@@ -68,14 +73,14 @@ public class Wind implements ISimulationChild {
      * This function is loading a JSON File and converts it into a List<WindLayer>
      * @param configPath path to the WindLayer configuration File
      */
-    private void loadFromConfig(String configPath){
+    private void loadFromConfig(String configPath) {
         SimulationConfig windSimulationConfig =  ConfigReader.readConfig(configPath);
         List<WindConfig> windConfigList = windSimulationConfig.getWindConfigList();
-        for(int i =0; i < windConfigList.size(); i++) {
-            WindLayer windLayer = new WindLayer(windConfigList.get(i).getWindSpeed(),
-                    windConfigList.get(i).getGustSpeed(), windConfigList.get(i).getTimeStart(),
-                    windConfigList.get(i).getTimeEnd(), windConfigList.get(i).getAltitudeBottom(),
-                    windConfigList.get(i).getAltitudeTop(), windConfigList.get(i).getWindDirection());
+        for (WindConfig windConfig : windConfigList) {
+            WindLayer windLayer = new WindLayer(windConfig.getWindSpeed(),
+                    windConfig.getGustSpeed(), windConfig.getTimeStart(),
+                    windConfig.getTimeEnd(), windConfig.getAltitudeBottom(),
+                    windConfig.getAltitudeTop(), windConfig.getWindDirection());
             windLayers.add(windLayer);
         }
     }
@@ -84,7 +89,7 @@ public class Wind implements ISimulationChild {
      * This function sorts the given WindLayer by Time
      * @param windLayers List of unsorted WindLayer
      */
-    private void sortWindLayer(List<WindLayer> windLayers){
+    private void sortWindLayer(List<WindLayer> windLayers) {
         windLayers.sort(Comparator.comparing(WindLayer::getTimeStart));
         sortWindLayerAltitudeBased();
     }
@@ -92,11 +97,11 @@ public class Wind implements ISimulationChild {
     /**
      * This function sorts the given WindLayer by Altitude
      */
-    private void sortWindLayerAltitudeBased(){
-        for (int i =0; i < windLayers.size() - 1; i++){
-            for(int x = 0; x < windLayers.size() - i - 1; x++){
-                if(windLayers.get(x).getAltitudeBottom() > windLayers.get(x+1).getAltitudeBottom()
-                        && windLayers.get(x).getTimeEnd() >= windLayers.get(x + 1).getTimeStart()){
+    private void sortWindLayerAltitudeBased() {
+        for (int i =0; i < windLayers.size() - 1; i++) {
+            for (int x = 0; x < windLayers.size() - i - 1; x++) {
+                if (windLayers.get(x).getAltitudeBottom() > windLayers.get(x+1).getAltitudeBottom()
+                        && windLayers.get(x).getTimeEnd() >= windLayers.get(x + 1).getTimeStart()) {
                     WindLayer tempLayer = windLayers.get(x);
                     windLayers.set(x, windLayers.get(x + 1));
                     windLayers.set(x + 1, tempLayer);
@@ -112,19 +117,19 @@ public class Wind implements ISimulationChild {
         double altDistance = 2 * WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE;
         double timeDistance = 2 * WIND_LAYER_INTERPOLATION_TIME_RANGE;
 
-        for (int i = 0; i < windLayers.size() - 1; i++){
-            for (int x = i + 1; x < windLayers.size() - 1; x++){
+        for (int i = 0; i < windLayers.size() - 1; i++) {
+            for (int x = i + 1; x < windLayers.size() - 1; x++) {
                 WindLayer oldLayer = windLayers.get(i);
                 WindLayer nextLayer = windLayers.get(x);
                 if (oldLayer.getAltitudeTop() < nextLayer.getAltitudeBottom() + altDistance
-                        &&(oldLayer.getTimeEnd() > nextLayer.getTimeStart() ||
-                        oldLayer.getTimeEnd() + timeDistance <= nextLayer.getTimeEnd() &&
-                                nextLayer.getTimeStart()  - oldLayer.getTimeEnd() <= timeDistance)){
+                        && (oldLayer.getTimeEnd() > nextLayer.getTimeStart()
+                        || oldLayer.getTimeEnd() + timeDistance <= nextLayer.getTimeEnd()
+                        && nextLayer.getTimeStart()  - oldLayer.getTimeEnd() <= timeDistance)) {
                     nextLayer.setAltitudeBottom(oldLayer.getAltitudeTop() + altDistance);
-                } else if(oldLayer.getTimeEnd() < nextLayer.getTimeStart() + timeDistance
-                        &&(oldLayer.getAltitudeTop() > nextLayer.getAltitudeBottom() ||
-                        oldLayer.getAltitudeTop() + altDistance <= nextLayer.getAltitudeTop() &&
-                                nextLayer.getAltitudeBottom()  - oldLayer.getAltitudeTop() <= altDistance)){
+                } else if (oldLayer.getTimeEnd() < nextLayer.getTimeStart() + timeDistance
+                        && (oldLayer.getAltitudeTop() > nextLayer.getAltitudeBottom()
+                        || oldLayer.getAltitudeTop() + altDistance <= nextLayer.getAltitudeTop()
+                        && nextLayer.getAltitudeBottom()  - oldLayer.getAltitudeTop() <= altDistance)) {
                     nextLayer.setTimeStart(oldLayer.getTimeEnd() + timeDistance);
                 }
             }
@@ -171,7 +176,7 @@ public class Wind implements ISimulationChild {
      * Applies wind based on the current location.
      * @param location Location of the drone
      */
-    public void applyWind(Location location){
+    public void applyWind(Location location) {
         double time = simulation.getTime();
 
         // Update oldest layer to set start point of search algorithm
@@ -293,6 +298,16 @@ public class Wind implements ISimulationChild {
         return windLayers;
     }
 
+    @Override
+    public void setSimulation(Simulation simulation) {
+        this.simulation = simulation;
+    }
+
+    @Override
+    public Simulation getSimulation() {
+        return this.simulation;
+    }
+
     protected static final class WindChange {
 
         private final double track;
@@ -305,14 +320,32 @@ public class Wind implements ISimulationChild {
 
     }
 
-    @Override
-    public void setSimulation(Simulation simulation) {
-        this.simulation = simulation;
+    public static final class CurrentWind {
+
+        private final double windSpeed;
+        private final double windDirection;
+
+        public CurrentWind(double windSpeed, double windDirection) {
+            this.windSpeed = windSpeed;
+            this.windDirection = windDirection;
+        }
+
+        /**
+         *
+         * @return Wind speed in m/s
+         */
+        public double getWindSpeed() {
+            return windSpeed;
+        }
+
+        /**
+         *
+         * @return Wind direction in deg
+         */
+        public double getWindDirection() {
+            return windDirection;
+        }
     }
 
-    @Override
-    public Simulation getSimulation() {
-        return this.simulation;
-    }
 
 }
