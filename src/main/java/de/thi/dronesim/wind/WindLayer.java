@@ -1,7 +1,6 @@
 package de.thi.dronesim.wind;
 
 import de.thi.dronesim.drone.Location;
-import de.thi.dronesim.drone.UfoSim;
 
 public class WindLayer implements Comparable<WindLayer> {
 
@@ -56,10 +55,10 @@ public class WindLayer implements Comparable<WindLayer> {
      * Applies wind speeds to drone
      * @param location Current location
      */
-    protected Wind.WindChange applyForces(Location location){
+    protected Wind.WindChange applyForces(Location location, double time) {
         double hdg = location.getHeading();
         double tas = location.getAirspeed();
-        double ws = calcWindSpeed();
+        double ws = calcWindSpeed(time);
 
         if (hdg == windDirection) {
             return new Wind.WindChange(hdg, tas - ws);
@@ -82,14 +81,16 @@ public class WindLayer implements Comparable<WindLayer> {
         return new Wind.WindChange(hdg + wca, gs);
     }
 
+    protected static Wind.WindChange applyOrZero(WindLayer windLayer, Location location, double time) {
+        return windLayer != null ? windLayer.applyForces(location, time) : new Wind.WindChange(location.getHeading(), 0);
+    }
 
     /**
      * calculating wind speed with interpolation
      * @return windSpeed New wind speed in          [m/s]
      */
-    private double calcWindSpeed() {
+    private double calcWindSpeed(double time) {
         double windSpeed = this.windSpeed;
-        double time = UfoSim.getInstance().getTime();
 
         if (time > nextGustStart + GUST_RISE_TIME * 2) {
             calcNextGust(time);

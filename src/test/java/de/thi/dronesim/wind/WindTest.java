@@ -1,7 +1,7 @@
 package de.thi.dronesim.wind;
 
+import de.thi.dronesim.Simulation;
 import de.thi.dronesim.drone.Location;
-import de.thi.dronesim.drone.UfoSim;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,14 +30,26 @@ class WindTest {
     @BeforeEach
     public void setUpWind() throws Exception{
         wind = new Wind(createWindLayerList());
+        wind.setSimulation(new Simulation());
         windGust = new Wind(createWindGustLayerList());
     }
 
     @Test
     void applyWindInSameDirection() {
+        setSimulationTime(15);
         setUpLocation(5,5,5,10,210);
         wind.applyWind(location);
         assertEquals(13, location.getGroundSpeed(), "Wind in same direction as drone");
+    }
+
+    @Test
+    void getWindAt() {
+        setSimulationTime(15);
+        setUpLocation(5, 5, 5, 10, 210);
+        wind.applyWind(location);
+        Wind.CurrentWind wind = Wind.getWindAt(location);
+        assertEquals(3, wind.getWindSpeed(), "");
+        assertEquals(30, wind.getWindDirection(), "");
     }
 
     @Test
@@ -133,15 +145,15 @@ class WindTest {
     /**
      * method to set the simulation time
      * @param input set the simulation to that time
-     * @throws NoSuchFieldException throws if time is not accessible
-     * @throws IllegalAccessException throws if illegal expression
      */
-    void setSimulationTime(int input) throws NoSuchFieldException, IllegalAccessException{
-        Field timeField = UfoSim.getInstance().getClass()
-                .getDeclaredField("time");
-        timeField.setAccessible(true);
-        byte time = (byte) input;
-        timeField.setByte(UfoSim.getInstance(), time);
+    void setSimulationTime(int input) {
+        try {
+            Field timeField = wind.getSimulation().getClass()
+                    .getDeclaredField("time");
+            timeField.setAccessible(true);
+            byte time = (byte) input;
+            timeField.setByte(wind.getSimulation(), time);
+        } catch (Exception ignored) {};
     }
 
 
