@@ -2,6 +2,8 @@ package de.thi.dronesim.persistence.entity;
 
 /**
  * Object that holds all Configurations for the initial Location.
+ *
+ * @author Daniel Stolle
  */
 public class LocationConfig {
 

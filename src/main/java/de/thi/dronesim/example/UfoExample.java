@@ -1,5 +1,5 @@
 package de.thi.dronesim.example;// Importiere die Simulation
-import de.thi.dronesim.ufo.UfoSim;
+import de.thi.dronesim.drone.UfoSim;
 
 // Das Programmierbeispiel in der Klasse de.thi.dronesim.example.UfoExample
 public class UfoExample {

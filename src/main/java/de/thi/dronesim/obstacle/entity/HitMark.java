@@ -1,8 +1,11 @@
 package de.thi.dronesim.obstacle.entity;
 
+import de.thi.dronesim.helpers.Jme3MathHelper;
 import de.thi.dronesim.obstacle.util.JBulletHitMark;
 
-import javax.vecmath.Vector3f;
+import com.jme3.math.Vector3f;
+
+import java.util.Objects;
 
 public class HitMark {
     private final float distance;
@@ -12,8 +15,8 @@ public class HitMark {
 
     public HitMark(JBulletHitMark hitBody) {
         this.distance = hitBody.distance;
-        this.worldHit = hitBody.worldHit;
-        this.relativeHit = hitBody.relativeHit;
+        this.worldHit = Jme3MathHelper.of(hitBody.worldHit);
+        this.relativeHit = Jme3MathHelper.of(hitBody.relativeHit);
         this.obstacle = hitBody.body.getObstacle();
     }
 
@@ -38,5 +41,18 @@ public class HitMark {
 
     public Obstacle getObstacle() {
         return obstacle;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        HitMark hitMark = (HitMark) o;
+        return Float.compare(hitMark.distance, distance) == 0 && worldHit.equals(hitMark.worldHit) && relativeHit.equals(hitMark.relativeHit) && obstacle.equals(hitMark.obstacle);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(distance, worldHit, relativeHit, obstacle);
     }
 }

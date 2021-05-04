@@ -1,45 +1,18 @@
-package de.thi.dronesim.gui.dview;
+package de.thi.dronesim.gui.jframe;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.jme3.math.Vector3f;
+import de.thi.dronesim.gui.dview.*;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Test for DView
+ * Test for InstrumentView
  *
  * @author Michael Weichenrieder
  */
-public class DViewTest extends JFrame {
-
-    private JButton thirdPersonButton;
-    private JButton birdViewButton;
-    private JButton firstPersonButton;
-    private JPanel dViewPanel;
-    private JPanel rootPanel;
-
-    /**
-     * Creates a new swing frame
-     *
-     * @param dView Scene to display
-     * @param width Display width
-     * @param height Display height
-     */
-    public DViewTest(final DView dView, RenderableDrone drone, int width, int height) {
-        super("DView-Test");
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        getContentPane().add(rootPanel);
-        dViewPanel.setMinimumSize(new Dimension(width, height));
-        dViewPanel.add(dView.getCanvas());
-        thirdPersonButton.addActionListener(e -> dView.setPerspective(DView.Perspective.THIRD_PERSON, drone));
-        birdViewButton.addActionListener(e -> dView.setPerspective(DView.Perspective.BIRD_VIEW, drone));
-        firstPersonButton.addActionListener(e -> dView.setPerspective(DView.Perspective.FIRST_PERSON, drone));
-        pack();
-        setVisible(true);
-    }
+public class InstrumentViewTest {
 
     /**
      * Init point
@@ -69,7 +42,7 @@ public class DViewTest extends JFrame {
         dView.addRenderableObject(drone);
 
         // Open swing frame
-        new Thread(() -> new DViewTest(dView, drone, 1280, 720)).start();
+        new Thread(() -> new InstrumentView(dView)).start();
     }
 
     /**

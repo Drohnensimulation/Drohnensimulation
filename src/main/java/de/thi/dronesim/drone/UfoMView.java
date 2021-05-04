@@ -1,4 +1,4 @@
-package de.thi.dronesim.ufo;
+package de.thi.dronesim.drone;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -15,7 +15,6 @@ import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.text.DefaultCaret;
 
-@SuppressWarnings("serial")
 public class UfoMView extends JFrame implements Runnable, KeyListener {
 
   private UfoSim sim  = UfoSim.getInstance(); // UfoView instance
