@@ -35,22 +35,6 @@ public class Wind implements ISimulationChild {
     }
 
     /**
-     * Interface for receiving Wind data based on the current location and simulation time
-     * @deprecated
-     * @param location current Location
-     * @param time current Simulation Time
-     * @return return WindChange if configLoaded, returns null if Config not loaded
-     */
-    public WindChange getCurrentWind(Location location, int time) {
-        if (this.configLoaded) {
-            applyWind(location);
-            return new WindChange(location.getTrack(), location.getGroundSpeed());
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * Calculates the wind direction and speed at the current time of a given location.
      * @param location Location of requested wind
      * @return Wind speed in m/s and direction in deg
