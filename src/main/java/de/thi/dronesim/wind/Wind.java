@@ -2,7 +2,6 @@ package de.thi.dronesim.wind;
 
 import de.thi.dronesim.ISimulationChild;
 import de.thi.dronesim.Simulation;
-import de.thi.dronesim.drone.Drone;
 import de.thi.dronesim.drone.Location;
 import de.thi.dronesim.persistence.ConfigReader;
 import de.thi.dronesim.persistence.entity.SimulationConfig;
@@ -173,7 +172,7 @@ public class Wind implements ISimulationChild {
      * @param location Location of the drone
      */
     public void applyWind(Location location){
-        double time = UfoSim.getInstance().getTime();
+        double time = simulation.getTime();
 
         // Update oldest layer to set start point of search algorithm
         updateLatestLayer(time - WIND_LAYER_INTERPOLATION_TIME_RANGE);
