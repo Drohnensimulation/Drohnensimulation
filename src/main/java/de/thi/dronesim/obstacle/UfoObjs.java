@@ -136,37 +136,57 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
     @Override
     public Set<HitMark> checkSensorCone(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
+    	/*
+    	 * this algorithm uses golden ratio ((1 + sqrt(5))/2) to create a golden angle and
+    	 * use this angle to rotate a vector around its origin n times depending on vector number
+    	 * then creating a point at the end of the vector. The end result looks like sunflower seeds
+    	 * distributed evenly on a disc. Then those points coordinations to send rays in a cone shaped
+    	 * object.
+    	 * 
+    	 * To read more about golden ratio and distributing points evenly on a disc check:
+    	 * http://blog.marmakoide.org/?p=1
+    	 * https://youtu.be/bqtqltqcQhw?t=128
+    	 */
     	Set<HitMark> hits = new HashSet<>();
-    	
-    	//TODO: Document algorithm process
+    	//using golden Ration Distribution to equally distribute rays
     	float goldenRatio = (1f + (float) Math.sqrt(5)) / 2;
         float angle = 2 * (float) Math.PI * goldenRatio;
         float dist;
         
         Vector3f angleVec = opening.normalize();
         Vector3f direction = orientation.normalize();
-        Vector3f rangeProjOnDir = direction.mult(angleVec.dot(direction));
-        
-        Vector3f i = rangeProjOnDir.subtract(angleVec);
+        //create a projection of angleVec on direction (to use for creating 2 perpendicular vectors to direction)
+        Vector3f angleProjOnDir = direction.mult(angleVec.dot(direction));
+        //use the projected vector to create a vector perpendicular to direction
+        Vector3f i = angleProjOnDir.subtract(angleVec);
+        //record the radius range to use for distributing rays
         float radius = i.length();
-        float r = radius / rangeProjOnDir.length() * range * config.config.rayDensity;
         i.normalizeLocal();
+        //create a second vector that is perpendicular to direction vector and i vector
         Vector3f j = i.cross(direction).normalizeLocal();
         
+        //reuse loop variables
         Vector3f dI = new Vector3f();
         Vector3f dJ = new Vector3f();
         Vector3f ray = new Vector3f();
+        
+        //rays count is dependent on cone base area and given density/m
+        float r = radius / angleProjOnDir.length() * range * config.config.rayDensity;
         int rayCount = (int) (r * r * Math.PI);
         
         for (int l = 0; l < rayCount; l++) {
+        	//determine distance from circle center based on ray number
             dist = (float) Math.sqrt(l / (rayCount - 1f)) * radius;
 
+            //use the golden angle and ray number to get x and y coordinates relative
+            //to circle center and transform it to world x, y, z coordinates
             dI.set(i.mult(dist * (float) Math.cos(angle * l)));
             dJ.set(j.mult(dist * (float) Math.sin(angle * l)));
-            ray.set(rangeProjOnDir.x + dI.x + dJ.x,
-                    rangeProjOnDir.y + dI.y + dJ.y,
-                    rangeProjOnDir.z + dI.z + dJ.z).normalizeLocal();
+            ray.set(angleProjOnDir.x + dI.x + dJ.x,
+                    angleProjOnDir.y + dI.y + dJ.y,
+                    angleProjOnDir.z + dI.z + dJ.z).normalizeLocal();
             
+            //check for collisions and add the hitmark to the list if a collision is found
             HitMark hit = this.rayTest(origin, ray, range);
             if(hit != null) {
             	hits.add(hit);
@@ -250,44 +270,61 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
     @Override
     public Set<HitMark> checkSensorCylinder(Vector3f origin, Vector3f orientation, Vector3f dimension) {
+    	/*
+    	 * this algorithm uses golden ratio ((1 + sqrt(5))/2) to create a golden angle and
+    	 * use this angle to rotate a vector around its origin n times depending on vector number
+    	 * then creating a point at the end of the vector. The end result looks like sunflower seeds
+    	 * distributed evenly on a disc. Then those points coordinations to send rays in a cylinder
+    	 * shaped object.
+    	 * 
+    	 * To read more about golden ratio and distributing points evenly on a disc check:
+    	 * http://blog.marmakoide.org/?p=1
+    	 * https://youtu.be/bqtqltqcQhw?t=128
+    	 */
     	Set<HitMark> hits = new HashSet<>();
     	Random rand = new Random();
 
-    	//TODO: Document algorithm process
     	//if dimensions of the cylinder base differs take the biggest one (error forgiving)
-    	float radius = (dimension.x >= dimension.y)? dimension.x/2f : dimension.y/2f;
-        float range = dimension.z;
-        //calculate needed rays count based on cylinder base area = PI * r^2
-        int density = config.config.rayDensity;
-        int rayCount = (int) ((radius *density) * (radius * density) * Math.PI);
-        float dist;
+    	float radius = (dimension.x >= dimension.y)? dimension.x/2f : dimension.y/2f; //cylinder radius
+        float range = dimension.z; //cylinder height
 
     	//using golden Ration Distribution to equally distribute rays
     	float goldenRatio = (1f + (float) Math.sqrt(5)) / 2;
         float angle = 2 * (float) Math.PI * goldenRatio;
+        float dist;
         
         //create a random Point to generate a vector perpendicular to direction 
         Vector3f direction = orientation.normalize();
         Vector3f randomPoint = new Vector3f(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
         Vector3f pointProjOnDir = direction.mult(randomPoint.dot(direction));
         
-        //Vectors needed to generate Rays
+        //use the projected point to create a vector perpendicular to direction
         Vector3f i = randomPoint.subtract(pointProjOnDir).normalizeLocal();
+        //create a second vector that is perpendicular to direction vector and i vector
         Vector3f j = i.cross(direction).normalizeLocal();
+        
+        //reuse loop variables
         Vector3f dI = new Vector3f();
         Vector3f dJ = new Vector3f();
-        //Ray starting Point
-        Vector3f startPoint = new Vector3f();
+        Vector3f startPoint = new Vector3f(); //Ray starting Point
+        
+        //calculate needed rays count based on cylinder base area = PI * r^2
+        int density = config.config.rayDensity;
+        int rayCount = (int) ((radius *density) * (radius * density) * Math.PI);
         
         for (int l = 0; l < rayCount; l++) {
+        	//determine distance from circle center based on ray number
             dist = (float) Math.sqrt(l / (rayCount - 1f)) * radius;
 
+            //use the golden angle and ray number to get x and y coordinates relative
+            //to circle center and transform it to world x, y, z coordinates
             dI.set(i.mult(dist * (float) Math.cos(angle * l)));
             dJ.set(j.mult(dist * (float) Math.sin(angle * l)));
             startPoint.set(origin.x + dI.x + dJ.x,
-            		origin.y + dI.y + dJ.y,
-            		origin.z + dI.z + dJ.z);
-            
+            			   origin.y + dI.y + dJ.y,
+            			   origin.z + dI.z + dJ.z);
+
+            //check for collisions and add the hitmark to the list if a collision is found
             HitMark hit = this.rayTest(startPoint, direction, range);
             if(hit != null) {
             	hits.add(hit);
