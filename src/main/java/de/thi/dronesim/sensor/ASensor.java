@@ -221,8 +221,9 @@ public abstract class ASensor {
 	/**
 	 * Calculates the length from origin point to sensor position. This length is needed to
 	 * create the cone-object.
-	 *
-	 * @author Daniel Stolle
+	 * 
+	 * @author: Moris Breitenborn started calculation with intercept theorems.
+	 * @author Daniel Stolle improved method by simplifying it.
 	 * @return length between origin and sensor position
 	 */
 	public float getOriginToPositionLength(){
