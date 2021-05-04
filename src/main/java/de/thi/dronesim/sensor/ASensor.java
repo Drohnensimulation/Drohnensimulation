@@ -21,6 +21,7 @@ public abstract class ASensor {
 	protected Vector3f vectorAngle;
 	protected float sensorRadius;
 	protected float measurementAccuracy;
+	protected Vector3f orientationVector;
 	
 	//Relative Ausrichtung zur Drohne.
 	//Eine Drehung der Drohne hat keinen Einfluss auf die folgenden Werte.
@@ -265,6 +266,10 @@ public abstract class ASensor {
 	 */
 	public Vector3f getOrientation() {
 		return new Vector3f(directionX, directionY, directionZ);
+	}
+	
+	public void setOrientation(Vector3f orientationVector) {
+		this.orientationVector=orientationVector;
 	}
 
 	/** 
