@@ -1,11 +1,11 @@
 package de.thi.dronesim.obstacle;
 
+import com.jme3.math.Vector3f;
 import de.thi.dronesim.obstacle.dto.ObstacleDTO;
 import de.thi.dronesim.obstacle.dto.ObstacleJsonDTO;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 
-import javax.vecmath.Vector3f;
 import java.util.Set;
 
 public interface IUfoObjs {
@@ -46,7 +46,7 @@ public interface IUfoObjs {
      * @param opening Öffnungswinkel angegeben als Steigung
      * @return Referenz zu einem Getroffenen Objekt
      */
-    HitMark pruefeSensorCone(Vector3f origin, Vector3f orientation, float range, Vector3f opening);
+    Set<HitMark> checkSensorCone(Vector3f origin, Vector3f orientation, float range, Vector3f opening);
 
     /**
      * Prüft auf Kollisionen entlang einer 4 Seitigen Pyramide
@@ -56,7 +56,7 @@ public interface IUfoObjs {
      * @param opening Öffnungswinkel angegeben als Steigung
      * @return Referenz zu einem Getroffenen Objekt
      */
-    HitMark checkSensorPyramid(Vector3f origin, Vector3f orientation, float range, Vector3f opening);
+    Set<HitMark> checkSensorPyramid(Vector3f origin, Vector3f orientation, float range, Vector3f opening);
 
     /**
      * Prüft auf Kollisionen entlang eines Quaders
@@ -65,7 +65,7 @@ public interface IUfoObjs {
      * @param dimension Dimension des Quaders (x, y, z/Reichweite)
      * @return Referenz zu einem Getroffenen Objekt
      */
-    HitMark checkSensorCuboid(Vector3f origin, Vector3f orientation, Vector3f dimension);
+    Set<HitMark> checkSensorCuboid(Vector3f origin, Vector3f orientation, Vector3f dimension);
 
     /**
      * Prüft auf Kollisionen entlang eines Zylinders
@@ -74,17 +74,10 @@ public interface IUfoObjs {
      * @param dimension Dimension des Zylinders (x/Durchmesser, y/Durchmesser, z/Reichweite)
      * @return Referenz zu einem Getroffenen Objekt
      */
-    HitMark checkSensorCylinder(Vector3f origin, Vector3f orientation, Vector3f dimension);
-
-
-    /**
-     * Loads Environmental Context into the Simulation
-     * @param configHolder Config Holder containing the obstacle config {@link ObstacleJsonDTO}
-     */
-    void load(Object configHolder);
+    Set<HitMark> checkSensorCylinder(Vector3f origin, Vector3f orientation, Vector3f dimension);
 
     /**
-     * Speichert den Aktuellen Umgebungskontext in die angegebene Datei
+     * Extracts the current state into the ConfigDTO
      */
-    Object save();
+    ObstacleJsonDTO save();
 }

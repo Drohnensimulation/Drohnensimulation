@@ -59,9 +59,15 @@
  * public void reset()
  */
 
-package de.thi.dronesim.ufo;
+package de.thi.dronesim.drone;
 
-// class for the simulation of an ufo
+/**
+ * @deprecated
+ * @see de.thi.dronesim.Simulation
+ *
+ * class for the simulation of an ufo
+ */
+@Deprecated
 public final class UfoSim implements Runnable {
 
   // constants

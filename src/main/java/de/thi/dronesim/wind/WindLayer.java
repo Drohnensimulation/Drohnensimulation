@@ -1,7 +1,7 @@
 package de.thi.dronesim.wind;
 
-import de.thi.dronesim.ufo.Location;
-import de.thi.dronesim.ufo.UfoSim;
+import de.thi.dronesim.drone.Location;
+import de.thi.dronesim.drone.UfoSim;
 
 public class WindLayer implements Comparable<WindLayer> {
 
@@ -29,7 +29,7 @@ public class WindLayer implements Comparable<WindLayer> {
      * @param altitudeTop height of wind layer top                  [m]
      * @param windDirection current wind direction                  [degree]
      */
-    public WindLayer(double windSpeed, double gustSpeed, double timeStart, double timeEnd, double altitudeBottom,
+    protected WindLayer(double windSpeed, double gustSpeed, double timeStart, double timeEnd, double altitudeBottom,
                      double altitudeTop, double windDirection) {
         this.windSpeed = windSpeed;
         this.gustSpeed = gustSpeed;
@@ -40,7 +40,7 @@ public class WindLayer implements Comparable<WindLayer> {
         this.windDirection = windDirection;
     }
 
-    public WindLayer copy() {
+    protected WindLayer copy() {
         return new WindLayer(
                 windSpeed,
                 gustSpeed,
@@ -56,7 +56,7 @@ public class WindLayer implements Comparable<WindLayer> {
      * Applies wind speeds to drone
      * @param location Current location
      */
-    public Wind.WindChange applyForces(Location location){
+    protected Wind.WindChange applyForces(Location location){
         double hdg = location.getHeading();
         double tas = location.getAirspeed();
         double ws = calcWindSpeed();
@@ -130,83 +130,83 @@ public class WindLayer implements Comparable<WindLayer> {
         nextGustSpeed = Math.random() * gustSpeed + windSpeed;
     }
 
-    public static double getGustRiseTime() {
+    protected static double getGustRiseTime() {
         return GUST_RISE_TIME;
     }
 
-    public static double getMaxCalmTime() {
+    protected static double getMaxCalmTime() {
         return MAX_CALM_TIME;
     }
 
-    public double getWindSpeed() {
+    protected double getWindSpeed() {
         return windSpeed;
     }
 
-    public double getGustSpeed() {
+    protected double getGustSpeed() {
         return gustSpeed;
     }
 
-    public double getTimeStart() {
+    protected double getTimeStart() {
         return timeStart;
     }
 
-    public double getTimeEnd() {
+    protected double getTimeEnd() {
         return timeEnd;
     }
 
-    public double getAltitudeBottom() {
+    protected double getAltitudeBottom() {
         return altitudeBottom;
     }
 
-    public double getAltitudeTop() {
+    protected double getAltitudeTop() {
         return altitudeTop;
     }
 
-    public double getWindDirection() {
+    protected double getWindDirection() {
         return windDirection;
     }
 
-    public double getNextGustStart() {
+    protected double getNextGustStart() {
         return nextGustStart;
     }
 
-    public double getNextGustSpeed() {
+    protected double getNextGustSpeed() {
         return nextGustSpeed;
     }
 
-    public void setWindSpeed(double windSpeed) {
+    protected void setWindSpeed(double windSpeed) {
         this.windSpeed = windSpeed;
     }
 
-    public void setGustSpeed(double gustSpeed) {
+    protected void setGustSpeed(double gustSpeed) {
         this.gustSpeed = gustSpeed;
     }
 
-    public void setTimeStart(double timeStart) {
+    protected void setTimeStart(double timeStart) {
         this.timeStart = timeStart;
     }
 
-    public void setTimeEnd(double timeEnd) {
+    protected void setTimeEnd(double timeEnd) {
         this.timeEnd = timeEnd;
     }
 
-    public void setAltitudeBottom(double altitudeBottom) {
+    protected void setAltitudeBottom(double altitudeBottom) {
         this.altitudeBottom = altitudeBottom;
     }
 
-    public void setAltitudeTop(double altitudeTop) {
+    protected void setAltitudeTop(double altitudeTop) {
         this.altitudeTop = altitudeTop;
     }
 
-    public void setWindDirection(double windDirection) {
+    protected void setWindDirection(double windDirection) {
         this.windDirection = windDirection;
     }
 
-    public void setNextGustStart(double nextGustStart) {
+    protected void setNextGustStart(double nextGustStart) {
         this.nextGustStart = nextGustStart;
     }
 
-    public void setNextGustSpeed(double nextGustSpeed) {
+    protected void setNextGustSpeed(double nextGustSpeed) {
         this.nextGustSpeed = nextGustSpeed;
     }
 

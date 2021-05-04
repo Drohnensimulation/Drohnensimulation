@@ -1,26 +1,53 @@
 package de.thi.dronesim.wind;
 
-import de.thi.dronesim.ufo.Location;
-import de.thi.dronesim.ufo.UfoSim;
+import de.thi.dronesim.ISimulationChild;
+import de.thi.dronesim.Simulation;
+import de.thi.dronesim.drone.Drone;
+import de.thi.dronesim.drone.Location;
+import de.thi.dronesim.persistence.ConfigReader;
+import de.thi.dronesim.persistence.entity.SimulationConfig;
+import de.thi.dronesim.persistence.entity.WindConfig;
 
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
-public class Wind {
+public class Wind implements ISimulationChild {
 
     private static final double WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE = 5;        // range in m
     private static final double WIND_LAYER_INTERPOLATION_TIME_RANGE = 5;            // range in s
 
+    //Main simulation
+    private Simulation simulation;
+    private boolean configLoaded = false;
+    private String configPath;
+
     private List<WindLayer> windLayers;             // list of wind layers      [Windlayer]
     private int latestLayerId = 0;
 
-    public Wind() {
-
+    public Wind(String configPath) {
+        this.configPath = configPath;
+        load();
     }
 
     public Wind(List<WindLayer> layers){
+        this.configLoaded = true;
         this.windLayers = layers;
+    }
+
+    /**
+     * Interface for receiving Wind data based on the current location and simulation time
+     * @param location current Location
+     * @param time current Simulation Time
+     * @return return WindChange if configLoaded, returns null if Config not loaded
+     */
+    public WindChange getCurrentWind(Location location, int time){
+        if(this.configLoaded){
+            applyWind(location);
+            return new WindChange(location.getTrack(), location.getGroundSpeed());
+        }else {
+            return null;
+        }
     }
 
     /**
@@ -30,13 +57,80 @@ public class Wind {
      * </p>
      *
      */
-    public void load() {
+    private void load() {
         // TODO check for overlapping and small gaps
+        loadFromConfig(this.configPath);
+        sortWindLayer(windLayers);
+        normalize();
+        this.configLoaded = true;
     }
 
+    /**
+     * This function is loading a JSON File and converts it into a List<WindLayer>
+     * @param configPath path to the WindLayer configuration File
+     */
+    private void loadFromConfig(String configPath){
+        SimulationConfig windSimulationConfig =  ConfigReader.readConfig(configPath);
+        List<WindConfig> windConfigList = windSimulationConfig.getWindConfigList();
+        for(int i =0; i < windConfigList.size(); i++) {
+            WindLayer windLayer = new WindLayer(windConfigList.get(i).getWindSpeed(),
+                    windConfigList.get(i).getGustSpeed(), windConfigList.get(i).getTimeStart(),
+                    windConfigList.get(i).getTimeEnd(), windConfigList.get(i).getAltitudeBottom(),
+                    windConfigList.get(i).getAltitudeTop(), windConfigList.get(i).getWindDirection());
+            windLayers.add(windLayer);
+        }
+    }
+
+    /**
+     * This function sorts the given WindLayer by Time
+     * @param windLayers List of unsorted WindLayer
+     */
+    private void sortWindLayer(List<WindLayer> windLayers){
+        windLayers.sort(Comparator.comparing(WindLayer::getTimeStart));
+        sortWindLayerAltitudeBased();
+    }
+
+    /**
+     * This function sorts the given WindLayer by Altitude
+     */
+    private void sortWindLayerAltitudeBased(){
+        for (int i =0; i < windLayers.size() - 1; i++){
+            for(int x = 0; x < windLayers.size() - i - 1; x++){
+                if(windLayers.get(x).getAltitudeBottom() > windLayers.get(x+1).getAltitudeBottom()
+                        && windLayers.get(x).getTimeEnd() >= windLayers.get(x + 1).getTimeStart()){
+                    WindLayer tempLayer = windLayers.get(x);
+                    windLayers.set(x, windLayers.get(x + 1));
+                    windLayers.set(x + 1, tempLayer);
+                }
+            }
+        }
+    }
+
+    /**
+     * This Method normalizes the WindLayer already sorted, as defined in function load
+     */
     private void normalize() {
-        // TODO change height and time here according to definition #load
-        // TODO round time to WIND_LAYER_INTERPOLATION_TIME_RANGE * 2
+        double altDistance = 2 * WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE;
+        double timeDistance = 2 * WIND_LAYER_INTERPOLATION_TIME_RANGE;
+
+        for (int i = 0; i < windLayers.size() - 1; i++){
+            for (int x = i + 1; x < windLayers.size() - 1; x++){
+                WindLayer oldLayer = windLayers.get(i);
+                WindLayer nextLayer = windLayers.get(x);
+                if (oldLayer.getAltitudeTop() < nextLayer.getAltitudeBottom() + altDistance
+                        &&(oldLayer.getTimeEnd() > nextLayer.getTimeStart() ||
+                        oldLayer.getTimeEnd() + timeDistance <= nextLayer.getTimeEnd() &&
+                                nextLayer.getTimeStart()  - oldLayer.getTimeEnd() <= timeDistance)){
+                    nextLayer.setAltitudeBottom(oldLayer.getAltitudeTop() + altDistance);
+                } else if(oldLayer.getTimeEnd() < nextLayer.getTimeStart() + timeDistance
+                        &&(oldLayer.getAltitudeTop() > nextLayer.getAltitudeBottom() ||
+                        oldLayer.getAltitudeTop() + altDistance <= nextLayer.getAltitudeTop() &&
+                                nextLayer.getAltitudeBottom()  - oldLayer.getAltitudeTop() <= altDistance)){
+                    nextLayer.setTimeStart(oldLayer.getTimeEnd() + timeDistance);
+                }
+            }
+        }
+
     }
 
     public void reset() {
@@ -181,10 +275,6 @@ public class Wind {
         return lowerChange;
     }
 
-    public void sortWindLayer(){
-        Collections.sort(windLayers);
-    }
-
     private WindChange interpolate(WindChange first, WindChange second, double x, double range) {
 
         // Calculate change in track
@@ -214,6 +304,16 @@ public class Wind {
             this.gs = gs;
         }
 
+    }
+
+    @Override
+    public void setSimulation(Simulation simulation) {
+        this.simulation = simulation;
+    }
+
+    @Override
+    public Simulation getSimulation() {
+        return this.simulation;
     }
 
 }
