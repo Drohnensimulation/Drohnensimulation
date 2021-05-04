@@ -223,8 +223,8 @@ public class Wind implements ISimulationChild {
 
         WindChange windChange;
         if (timeInterpolationFirst) {
-            WindChange upperChange = interpolateTimeLayers(lowerPrevLayer, lowerNextLayer, location, time);
-            WindChange lowerChange = interpolateTimeLayers(upperPrevLayer, upperNextLayer, location, time);
+            WindChange upperChange = interpolateTimeLayers(lowerPrevLayer, lowerNextLayer, location);
+            WindChange lowerChange = interpolateTimeLayers(upperPrevLayer, upperNextLayer, location);
 
             // If both changes are zero, no further interpolation is needed
             if (upperChange.gs == 0 && lowerChange.gs == 0) {
@@ -262,9 +262,10 @@ public class Wind implements ISimulationChild {
         location.setGroundSpeed(windChange.gs);
     }
 
-    private WindChange interpolateTimeLayers(WindLayer prevLayer, WindLayer nextLayer, Location location, double time) {
-        WindChange prevChange = WindLayer.applyOrZero(prevLayer, location);
-        WindChange nextChange = WindLayer.applyOrZero(nextLayer, location);
+    private WindChange interpolateTimeLayers(WindLayer prevLayer, WindLayer nextLayer, Location location) {
+        double time = simulation.getTime();
+        WindChange prevChange = WindLayer.applyOrZero(prevLayer, location, time);
+        WindChange nextChange = WindLayer.applyOrZero(nextLayer, location, time);
 
         if (prevLayer != null || nextLayer != null) {
             double ref = prevLayer != null ? prevLayer.getTimeEnd() : nextLayer.getTimeStart();
@@ -277,8 +278,8 @@ public class Wind implements ISimulationChild {
     }
 
     private WindChange interpolateAltitudeLayers(WindLayer lowerLayer, WindLayer upperLayer, Location location) {
-        WindChange lowerChange = WindLayer.applyOrZero(lowerLayer, location);
-        WindChange upperChange = WindLayer.applyOrZero(upperLayer, location);
+        WindChange lowerChange = WindLayer.applyOrZero(lowerLayer, location, simulation.getTime());
+        WindChange upperChange = WindLayer.applyOrZero(upperLayer, location, simulation.getTime());
 
         if (lowerLayer != null || upperLayer != null) {
             double alt = upperLayer != null ? upperLayer.getAltitudeBottom() : lowerLayer.getAltitudeTop();
