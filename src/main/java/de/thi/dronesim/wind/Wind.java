@@ -50,9 +50,36 @@ public class Wind implements ISimulationChild {
         }
     }
 
+    /**
+     * Calculates the wind direction and speed at the current time of a given location.
+     * @param location Location of requested wind
+     * @return Wind speed in m/s and direction in deg
+     */
     public static Wind.CurrentWind getWindAt(Location location) {
+        double tas = location.getAirspeed();
+        double gs = location.getGroundSpeed();
 
-        return new CurrentWind(0, 0);
+        // No wind at all
+        if (location.getGroundSpeed() == location.getAirspeed())
+            return new CurrentWind(location.getHeading(), 0);
+
+        // Nose or tailwind
+        if (location.getHeading() == location.getTrack()) {
+            double ws = location.getAirspeed() - location.getGroundSpeed();
+            return new Wind.CurrentWind(
+                    ws > 0 ? location.getHeading() : (location.getHeading() + 180) % 360,
+                    Math.abs(ws));
+        }
+        // Wind correction angle
+        double wca = location.getHeading() - location.getTrack();
+        // Calculate wind speed
+        double ws = gs * gs + tas * tas - 2 * gs * tas * Math.cos(Math.toRadians(Math.abs(wca)));
+        // Calculate wind angle
+        double wa = Math.toDegrees(Math.asin(Math.sin(Math.toRadians(wca)) / ws * gs));
+        // Calculate wind direction
+        double wd = (((location.getTrack() - wa * Math.signum(wca)) + 540) % 360) - 180;
+
+        return new CurrentWind(wa, wd);
     }
 
     /**
@@ -322,12 +349,12 @@ public class Wind implements ISimulationChild {
 
     public static final class CurrentWind {
 
-        private final double windSpeed;
         private final double windDirection;
+        private final double windSpeed;
 
-        public CurrentWind(double windSpeed, double windDirection) {
-            this.windSpeed = windSpeed;
+        public CurrentWind(double windDirection, double windSpeed) {
             this.windDirection = windDirection;
+            this.windSpeed = windSpeed;
         }
 
         /**
