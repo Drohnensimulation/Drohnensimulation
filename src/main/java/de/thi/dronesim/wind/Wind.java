@@ -2,8 +2,8 @@ package de.thi.dronesim.wind;
 
 import de.thi.dronesim.ISimulationChild;
 import de.thi.dronesim.Simulation;
+import de.thi.dronesim.drone.Drone;
 import de.thi.dronesim.drone.Location;
-import de.thi.dronesim.drone.UfoSim;
 import de.thi.dronesim.persistence.ConfigReader;
 import de.thi.dronesim.persistence.entity.SimulationConfig;
 import de.thi.dronesim.persistence.entity.WindConfig;
@@ -18,15 +18,34 @@ public class Wind implements ISimulationChild {
 
     //Main simulation
     private Simulation simulation;
+    private boolean configLoaded = false;
+    private String configPath;
 
     private List<WindLayer> windLayers;             // list of wind layers      [Windlayer]
 
-    public Wind() {
-
+    public Wind(String configPath) {
+        this.configPath = configPath;
+        load();
     }
 
     public Wind(List<WindLayer> layers){
+        this.configLoaded = true;
         this.windLayers = layers;
+    }
+
+    /**
+     * Interface for receiving Wind data based on the current location and simulation time
+     * @param location current Location
+     * @param time current Simulation Time
+     * @return return WindChange if configLoaded, returns null if Config not loaded
+     */
+    public WindChange getCurrentWind(Location location, int time){
+        if(this.configLoaded){
+            applyWind(location);
+            return new WindChange(location.getTrack(), location.getGroundSpeed());
+        }else {
+            return null;
+        }
     }
 
     /**
@@ -36,11 +55,12 @@ public class Wind implements ISimulationChild {
      * </p>
      *
      */
-    public void load(String configPath) {
+    private void load() {
         // TODO check for overlapping and small gaps
-        loadFromConfig(configPath);
+        loadFromConfig(this.configPath);
         sortWindLayer(windLayers);
         normalize();
+        this.configLoaded = true;
     }
 
     /**
@@ -129,7 +149,7 @@ public class Wind implements ISimulationChild {
      * @param location
      */
     public void applyWind(Location location){
-        double time = UfoSim.getInstance().getTime(); // TODO needs to be adjusted because it is desperate
+        double time = Drone.getInstance().getTime(); // TODO needs to be adjusted because it is desperate
 
         // TODO introduce caching
         WindLayer lowerPrevLayer = findWindLayer(location.getZ() - WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
