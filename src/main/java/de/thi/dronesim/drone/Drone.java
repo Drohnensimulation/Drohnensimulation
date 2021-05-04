@@ -17,4 +17,32 @@ public class Drone {
      */
     private List<ASensor> sensors;
 
+    private volatile double time;        // elapsed flight time with v > 0 since reset [s]
+    private static Drone instance;      // singleton instance
+
+    public Drone(){
+
+    }
+
+    /**
+     * returns Simulation time
+     * @author Laurence Hupp
+     * @return time
+     */
+    public double getTime() {
+        return time;
+    }
+
+    /**
+     * get the current Instance of the Drone
+     * @author Laurence Hupp
+     * @return Drone Instance
+     */
+    public static Drone getInstance() {
+        if (instance == null) {
+            instance = new Drone();
+        }
+
+        return instance;
+    }
 }
