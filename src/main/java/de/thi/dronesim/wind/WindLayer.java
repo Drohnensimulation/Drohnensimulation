@@ -82,6 +82,9 @@ public class WindLayer implements Comparable<WindLayer> {
         return new Wind.WindChange(hdg + wca, gs);
     }
 
+    protected static Wind.WindChange applyOrZero(WindLayer windLayer, Location location) {
+        return windLayer != null ? windLayer.applyForces(location) : new Wind.WindChange(location.getHeading(), 0);
+    }
 
     /**
      * calculating wind speed with interpolation

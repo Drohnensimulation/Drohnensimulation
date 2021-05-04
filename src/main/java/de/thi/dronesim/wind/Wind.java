@@ -5,6 +5,7 @@ import de.thi.dronesim.ufo.UfoSim;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 
 public class Wind {
 
@@ -12,6 +13,7 @@ public class Wind {
     private static final double WIND_LAYER_INTERPOLATION_TIME_RANGE = 5;            // range in s
 
     private List<WindLayer> windLayers;             // list of wind layers      [Windlayer]
+    private int latestLayerId = 0;
 
     public Wind() {
 
@@ -37,27 +39,52 @@ public class Wind {
         // TODO round time to WIND_LAYER_INTERPOLATION_TIME_RANGE * 2
     }
 
+    public void reset() {
+        latestLayerId = 0;
+    }
+
+    /**
+     * Searches oldest layer by time
+     * @param time Oldest time still in use
+     */
+    private void updateLatestLayer(double time) {
+        for (int i = latestLayerId; i < windLayers.size(); i++) {
+            if (windLayers.get(i).getTimeEnd() <= time) {
+                // Increment id as this layer will not be used anymore
+                latestLayerId = i;
+            } else {
+                break;
+            }
+        }
+    }
+
     private WindLayer findWindLayer(double alt, double time) {
-        // TODO implement better search algorithm
-        for (WindLayer layer: windLayers) {
+        for (ListIterator<WindLayer> it = windLayers.listIterator(latestLayerId); it.hasNext(); ) {
+            WindLayer layer = it.next();
             if (layer.getAltitudeBottom() <= alt
                     && layer.getAltitudeTop() > alt
                     && layer.getTimeStart() <= time
                     && layer.getTimeEnd() > time) {
                 return layer;
             }
+
+            // As layers are sorted by start time, we can stop the search if time excites start time here
+            if (layer.getTimeStart() > time) break;
         }
         return null;
     }
 
     /**
-     * applies wind based on the current location
-     * @param location
+     * Applies wind based on the current location.
+     * @param location Location of the drone
      */
     public void applyWind(Location location){
         double time = UfoSim.getInstance().getTime();
 
-        // TODO introduce caching
+        // Update oldest layer to set start point of search algorithm
+        updateLatestLayer(time - WIND_LAYER_INTERPOLATION_TIME_RANGE);
+
+        // Find all 4 layers required. More layers can't have any effect by definition
         WindLayer lowerPrevLayer = findWindLayer(location.getZ() - WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
                 time - WIND_LAYER_INTERPOLATION_TIME_RANGE);
         WindLayer upperPrevLayer = findWindLayer(location.getZ() + WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
@@ -67,21 +94,58 @@ public class Wind {
         WindLayer upperNextLayer = findWindLayer(location.getZ() + WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
                 time + WIND_LAYER_INTERPOLATION_TIME_RANGE);
 
-        WindChange prevChange = calculateAltitudeChange(lowerPrevLayer, upperPrevLayer, location);
-        WindChange nextChange = calculateAltitudeChange(lowerNextLayer, upperNextLayer, location);
+        // In case no layer was found, no wind applies
+        if (lowerPrevLayer == null && upperPrevLayer == null && lowerNextLayer == null && upperNextLayer == null) {
+            // Set track to hdg, gs to tas
+            location.setTrack(location.getHeading());
+            location.setGroundSpeed(location.getAirspeed());
+            return;
+        }
+
+        boolean timeInterpolationFirst = false;
+        if (lowerPrevLayer != null && upperNextLayer != null) {
+            timeInterpolationFirst = lowerPrevLayer.getTimeEnd() != upperNextLayer.getTimeStart();
+        } else if (upperPrevLayer != null && lowerNextLayer != null) {
+            timeInterpolationFirst = upperPrevLayer.getTimeEnd() != lowerNextLayer.getTimeStart();
+        } else if ((lowerNextLayer != null && upperNextLayer != null)
+                || (lowerPrevLayer != null && upperPrevLayer != null)) {
+            timeInterpolationFirst = true;
+        }
 
         WindChange windChange;
-        if (prevChange != null || nextChange != null) {
-            // Check if one layer is a null layer
-            if (prevChange == null) {
-                prevChange = new WindChange(nextChange.track, 0);
-            } else if (nextChange == null) {
-                nextChange = new WindChange(prevChange.track, 0);
+        if (timeInterpolationFirst) {
+            WindChange upperChange = interpolateTimeLayers(lowerPrevLayer, lowerNextLayer, location, time);
+            WindChange lowerChange = interpolateTimeLayers(upperPrevLayer, upperNextLayer, location, time);
+
+            // If both changes are zero, no further interpolation is needed
+            if (upperChange.gs == 0 && lowerChange.gs == 0) {
+                windChange = upperChange;
+            } else {
+                // Either lowerPrevLayer or lowerNextLayer has to be not null as timeInterpolationFirst is set to true
+                double ref = lowerPrevLayer != null ? lowerPrevLayer.getAltitudeTop() : lowerNextLayer.getAltitudeTop();
+                // Interpolate time
+                windChange = interpolate(upperChange, lowerChange,
+                        location.getY() - ref,
+                        WIND_LAYER_INTERPOLATION_TIME_RANGE);
             }
-            windChange = interpolate(prevChange, nextChange, 0, WIND_LAYER_INTERPOLATION_TIME_RANGE);
         } else {
-            // Calm day today
-            windChange = new WindChange(location.getHeading(), location.getAirspeed());
+            // Interpolate altitude first
+            WindChange prevChange = interpolateAltitudeLayers(lowerPrevLayer, upperPrevLayer, location);
+            WindChange nextChange = interpolateAltitudeLayers(lowerNextLayer, upperNextLayer, location);
+
+            // If both changes are zero, no further interpolation is needed
+            if (prevChange.gs == 0 && nextChange.gs == 0) {
+                windChange = prevChange;
+            } else {
+                // At least one layer has to be not null
+                double ref = lowerPrevLayer != null ? lowerPrevLayer.getTimeEnd() :
+                        (lowerNextLayer != null ? lowerNextLayer.getTimeStart() :
+                                (upperPrevLayer != null ? upperPrevLayer.getTimeEnd() : upperNextLayer.getTimeStart()));
+                // Interpolate time
+                windChange = interpolate(prevChange, nextChange,
+                        time - ref,
+                        WIND_LAYER_INTERPOLATION_TIME_RANGE);
+            }
         }
 
         // Apply changes
@@ -89,30 +153,32 @@ public class Wind {
         location.setGroundSpeed(windChange.gs);
     }
 
-    private WindChange calculateAltitudeChange(WindLayer lowerLayer, WindLayer upperLayer, Location location) {
-        WindChange lowerChange;
-        WindChange upperChange;
+    private WindChange interpolateTimeLayers(WindLayer prevLayer, WindLayer nextLayer, Location location, double time) {
+        WindChange prevChange = WindLayer.applyOrZero(prevLayer, location);
+        WindChange nextChange = WindLayer.applyOrZero(nextLayer, location);
+
+        if (prevLayer != null || nextLayer != null) {
+            double ref = prevLayer != null ? prevLayer.getTimeEnd() : nextLayer.getTimeStart();
+            return interpolate(prevChange, nextChange,
+                    time - ref,
+                    WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE);
+        }
+        // No layer applies so no wind is set
+        return new WindChange(location.getHeading(), 0);
+    }
+
+    private WindChange interpolateAltitudeLayers(WindLayer lowerLayer, WindLayer upperLayer, Location location) {
+        WindChange lowerChange = WindLayer.applyOrZero(lowerLayer, location);
+        WindChange upperChange = WindLayer.applyOrZero(upperLayer, location);
 
         if (lowerLayer != null || upperLayer != null) {
-            double alt;
-            if (lowerLayer == null) {
-                upperChange = upperLayer.applyForces(location);
-                lowerChange = new WindChange(upperChange.track, 0);
-                alt = upperLayer.getAltitudeBottom();
-            } else if (upperLayer == null) {
-                lowerChange = lowerLayer.applyForces(location);
-                upperChange = new WindChange(lowerChange.track, 0);
-                alt = lowerLayer.getAltitudeTop();
-            } else {
-                lowerChange = lowerLayer.applyForces(location);
-                upperChange = upperLayer.applyForces(location);
-                alt = lowerLayer.getAltitudeTop();
-            }
+            double alt = upperLayer != null ? upperLayer.getAltitudeBottom() : lowerLayer.getAltitudeTop();
             return interpolate(lowerChange, upperChange,
                     location.getZ() - alt,
                     WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE);
         }
-        return null;
+        // If both layers are null, each change is a zero change.
+        return lowerChange;
     }
 
     public void sortWindLayer(){
@@ -134,10 +200,9 @@ public class Wind {
         return new WindChange(track, gs);
     }
 
-    public List<WindLayer> getWindLayers(){
+    protected List<WindLayer> getWindLayers() {
         return windLayers;
     }
-
 
     protected static final class WindChange {
 
