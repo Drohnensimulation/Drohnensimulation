@@ -42,7 +42,7 @@ class SensorTest {
         ASensor sensor = new InfraredSensor();
         sensor.setDirection(1, 0, 0);
         sensor.setPosition(0, 0, 0);
-        sensor.setAngleOfViewHorizontal(45);
+        sensor.setSensorAngle(45);
         sensor.setRange(1);
         sensor.setSize(1);
 
@@ -64,7 +64,7 @@ class SensorTest {
         ASensor sensor = new InfraredSensor();
         sensor.setDirection(1, 0, 0);
         sensor.setPosition(1, 0, 0);
-        sensor.setAngleOfViewHorizontal(45);
+        sensor.setSensorAngle(45);
         sensor.setRange(1);
         sensor.setSize(1);
 
@@ -86,7 +86,7 @@ class SensorTest {
         ASensor sensor = new InfraredSensor();
         sensor.setDirection(0, 1, 0);
         sensor.setPosition(0, 0, 0);
-        sensor.setAngleOfViewHorizontal(45);
+        sensor.setSensorAngle(45);
         sensor.setRange(1);
         sensor.setSize(1);
 
@@ -108,7 +108,7 @@ class SensorTest {
         ASensor sensor = new InfraredSensor();
         sensor.setDirection(0, 0, 1);
         sensor.setPosition(0, 0, 0);
-        sensor.setAngleOfViewHorizontal(45);
+        sensor.setSensorAngle(45);
         sensor.setRange(1);
         sensor.setSize(1);
 
@@ -130,7 +130,7 @@ class SensorTest {
         ASensor sensor = new InfraredSensor();
         sensor.setDirection(1, 1, 0);
         sensor.setPosition(0, 0, 0);
-        sensor.setAngleOfViewHorizontal(45);
+        sensor.setSensorAngle(45);
         sensor.setRange(1);
         sensor.setSize(1);
 
@@ -153,7 +153,7 @@ class SensorTest {
         ASensor sensor = new InfraredSensor();
         sensor.setDirection(1, 1, 1);
         sensor.setPosition(0, 0, 0);
-        sensor.setAngleOfViewHorizontal(45);
+        sensor.setSensorAngle(45);
         sensor.setRange(1);
         sensor.setSize(1);
 
@@ -175,7 +175,7 @@ class SensorTest {
         ASensor sensor = new InfraredSensor();
         sensor.setDirection(1, 0, 0);
         sensor.setPosition(0, 0, 0);
-        sensor.setAngleOfViewHorizontal(45);
+        sensor.setSensorAngle(45);
         sensor.setRange(1);
         sensor.setSize(2);
 
@@ -197,7 +197,7 @@ class SensorTest {
         ASensor sensor = new InfraredSensor();
         sensor.setDirection(1, 0, 0);
         sensor.setPosition(0, 0, 0);
-        sensor.setAngleOfViewHorizontal(60F);
+        sensor.setSensorAngle(60F);
         sensor.setRange(1);
         sensor.setSize(1);
 
@@ -219,7 +219,7 @@ class SensorTest {
         ASensor sensor = new InfraredSensor();
         sensor.setDirection(1, 1, 1);
         sensor.setPosition(1, 2, 3);
-        sensor.setAngleOfViewHorizontal(45);
+        sensor.setSensorAngle(45);
         sensor.setRange(1);
         sensor.setSize(1);
 
