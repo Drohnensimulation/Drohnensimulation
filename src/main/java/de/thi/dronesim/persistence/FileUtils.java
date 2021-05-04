@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 
 /**
  * Class to read/write Files.
+ *
+ * @author Daniel Stolle
  */
 final class FileUtils {
 

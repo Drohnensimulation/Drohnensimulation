@@ -1,15 +1,20 @@
 package de.thi.dronesim.wind;
 
+import de.thi.dronesim.ISimulationChild;
+import de.thi.dronesim.Simulation;
 import de.thi.dronesim.drone.Location;
 import de.thi.dronesim.drone.UfoSim;
 
 import java.util.Collections;
 import java.util.List;
 
-public class Wind {
+public class Wind implements ISimulationChild {
 
     private static final double WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE = 5;        // range in m
     private static final double WIND_LAYER_INTERPOLATION_TIME_RANGE = 5;            // range in s
+
+    //Main simulation
+    private Simulation simulation;
 
     private List<WindLayer> windLayers;             // list of wind layers      [Windlayer]
 
@@ -138,7 +143,6 @@ public class Wind {
         return windLayers;
     }
 
-
     protected static final class WindChange {
 
         private final double track;
@@ -149,6 +153,16 @@ public class Wind {
             this.gs = gs;
         }
 
+    }
+
+    @Override
+    public void setSimulation(Simulation simulation) {
+        this.simulation = simulation;
+    }
+
+    @Override
+    public Simulation getSimulation() {
+        return this.simulation;
     }
 
 }

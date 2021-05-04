@@ -4,6 +4,8 @@ import com.jme3.math.Vector3f;
 
 /**
  * Object that holds all Configurations to a Sensor.
+ *
+ * @author Daniel Stolle
  */
 public class SensorConfig {
 
