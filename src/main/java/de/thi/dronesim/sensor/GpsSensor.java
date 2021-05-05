@@ -66,6 +66,7 @@ public class GpsSensor {
 		zCoord = this.addNoise(zCoord, this.horizontalNoise);
 		yCoord = this.addNoise(yCoord, this.verticalNoise);
 		
+		//TODO: replace system time with global simulation time
 		long currentTime = System.currentTimeMillis();
 		
 		//Adds the measurement to the queue
