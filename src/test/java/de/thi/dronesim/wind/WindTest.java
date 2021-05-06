@@ -34,6 +34,96 @@ class WindTest {
         windGust = new Wind(createWindGustLayerList());
     }
 
+
+    @Test
+    void sort_timeAlreadySorted() {
+        // Case 1
+        int[] result = {0 ,1};
+        List<WindLayer> layers = new ArrayList<>();
+        layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
+        layers.add(new WindLayer(0, 0, 20, 30, 0, 10, 0));
+        Wind wind = new Wind(new ArrayList<>(layers));
+
+        for (int i = 0; i < wind.getWindLayers().size() -1; i++) {
+            assertEquals(result[i], wind.getWindLayers().indexOf(layers.get(i)));
+        }
+    }
+
+    @Test
+    void sort_timeUnsorted() {
+        // Case 1
+        int[] result = {1 ,0};
+        List<WindLayer> layers = new ArrayList<>();
+        layers.add(new WindLayer(0, 0, 20, 30, 0, 10, 0));
+        layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
+        Wind wind = new Wind(new ArrayList<>(layers));
+
+        for (int i = 0; i < wind.getWindLayers().size() -1; i++) {
+            assertEquals(result[i], layers.indexOf(wind.getWindLayers().get(i)));
+        }
+    }
+
+    @Test
+    void sort_altitudeAlreadySorted() {
+        // Case 1
+        int[] result = {0 ,1};
+        List<WindLayer> layers = new ArrayList<>();
+        layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
+        layers.add(new WindLayer(0, 0, 0, 10, 20, 30, 0));
+        Wind wind = new Wind(new ArrayList<>(layers));
+
+        for (int i = 0; i < wind.getWindLayers().size() -1; i++) {
+            assertEquals(result[i], wind.getWindLayers().indexOf(layers.get(i)));
+        }
+    }
+
+    @Test
+    void sort_altitudeUnsorted() {
+        // Case 1
+        int[] result = {1 ,0};
+        List<WindLayer> layers = new ArrayList<>();
+        layers.add(new WindLayer(0, 0, 0, 10, 20, 30, 0));
+        layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
+        Wind wind = new Wind(new ArrayList<>(layers));
+
+        for (int i = 0; i < wind.getWindLayers().size() -1; i++) {
+            assertEquals(result[i], layers.indexOf(wind.getWindLayers().get(i)));
+        }
+    }
+
+    @Test
+    void sort_mixedUnsorted() {
+        // Case 1
+        int[] result = {2,3,0,1};
+        List<WindLayer> layers = new ArrayList<>();
+        layers.add(new WindLayer(0, 0, 20, 30, 0, 10, 0));
+        layers.add(new WindLayer(0, 0, 20, 30, 20, 30, 0));
+        layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
+        layers.add(new WindLayer(0, 0, 0, 10, 20, 30, 0));
+        Wind wind = new Wind(new ArrayList<>(layers));
+
+        for (int i = 0; i < wind.getWindLayers().size() -1; i++) {
+            assertEquals(result[i], layers.indexOf(wind.getWindLayers().get(i)));
+        }
+    }
+
+    @Test
+    void sort_mixed2Unsorted() {
+        // Case 1
+        int[] result = {4, 3, 1, 0, 2};
+        List<WindLayer> layers = new ArrayList<>();
+        layers.add(new WindLayer(0, 0, 40, 50, 0, 10, 0));
+        layers.add(new WindLayer(0, 0, 30, 40, 20, 30, 0));
+        layers.add(new WindLayer(0, 0, 40, 50, 40, 50, 0));
+        layers.add(new WindLayer(0, 0, 10, 30, 0, 10, 0));
+        layers.add(new WindLayer(0, 0, 0, 30, 40, 50, 0));
+        Wind wind = new Wind(new ArrayList<>(layers));
+
+        for (int i = 0; i < wind.getWindLayers().size() -1; i++) {
+            assertEquals(result[i], layers.indexOf(wind.getWindLayers().get(i)));
+        }
+    }
+
     @Test
     void applyWindInSameDirection() {
         setSimulationTime(15);
