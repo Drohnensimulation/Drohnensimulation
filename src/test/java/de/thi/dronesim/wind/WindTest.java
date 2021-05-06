@@ -32,6 +32,7 @@ class WindTest {
         wind = new Wind(createWindLayerList());
         wind.setSimulation(new Simulation());
         windGust = new Wind(createWindGustLayerList());
+        windGust.setSimulation(new Simulation());
     }
 
 
@@ -144,6 +145,7 @@ class WindTest {
 
     @Test
     void applyWindInOppositeDirection() {
+        setSimulationTime(15);
         setUpLocation(5,5,5,10,30);
         wind.applyWind(location);
         assertEquals(7, location.getGroundSpeed(), "Wind in opposite direction as drone");
@@ -151,6 +153,7 @@ class WindTest {
 
     @Test
     void applyWindFromSide() {
+        setSimulationTime(15);
         setUpLocation(5,5,5,10,180);
         wind.applyWind(location);
         assertEquals(187, location.getTrack(), 1, "check Track");
@@ -159,6 +162,7 @@ class WindTest {
 
     @Test
     void applyWindOtherFromSide() {
+        setSimulationTime(15);
         setUpLocation(5,5,5,10,330);
         wind.applyWind(location);
         assertEquals(313, location.getTrack(), 1, "check Track");
@@ -166,9 +170,9 @@ class WindTest {
     }
 
     @Test
-    void applyWindGustTop() throws NoSuchFieldException, IllegalAccessException {
-        setUpLocation(5,5,5,10,330);
+    void applyWindGustTop() {
         setSimulationTime(2);
+        setUpLocation(5,5,5,10,330);
         windGust.applyWind(location);
         assertEquals(310, location.getTrack(), 1, "check Track");
         assertEquals(9, location.getGroundSpeed(),1, "check ground speed");
@@ -176,6 +180,7 @@ class WindTest {
 
     @Test
     void applyWindBetweenLayers() {
+        setSimulationTime(15);
         setUpLocation(5,5,10,10,330);
         wind.applyWind(location);
         assertEquals(288, location.getTrack(), 1, "check Track");
@@ -183,7 +188,7 @@ class WindTest {
     }
 
     @ Test
-    void applyWindGustStart() throws NoSuchFieldException, IllegalAccessException {
+    void applyWindGustStart() {
         setUpLocation(5,5,5,10,330);
         setSimulationTime(1);
         windGust.applyWind(location);
@@ -192,7 +197,7 @@ class WindTest {
     }
 
     @Test
-    void applyWindBetweenLayersTimeBasedMid() throws NoSuchFieldException, IllegalAccessException{
+    void applyWindBetweenLayersTimeBasedMid() {
         setUpLocation(5,5,10,10,330);
         setSimulationTime(15);
         wind.applyWind(location);
@@ -201,7 +206,7 @@ class WindTest {
     }
 
     @Test
-    void applyWindBetweenLayersTimeBasedLeft() throws NoSuchFieldException, IllegalAccessException{
+    void applyWindBetweenLayersTimeBasedLeft() {
         setUpLocation(5,5,10,10,330);
         setSimulationTime(12);
         wind.applyWind(location);
@@ -210,7 +215,7 @@ class WindTest {
     }
 
     @Test
-    void applyWindBetweenLayersTimeBasedRight() throws NoSuchFieldException, IllegalAccessException{
+    void applyWindBetweenLayersTimeBasedRight(){
         setUpLocation(5,5,10,10,330);
         setSimulationTime(17);
         wind.applyWind(location);
