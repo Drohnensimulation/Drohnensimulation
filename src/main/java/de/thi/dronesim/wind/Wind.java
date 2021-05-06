@@ -7,9 +7,7 @@ import de.thi.dronesim.persistence.ConfigReader;
 import de.thi.dronesim.persistence.entity.SimulationConfig;
 import de.thi.dronesim.persistence.entity.WindConfig;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 public class Wind implements ISimulationChild {
 
@@ -19,19 +17,18 @@ public class Wind implements ISimulationChild {
     //Main simulation
     private Simulation simulation;
     private boolean configLoaded = false;
-    private String configPath;
 
     private List<WindLayer> windLayers;             // list of wind layers      [Windlayer]
     private int latestLayerId = 0;
 
     public Wind(String configPath) {
-        this.configPath = configPath;
-        load();
+        loadFromConfig(configPath);
     }
 
     public Wind(List<WindLayer> layers) {
         this.configLoaded = true;
         this.windLayers = layers;
+        load();
     }
 
     /**
@@ -73,9 +70,7 @@ public class Wind implements ISimulationChild {
      * </p>
      */
     private void load() {
-        // TODO check for overlapping and small gaps
-        loadFromConfig(this.configPath);
-        sortWindLayer(windLayers);
+        sortWindLayer();
         normalize();
         this.configLoaded = true;
     }
@@ -94,58 +89,60 @@ public class Wind implements ISimulationChild {
                     windConfig.getAltitudeTop(), windConfig.getWindDirection());
             windLayers.add(windLayer);
         }
+        load();
     }
 
     /**
      * This function sorts the given WindLayer by Time
-     * @param windLayers List of unsorted WindLayer
      */
-    private void sortWindLayer(List<WindLayer> windLayers) {
+    private void sortWindLayer() {
+        windLayers.sort(Comparator.comparing(WindLayer::getAltitudeBottom));
         windLayers.sort(Comparator.comparing(WindLayer::getTimeStart));
-        sortWindLayerAltitudeBased();
     }
 
     /**
-     * This function sorts the given WindLayer by Altitude
-     */
-    private void sortWindLayerAltitudeBased() {
-        for (int i =0; i < windLayers.size() - 1; i++) {
-            for (int x = 0; x < windLayers.size() - i - 1; x++) {
-                if (windLayers.get(x).getAltitudeBottom() > windLayers.get(x+1).getAltitudeBottom()
-                        && windLayers.get(x).getTimeEnd() >= windLayers.get(x + 1).getTimeStart()) {
-                    WindLayer tempLayer = windLayers.get(x);
-                    windLayers.set(x, windLayers.get(x + 1));
-                    windLayers.set(x + 1, tempLayer);
-                }
-            }
-        }
-    }
-
-    /**
+     *
      * This Method normalizes the WindLayer already sorted, as defined in function load
+     * The borders of the wind layers are rounded up to the doubled interpolation range
      */
     private void normalize() {
-        double altDistance = 2 * WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE;
-        double timeDistance = 2 * WIND_LAYER_INTERPOLATION_TIME_RANGE;
+        final double altDistance = 2 * WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE;
+        final double timeDistance = 2 * WIND_LAYER_INTERPOLATION_TIME_RANGE;
 
+        // Round time and altitude
+//        windLayers.forEach();
+        for (WindLayer windLayer : windLayers) {
+            windLayer.setAltitudeBottom(windLayer.getAltitudeBottom() + windLayer.getAltitudeBottom() % altDistance);
+            windLayer.setAltitudeTop(windLayer.getAltitudeTop() + windLayer.getAltitudeTop() % altDistance);
+            windLayer.setTimeStart(windLayer.getTimeStart() + windLayer.getTimeStart() % timeDistance);
+            windLayer.setTimeEnd(windLayer.getTimeEnd() + windLayer.getTimeEnd() % timeDistance);
+        }
+
+        Collection<WindLayer> removed = new ArrayList<>();
         for (int i = 0; i < windLayers.size() - 1; i++) {
+            WindLayer currentLayer = windLayers.get(i);
+            // Check layer length is zero
+            if (currentLayer.getAltitudeBottom() == currentLayer.getAltitudeTop()
+                    || currentLayer.getTimeStart() == currentLayer.getTimeEnd()) {
+                removed.add(currentLayer);
+                continue;
+            }
+            // Normalize start for next layer
             for (int x = i + 1; x < windLayers.size() - 1; x++) {
-                WindLayer oldLayer = windLayers.get(i);
                 WindLayer nextLayer = windLayers.get(x);
-                if (oldLayer.getAltitudeTop() < nextLayer.getAltitudeBottom() + altDistance
-                        && (oldLayer.getTimeEnd() > nextLayer.getTimeStart()
-                        || oldLayer.getTimeEnd() + timeDistance <= nextLayer.getTimeEnd()
-                        && nextLayer.getTimeStart()  - oldLayer.getTimeEnd() <= timeDistance)) {
-                    nextLayer.setAltitudeBottom(oldLayer.getAltitudeTop() + altDistance);
-                } else if (oldLayer.getTimeEnd() < nextLayer.getTimeStart() + timeDistance
-                        && (oldLayer.getAltitudeTop() > nextLayer.getAltitudeBottom()
-                        || oldLayer.getAltitudeTop() + altDistance <= nextLayer.getAltitudeTop()
-                        && nextLayer.getAltitudeBottom()  - oldLayer.getAltitudeTop() <= altDistance)) {
-                    nextLayer.setTimeStart(oldLayer.getTimeEnd() + timeDistance);
+                // Normalize lower altitude border
+                if (currentLayer.getAltitudeTop() < nextLayer.getAltitudeBottom() - altDistance             // next Layer inside current layer
+                        && currentLayer.getTimeEnd() + timeDistance > nextLayer.getTimeStart()) {
+                    nextLayer.setAltitudeBottom(currentLayer.getAltitudeTop());
+                }
+                // Normalize start time
+                if (currentLayer.getTimeEnd() < nextLayer.getTimeStart() - timeDistance
+                        && currentLayer.getAltitudeTop() + altDistance > nextLayer.getAltitudeBottom()) {
+                    nextLayer.setTimeStart(currentLayer.getTimeEnd());
                 }
             }
         }
-
+        windLayers.removeAll(removed);
     }
 
     public void reset() {
