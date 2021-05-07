@@ -16,7 +16,7 @@ public class WindLayer implements Comparable<WindLayer> {
     private double windDirection;                       // current wind direction               [degree]
 
     private double nextGustStart = 0.0;                 // start time of the next gust          [s]
-    private  double nextGustSpeed = 0.0;                // speed of the next gust               [m/s]
+    private double nextGustSpeed = 0.0;                // speed of the next gust               [m/s]
 
     /**
      * Constructor for wind layer
@@ -52,6 +52,34 @@ public class WindLayer implements Comparable<WindLayer> {
     }
 
     /**
+     * Checks if two layers overlap with each other
+     * @param other Layer to test on
+     * @return True of both layers overlap, otherwise false
+     */
+    public boolean overlapsWith(WindLayer other) {
+        return timeStart < other.timeStart + (other.timeEnd - other.timeStart)
+                && timeStart + (timeEnd - timeStart) > other.timeStart
+                && altitudeBottom < other.altitudeBottom + (other.altitudeTop - other.altitudeBottom)
+                && altitudeBottom + (altitudeTop - altitudeBottom) > other.altitudeBottom;
+    }
+
+    /**
+     *
+     * @return True if all values are within their limits
+     */
+    public boolean isValid() {
+        return windDirection >= 0 && windDirection < 360
+                && altitudeBottom >= 0
+                && altitudeTop > 0
+                && timeStart >= 0
+                && timeEnd > 0
+                && windSpeed >= 0
+                && gustSpeed >= windSpeed
+                && altitudeBottom < altitudeTop
+                && timeStart < timeEnd;
+    }
+
+    /**
      * Applies wind speeds to drone
      * @param location Current location
      */
@@ -61,11 +89,16 @@ public class WindLayer implements Comparable<WindLayer> {
         double ws = calcWindSpeed(time);
 
         if (hdg == windDirection) {
-            return new Wind.WindChange(hdg, tas - ws);
+            double gs = tas - ws;
+            if (ws - tas > 0) {
+                hdg = (hdg + 180) % 360;
+                gs *= -1;
+            }
+            return new Wind.WindChange(hdg, gs);
         }
 
         // tail wind only
-        if ((hdg - ws) % 180 == 0) {
+        if ((hdg - windDirection) % 180 == 0) {
             return new Wind.WindChange(hdg, tas + ws);
         }
 
@@ -77,6 +110,8 @@ public class WindLayer implements Comparable<WindLayer> {
         double wca = Math.toDegrees(Math.asin(ws * Math.sin(Math.toRadians(Math.abs(wa))) / gs));
         // Set correct sign for wca
         if (wa > 0) wca *= -1;
+        // Use vertex angle for obtuse triangle
+        if (Math.abs(wa) < 90 && gs > tas) wca = 180 - wca;
         // Calculate resulting course
         return new Wind.WindChange(hdg + wca, gs);
     }
@@ -110,7 +145,7 @@ public class WindLayer implements Comparable<WindLayer> {
      * @return y
      */
     private double interpolation(double time, double gustSpeed, double gustStart, double gustEnd){
-        double y = ((gustSpeed - windSpeed)/(gustEnd - gustStart)) * (time - gustStart);
+        double y  = ((gustSpeed - windSpeed)/(gustEnd - gustStart)) * (time - gustStart);
 
         if(time > (gustStart + GUST_RISE_TIME)){
             return gustSpeed - y;

@@ -119,26 +119,25 @@ public class Wind implements ISimulationChild {
         }
 
         Collection<WindLayer> removed = new ArrayList<>();
-        for (int i = 0; i < windLayers.size() - 1; i++) {
+        for (int i = 0; i < windLayers.size(); i++) {
             WindLayer currentLayer = windLayers.get(i);
-            // Check layer length is zero
-            if (currentLayer.getAltitudeBottom() == currentLayer.getAltitudeTop()
-                    || currentLayer.getTimeStart() == currentLayer.getTimeEnd()) {
+            // Check layer length is valid
+            if (!currentLayer.isValid()) {
                 removed.add(currentLayer);
                 continue;
             }
-            // Normalize start for next layer
-            for (int x = i + 1; x < windLayers.size() - 1; x++) {
-                WindLayer nextLayer = windLayers.get(x);
-                // Normalize lower altitude border
-                if (currentLayer.getAltitudeTop() < nextLayer.getAltitudeBottom() - altDistance             // next Layer inside current layer
-                        && currentLayer.getTimeEnd() + timeDistance > nextLayer.getTimeStart()) {
-                    nextLayer.setAltitudeBottom(currentLayer.getAltitudeTop());
-                }
-                // Normalize start time
-                if (currentLayer.getTimeEnd() < nextLayer.getTimeStart() - timeDistance
-                        && currentLayer.getAltitudeTop() + altDistance > nextLayer.getAltitudeBottom()) {
-                    nextLayer.setTimeStart(currentLayer.getTimeEnd());
+            // Check if any following layer violates borders of current layers
+            for (int x = i + 1; x < windLayers.size(); x++) {
+                WindLayer followingLayer = windLayers.get(x);
+                // Check if two layers overlap
+                if (currentLayer.overlapsWith(followingLayer)) {
+                    // Remove layer from list
+                    removed.add(followingLayer);
+
+                    // TODO use logger here
+                    System.err.println("[Wind] Wind layer ("+x
+                            +") violates the border of another layer and is therefore removed!");
+                    System.out.println("[Wind] Borders of different wind layers must not overlap.");
                 }
             }
         }
@@ -191,13 +190,13 @@ public class Wind implements ISimulationChild {
         updateLatestLayer(time - WIND_LAYER_INTERPOLATION_TIME_RANGE);
 
         // Find all 4 layers required. More layers can't have any effect by definition
-        WindLayer lowerPrevLayer = findWindLayer(location.getZ() - WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
+        WindLayer lowerPrevLayer = findWindLayer(location.getY() - WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
                 time - WIND_LAYER_INTERPOLATION_TIME_RANGE);
-        WindLayer upperPrevLayer = findWindLayer(location.getZ() + WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
+        WindLayer upperPrevLayer = findWindLayer(location.getY() + WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
                 time - WIND_LAYER_INTERPOLATION_TIME_RANGE);
-        WindLayer lowerNextLayer = findWindLayer(location.getZ() - WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
+        WindLayer lowerNextLayer = findWindLayer(location.getY() - WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
                 time + WIND_LAYER_INTERPOLATION_TIME_RANGE);
-        WindLayer upperNextLayer = findWindLayer(location.getZ() + WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
+        WindLayer upperNextLayer = findWindLayer(location.getY() + WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
                 time + WIND_LAYER_INTERPOLATION_TIME_RANGE);
 
         // In case no layer was found, no wind applies
