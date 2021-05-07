@@ -112,10 +112,10 @@ public class Wind implements ISimulationChild {
         // Round time and altitude
 //        windLayers.forEach();
         for (WindLayer windLayer : windLayers) {
-            windLayer.setAltitudeBottom(windLayer.getAltitudeBottom() + windLayer.getAltitudeBottom() % altDistance);
-            windLayer.setAltitudeTop(windLayer.getAltitudeTop() + windLayer.getAltitudeTop() % altDistance);
-            windLayer.setTimeStart(windLayer.getTimeStart() + windLayer.getTimeStart() % timeDistance);
-            windLayer.setTimeEnd(windLayer.getTimeEnd() + windLayer.getTimeEnd() % timeDistance);
+            windLayer.setAltitudeBottom(Math.ceil(windLayer.getAltitudeBottom() / altDistance) * altDistance);
+            windLayer.setAltitudeTop(Math.ceil(windLayer.getAltitudeTop() / altDistance) * altDistance);
+            windLayer.setTimeStart(Math.ceil(windLayer.getTimeStart() / timeDistance) * timeDistance);
+            windLayer.setTimeEnd(Math.ceil(windLayer.getTimeEnd() / timeDistance) * timeDistance);
         }
 
         Collection<WindLayer> removed = new ArrayList<>();
