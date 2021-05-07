@@ -184,7 +184,7 @@ public class Wind implements ISimulationChild {
      * @param location Location of the drone
      */
     public void applyWind(Location location) {
-        double time = simulation.getTime();
+        int time = simulation.getTime();
 
         // Update oldest layer to set start point of search algorithm
         updateLatestLayer(time - WIND_LAYER_INTERPOLATION_TIME_RANGE);

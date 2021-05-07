@@ -20,7 +20,7 @@ public class Simulation {
     private final Map<Class<? extends ISimulationChild>, ISimulationChild> children;
     private final Drone drone;
 
-    private volatile double time;                                           // elapsed simulation time since reset [s]
+    private volatile int time;                                           // elapsed simulation time since reset [ms]
 
     /**
      * Constructor with empty SimulationConfig SimulationConfig
@@ -41,9 +41,9 @@ public class Simulation {
 
     /**
      *
-     * @return time Elapsed simulation time in s
+     * @return time Elapsed simulation time in ms
      */
-    public double getTime() {
+    public int getTime() {
         return time;
     }
 
