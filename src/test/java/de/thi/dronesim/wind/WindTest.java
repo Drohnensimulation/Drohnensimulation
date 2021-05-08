@@ -140,10 +140,10 @@ class WindTest {
         List<WindLayer> expected = new ArrayList<>();
 
         layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
-        expected.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
+        expected.add(new WindLayer(0, 0, -10, 10, -10, 10, 0));
 
         layers.add(new WindLayer(0, 0, 20, 30, 0, 10, 0));
-        expected.add(new WindLayer(0, 0, 20, 30, 0, 10, 0));
+        expected.add(new WindLayer(0, 0, 20, 30, -10, 10, 0));
 
         // Start normalization
         Wind wind = new Wind(layers);
@@ -157,10 +157,10 @@ class WindTest {
         List<WindLayer> expected = new ArrayList<>();
 
         layers.add(new WindLayer(0, 0, 0, 13, 0, 10, 0));
-        expected.add(new WindLayer(0, 0, 0, 20, 0, 10, 0));
+        expected.add(new WindLayer(0, 0, -10, 20, -10, 10, 0));
 
         layers.add(new WindLayer(0, 0, 17, 30, 0, 10, 0));
-        expected.add(new WindLayer(0, 0, 20, 30, 0, 10, 0));
+        expected.add(new WindLayer(0, 0, 20, 30, -10, 10, 0));
 
         // Start normalization
         Wind wind = new Wind(layers);
@@ -177,7 +177,7 @@ class WindTest {
         // Should be removed
 
         layers.add(new WindLayer(0, 0, 9, 19, 0, 10, 0));
-        expected.add(new WindLayer(0, 0, 10, 20, 0, 10, 0));
+        expected.add(new WindLayer(0, 0, 10, 20, -10, 10, 0));
 
         // Start normalization
         Wind wind = new Wind(layers);
@@ -191,7 +191,7 @@ class WindTest {
         List<WindLayer> expected = new ArrayList<>();
 
         layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
-        expected.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
+        expected.add(new WindLayer(0, 0, -10, 10, -10, 10, 0));
 
         layers.add(new WindLayer(0, 0, 0, 20, 0, 10, 0));
         // Should be removed
@@ -208,10 +208,10 @@ class WindTest {
         List<WindLayer> expected = new ArrayList<>();
 
         layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
-        expected.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
+        expected.add(new WindLayer(0, 0, -10, 10, -10, 10, 0));
 
         layers.add(new WindLayer(0, 0, 0, 10, 20, 30, 0));
-        expected.add(new WindLayer(0, 0, 0, 10, 20, 30, 0));
+        expected.add(new WindLayer(0, 0, -10, 10, 20, 30, 0));
 
         // Start normalization
         Wind wind = new Wind(layers);
@@ -225,10 +225,10 @@ class WindTest {
         List<WindLayer> expected = new ArrayList<>();
 
         layers.add(new WindLayer(0, 0, 0, 10, 0, 13, 0));
-        expected.add(new WindLayer(0, 0, 0, 10, 0, 20, 0));
+        expected.add(new WindLayer(0, 0, -10, 10, -10, 20, 0));
 
         layers.add(new WindLayer(0, 0, 0, 10, 17, 30, 0));
-        expected.add(new WindLayer(0, 0, 0, 10, 20, 30, 0));
+        expected.add(new WindLayer(0, 0, -10, 10, 20, 30, 0));
 
         // Start normalization
         Wind wind = new Wind(layers);
@@ -245,7 +245,7 @@ class WindTest {
         // Should be removed
 
         layers.add(new WindLayer(0, 0, 0, 10, 9, 19, 0));
-        expected.add(new WindLayer(0, 0, 0, 10, 10, 20, 0));
+        expected.add(new WindLayer(0, 0, -10, 10, 10, 20, 0));
 
         // Start normalization
         Wind wind = new Wind(layers);
@@ -259,7 +259,7 @@ class WindTest {
         List<WindLayer> expected = new ArrayList<>();
 
         layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
-        expected.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
+        expected.add(new WindLayer(0, 0, -10, 10, -10, 10, 0));
 
         layers.add(new WindLayer(0, 0, 0, 10, 0, 20, 0));
         // Should be removed
@@ -276,10 +276,10 @@ class WindTest {
         List<WindLayer> expected = new ArrayList<>();
 
         layers.add(new WindLayer(0, 0, 0, 15, 0, 13, 0));
-        expected.add(new WindLayer(0, 0, 0, 20, 0, 20, 0));
+        expected.add(new WindLayer(0, 0, -10, 20, -10, 20, 0));
 
         layers.add(new WindLayer(0, 0, 0, 16, 23, 33, 0));
-        expected.add(new WindLayer(0, 0, 0, 20, 30, 40, 0));
+        expected.add(new WindLayer(0, 0, -10, 20, 30, 40, 0));
 
         // Start normalization
         Wind wind = new Wind(layers);
@@ -293,10 +293,10 @@ class WindTest {
         List<WindLayer> expected = new ArrayList<>();
 
         layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
-        expected.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
+        expected.add(new WindLayer(0, 0, -10, 10, -10, 10, 0));
 
         layers.add(new WindLayer(0, 0, 10, 20, 0, 10, 0));
-        expected.add(new WindLayer(0, 0, 10, 20, 0, 10, 0));
+        expected.add(new WindLayer(0, 0, 10, 20, -10, 10, 0));
 
         // Start normalization
         Wind wind = new Wind(layers);
@@ -310,7 +310,7 @@ class WindTest {
         List<WindLayer> expected = new ArrayList<>();
 
         layers.add(new WindLayer(0, 0, 0, 20, 0, 20, 0));
-        expected.add(new WindLayer(0, 0, 0, 20, 0, 20, 0));
+        expected.add(new WindLayer(0, 0, -10, 20, -10, 20, 0));
 
         layers.add(new WindLayer(0, 0, 10, 30, 10, 50, 0));
         // Should be removed
@@ -463,145 +463,132 @@ class WindTest {
     }
 
     @Test
-    void interpolation_0(){
-
+    void interpolation_leftOutside() {
         createLocation(2, 20, 0);
         setSimulationTime(8);
-        windLayers.add(new WindLayer(10, 10, 10, 20, 0, 10, 0));
+        windLayers.add(new WindLayer(10, 10, 10, 20, 0, 10, 90));
 
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(20, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(210, location.getTrack(), "Wrong track");
-
+        assertEquals(20.6, location.getGroundSpeed(),1, "Wrong ground speed");
+        assertEquals(351.9, location.getTrack(),1, "Wrong track");
     }
 
     @Test
-    void interpolation_1(){
-
+    void interpolation_rightInside() {
         createLocation(2, 20, 0);
         setSimulationTime(18);
-        windLayers.add(new WindLayer(10, 10, 0, 20, 0, 10, 30));
+        windLayers.add(new WindLayer(10, 10, 0, 20, 0, 10, 90));
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(20, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(210, location.getTrack(), "Wrong track");
-
+        assertEquals(21.4, location.getGroundSpeed(),1, "Wrong ground speed");
+        assertEquals(341.9, location.getTrack(),1, "Wrong track");
     }
 
     @Test
-    void interpolation_2(){
-
+    void interpolation_above() {
         createLocation(12, 20, 0);
         setSimulationTime(10);
-        windLayers.add(new WindLayer(10, 10, 0, 20, 0, 10, 30));
+        windLayers.add(new WindLayer(10, 10, 0, 20, 0, 10, 90));
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(20, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(210, location.getTrack(), "Wrong track");
+        assertEquals(20.6, location.getGroundSpeed(),1, "Wrong ground speed");
+        assertEquals(351.9, location.getTrack(),1, "Wrong track");
     }
 
     @Test
-    void interpolation_3(){
-
+    void interpolation_underTop() {
         createLocation(8, 20, 0);
         setSimulationTime(10);
-        windLayers.add(new WindLayer(10, 10, 0, 20, 0, 10, 30));
+        windLayers.add(new WindLayer(10, 10, 0, 20, 0, 10, 0));
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(20, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(210, location.getTrack(), "Wrong track");
+        assertEquals(21.4, location.getGroundSpeed(),1, "Wrong ground speed");
+        assertEquals(341.9, location.getTrack(),1, "Wrong track");
     }
 
     @Test
-    void interpolation_4(){
-
+    void interpolation_outsideOfRange() {
         createLocation(2, 20, 0);
         setSimulationTime(1);
-        windLayers.add(new WindLayer(10, 10, 10, 20, 0, 10, 30));
+        windLayers.add(new WindLayer(10, 10, 10, 20, 0, 10, 0));
         setupWind();
         wind.applyWind(location);
 
         assertEquals(20, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(210, location.getTrack(), "Wrong track");
+        assertEquals(0, location.getTrack(), "Wrong track");
     }
 
     @Test
-    void interpolation_5(){
-
+    void interpolation_insideLayer() {
         createLocation(2, 20, 0);
         setSimulationTime(10);
-        windLayers.add(new WindLayer(10, 10, 0, 20, 0, 10, 30));
+        windLayers.add(new WindLayer(10, 10, 0, 20, 0, 10, 0));
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(20, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(210, location.getTrack(), "Wrong track");
+        assertEquals(10, location.getGroundSpeed(), "Wrong ground speed");
+        assertEquals(0, location.getTrack(), "Wrong track");
     }
 
     @Test
-    void interpolation_6(){
-
+    void interpolation_twoLayersLeft() {
         createLocation(2, 20, 0);
         setSimulationTime(28);
-        windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 30));
-        windLayers.add(new WindLayer(10, 10, 30, 60, 0, 10, 120));
+        windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 90));
+        windLayers.add(new WindLayer(10, 10, 30, 60, 0, 10, 240));
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(20, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(210, location.getTrack(), "Wrong track");
+        assertEquals(22, location.getGroundSpeed(), "Wrong ground speed");
+        assertEquals(0, location.getTrack(), "Wrong track");
     }
 
     @Test
-    void interpolation_7(){
-
+    void interpolation_twoLayersRight() {
         createLocation(2, 20, 0);
         setSimulationTime(32);
-        windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 30));
-        windLayers.add(new WindLayer(10, 10, 30, 60, 0, 10, 120));
+        windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 0));
+        windLayers.add(new WindLayer(10, 10, 30, 60, 0, 10, 180));
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(20, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(210, location.getTrack(), "Wrong track");
+        assertEquals(24, location.getGroundSpeed(), "Wrong ground speed");
+        assertEquals(0, location.getTrack(), "Wrong track");
     }
 
     @Test
-    void interpolation_8(){
-
+    void interpolation_twoLayersBottom() {
         createLocation(9, 20, 0);
-        setSimulationTime(32);
-        windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 30));
-        windLayers.add(new WindLayer(10, 10, 0, 30, 10, 20, 120));
+        setSimulationTime(20);
+        windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 0));
+        windLayers.add(new WindLayer(10, 10, 0, 30, 10, 20, 180));
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(20, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(210, location.getTrack(), "Wrong track");
+        assertEquals(18, location.getGroundSpeed(), "Wrong ground speed");
+        assertEquals(0, location.getTrack(), "Wrong track");
     }
 
     @Test
-    void interpolation_9(){
-
+    void interpolation_twoLayersTop() {
         createLocation(11, 20, 0);
-        setSimulationTime(32);
-        windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 30));
-        windLayers.add(new WindLayer(10, 10, 0, 30, 10, 20, 120));
+        setSimulationTime(20);
+        windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 0));
+        windLayers.add(new WindLayer(10, 10, 0, 30, 10, 20, 180));
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(20, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(210, location.getTrack(), "Wrong track");
+        assertEquals(22, location.getGroundSpeed(), "Wrong ground speed");
+        assertEquals(0, location.getTrack(), "Wrong track");
     }
 
     @Test
-    void interpolation_10(){
-
+    void interpolation_fourLayers() {
         createLocation(19, 20, 0);
         setSimulationTime(18);
         windLayers.add(new WindLayer(10, 10, 0, 20, 0, 20, 30));
@@ -615,8 +602,7 @@ class WindTest {
         assertEquals(210, location.getTrack(), "Wrong track");
     }
     @Test
-    void interpolation_11(){
-
+    void interpolation_fourLayersTimeFirst() {
         createLocation(13, 20, 0);
         setSimulationTime(18);
         windLayers.add(new WindLayer(10, 10, 0, 20, 0, 20, 30));
@@ -631,8 +617,7 @@ class WindTest {
     }
 
     @Test
-    void interpolation_12(){
-
+    void interpolation_fourLayersAltFirst_1(){
         createLocation(19, 20, 0);
         setSimulationTime(18);
         windLayers.add(new WindLayer(10, 10, 0, 30, 0, 20, 30));
