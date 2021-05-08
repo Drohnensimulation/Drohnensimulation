@@ -69,9 +69,9 @@ public class WindLayer implements Comparable<WindLayer> {
      */
     public boolean isValid() {
         return windDirection >= 0 && windDirection < 360
-                && altitudeBottom >= 0
+                && altitudeBottom >= -1 * Wind.WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE * 2
                 && altitudeTop > 0
-                && timeStart >= 0
+                && timeStart >= -1 * Wind.WIND_LAYER_INTERPOLATION_TIME_RANGE * 2
                 && timeEnd > 0
                 && windSpeed >= 0
                 && gustSpeed >= windSpeed
@@ -132,8 +132,9 @@ public class WindLayer implements Comparable<WindLayer> {
         return new Wind.WindChange(hdg + wca, gs);
     }
 
-    protected static Wind.WindChange applyOrZero(WindLayer windLayer, Location location, double time) {
-        return windLayer != null ? windLayer.applyForces(location, time) : new Wind.WindChange(location.getHeading(), 0);
+    protected static Wind.WindChange applyOrDefault(WindLayer windLayer, Location location, double time) {
+        return windLayer != null ? windLayer.applyForces(location, time) : new Wind.WindChange(location.getHeading(),
+                location.getAirspeed());
     }
 
     /**
@@ -160,13 +161,13 @@ public class WindLayer implements Comparable<WindLayer> {
      * @param gustStart     // current gust start time  [m/s]
      * @return y
      */
-    private double interpolation(double time, double gustSpeed, double gustStart, double gustEnd){
-        double y  = ((gustSpeed - windSpeed)/(gustEnd - gustStart)) * (time - gustStart);
-
-        if(time > (gustStart + GUST_RISE_TIME)){
-            return gustSpeed - y;
+    private double interpolation(double time, double gustSpeed, double gustStart, double gustEnd) {
+       double y;
+        if (time <= (gustStart + GUST_RISE_TIME)) {
+            y = ((gustSpeed - windSpeed)/(gustEnd - gustStart) * 2) * (time - gustStart);
+        } else {
+           y = -1 * ((gustSpeed - windSpeed)/(gustEnd - gustStart) * 2) * (time - gustStart) + (gustSpeed - windSpeed) * GUST_RISE_TIME;
         }
-
         return windSpeed + y;
     }
 

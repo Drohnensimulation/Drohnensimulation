@@ -63,7 +63,7 @@ public class Wind implements ISimulationChild {
         // Calculate wind direction
         double wd = (location.getHeading() - wa *  Math.signum(wca) + 360) % 360;
 
-        return new CurrentWind(wa, wd);
+        return new CurrentWind(wd, ws);
     }
 
     /**
@@ -216,8 +216,8 @@ public class Wind implements ISimulationChild {
 
         WindChange windChange;
         if (timeInterpolationFirst) {
-            WindChange upperChange = interpolateTimeLayers(lowerPrevLayer, lowerNextLayer, location);
-            WindChange lowerChange = interpolateTimeLayers(upperPrevLayer, upperNextLayer, location);
+            WindChange lowerChange = interpolateTimeLayers(lowerPrevLayer, lowerNextLayer, location);
+            WindChange upperChange = interpolateTimeLayers(upperPrevLayer, upperNextLayer, location);
 
             // If both changes are zero, no further interpolation is needed
             if (upperChange.gs == 0 && lowerChange.gs == 0) {
@@ -226,7 +226,7 @@ public class Wind implements ISimulationChild {
                 // Either lowerPrevLayer or lowerNextLayer has to be not null as timeInterpolationFirst is set to true
                 double ref = lowerPrevLayer != null ? lowerPrevLayer.getAltitudeTop() : lowerNextLayer.getAltitudeTop();
                 // Interpolate time
-                windChange = interpolate(upperChange, lowerChange,
+                windChange = interpolate(lowerChange, upperChange,
                         location.getY() - ref,
                         WIND_LAYER_INTERPOLATION_TIME_RANGE);
             }
@@ -257,8 +257,8 @@ public class Wind implements ISimulationChild {
 
     private WindChange interpolateTimeLayers(WindLayer prevLayer, WindLayer nextLayer, Location location) {
         double time = simulation.getTime();
-        WindChange prevChange = WindLayer.applyOrZero(prevLayer, location, time);
-        WindChange nextChange = WindLayer.applyOrZero(nextLayer, location, time);
+        WindChange prevChange = WindLayer.applyOrDefault(prevLayer, location, time);
+        WindChange nextChange = WindLayer.applyOrDefault(nextLayer, location, time);
 
         if (prevLayer != null || nextLayer != null) {
             double ref = prevLayer != null ? prevLayer.getTimeEnd() : nextLayer.getTimeStart();
@@ -271,13 +271,13 @@ public class Wind implements ISimulationChild {
     }
 
     private WindChange interpolateAltitudeLayers(WindLayer lowerLayer, WindLayer upperLayer, Location location) {
-        WindChange lowerChange = WindLayer.applyOrZero(lowerLayer, location, simulation.getTime());
-        WindChange upperChange = WindLayer.applyOrZero(upperLayer, location, simulation.getTime());
+        WindChange lowerChange = WindLayer.applyOrDefault(lowerLayer, location, simulation.getTime());
+        WindChange upperChange = WindLayer.applyOrDefault(upperLayer, location, simulation.getTime());
 
         if (lowerLayer != null || upperLayer != null) {
-            double alt = upperLayer != null ? upperLayer.getAltitudeBottom() : lowerLayer.getAltitudeTop();
+            double borderAlt = upperLayer != null ? upperLayer.getAltitudeBottom() : lowerLayer.getAltitudeTop();
             return interpolate(lowerChange, upperChange,
-                    location.getZ() - alt,
+                    location.getY() - borderAlt,
                     WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE);
         }
         // If both layers are null, each change is a zero change.
@@ -330,6 +330,11 @@ public class Wind implements ISimulationChild {
         private final double windDirection;
         private final double windSpeed;
 
+        /**
+         *
+         * @param windDirection Wind direction in deg
+         * @param windSpeed Wind speed in m/s
+         */
         public CurrentWind(double windDirection, double windSpeed) {
             this.windDirection = windDirection;
             this.windSpeed = windSpeed;
