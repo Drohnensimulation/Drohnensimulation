@@ -80,6 +80,22 @@ public class WindLayer implements Comparable<WindLayer> {
     }
 
     /**
+     * Normalizes all values to next lowest multiple of double interpolation range.
+     * If the start is zero, the start is also decreased by double interpolation range to prevent interpolation there.
+     */
+    public void normalize() {
+        double altDistance = Wind.WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE * 2;
+        double timeDistance = Wind.WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE * 2;
+        altitudeBottom = Math.ceil(altitudeBottom / altDistance) * altDistance;
+        altitudeTop = Math.ceil(altitudeTop / altDistance) * altDistance;
+        timeStart =  Math.ceil(timeStart / timeDistance) * timeDistance;
+        timeEnd = Math.ceil(timeEnd / timeDistance) * timeDistance;
+        // Set start to earlier point to prevent interpolation for these cases
+        if (timeStart == 0) timeStart = -1 * timeDistance;
+        if (altitudeBottom == 0) altitudeBottom = -1 * altDistance;
+    }
+
+    /**
      * Applies wind speeds to drone
      * @param location Current location
      */

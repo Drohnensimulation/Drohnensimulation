@@ -11,8 +11,8 @@ import java.util.*;
 
 public class Wind implements ISimulationChild {
 
-    private static final double WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE = 5;        // range in m
-    private static final double WIND_LAYER_INTERPOLATION_TIME_RANGE = 5;            // range in s
+    protected static final double WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE = 5;        // range in m
+    protected static final double WIND_LAYER_INTERPOLATION_TIME_RANGE = 5;            // range in s
 
     //Main simulation
     private Simulation simulation;
@@ -113,13 +113,7 @@ public class Wind implements ISimulationChild {
         final double timeDistance = 2 * WIND_LAYER_INTERPOLATION_TIME_RANGE;
 
         // Round time and altitude
-//        windLayers.forEach();
-        for (WindLayer windLayer : windLayers) {
-            windLayer.setAltitudeBottom(Math.ceil(windLayer.getAltitudeBottom() / altDistance) * altDistance);
-            windLayer.setAltitudeTop(Math.ceil(windLayer.getAltitudeTop() / altDistance) * altDistance);
-            windLayer.setTimeStart(Math.ceil(windLayer.getTimeStart() / timeDistance) * timeDistance);
-            windLayer.setTimeEnd(Math.ceil(windLayer.getTimeEnd() / timeDistance) * timeDistance);
-        }
+        windLayers.forEach(WindLayer::normalize);
 
         Collection<WindLayer> removed = new ArrayList<>();
         for (int i = 0; i < windLayers.size(); i++) {
