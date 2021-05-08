@@ -52,13 +52,16 @@ public class Wind implements ISimulationChild {
                     Math.abs(ws));
         }
         // Wind correction angle
-        double wca = location.getHeading() - location.getTrack();
+        double wca = 180 - Math.abs(Math.abs(location.getHeading() - location.getTrack()) - 180);
+        if ((location.getHeading() + wca) % 360 != location.getTrack()) wca *= -1;
         // Calculate wind speed
-        double ws = gs * gs + tas * tas - 2 * gs * tas * Math.cos(Math.toRadians(Math.abs(wca)));
+        double ws = Math.sqrt(gs * gs + tas * tas - 2 * gs * tas * Math.cos(Math.toRadians(Math.abs(wca))));
         // Calculate wind angle
-        double wa = Math.toDegrees(Math.asin(Math.sin(Math.toRadians(wca)) / ws * gs));
+        double wa = Math.toDegrees(Math.asin(Math.sin(Math.toRadians(Math.abs(wca))) / ws * gs));
+        // Use vertex angle for obtuse triangle
+        if (Math.abs(wca) < 90 && gs > tas) wa = 180 - wa;
         // Calculate wind direction
-        double wd = (((location.getTrack() - wa * Math.signum(wca)) + 540) % 360) - 180;
+        double wd = (location.getHeading() - wa *  Math.signum(wca) + 360) % 360;
 
         return new CurrentWind(wa, wd);
     }
