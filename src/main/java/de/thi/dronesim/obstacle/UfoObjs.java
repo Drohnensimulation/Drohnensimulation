@@ -197,7 +197,41 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
     @Override
     public Set<HitMark> checkSensorPyramid(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
-        return null;
+    	Set<HitMark> hits = new HashSet<>();
+    	
+    	Vector3f direction = orientation.normalize();
+    	Vector3f angleVec = opening.normalize();
+    	Vector3f angleProjOnDir = direction.mult(direction.dot(angleVec));
+    	Vector3f i = angleVec.subtract(angleProjOnDir);
+    	float width = 2 * i.length();
+    	i.normalizeLocal();
+    	Vector3f j = i.cross(direction).normalizeLocal();
+    	
+        //reuse loop variables
+        Vector3f dI = new Vector3f();
+        Vector3f dJ = new Vector3f();
+        Vector3f ray = new Vector3f();
+        
+        int rayPerRow = (int) (width / angleProjOnDir.length() * range * config.config.rayDensity);
+        float step = width / rayPerRow;
+        
+        for (float y = -width/2; y <= width/2; y += step) {
+            for (float x = -width/2; x <= width/2; x += step) {
+            	
+                dI.set(i.mult(x));
+                dJ.set(j.mult(y));
+                ray.set(angleProjOnDir.x + dI.x + dJ.x,
+                        angleProjOnDir.y + dI.y + dJ.y,
+                        angleProjOnDir.z + dI.z + dJ.z).normalizeLocal();
+                
+                HitMark hit = this.rayTest(origin, ray, range);
+                if(hit != null) {
+                	hits.add(hit);
+                }
+            }
+        }
+    	
+        return hits;
     }
 
     @Override
