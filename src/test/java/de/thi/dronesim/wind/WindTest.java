@@ -350,8 +350,8 @@ class WindTest {
         setSimulationTime(20);
         setupWind();
         wind.applyWind(location);
-        assertEquals(20, location.getGroundSpeed(), 1,  "Wrong ground speed");
-        assertEquals(210, location.getTrack(), 1,  "Wrong track");
+        assertEquals(20, location.getGroundSpeed(), 0.5,  "Wrong ground speed");
+        assertEquals(210, location.getTrack(), 0.5,  "Wrong track");
     }
 
     @Test
@@ -361,8 +361,8 @@ class WindTest {
         setSimulationTime(20);
         setupWind();
         wind.applyWind(location);
-        assertEquals(2, location.getGroundSpeed(), 1,  "Wrong ground speed");
-        assertEquals(210, location.getTrack(), 1, "Wrong track");
+        assertEquals(2, location.getGroundSpeed(), 0.5,  "Wrong ground speed");
+        assertEquals(210, location.getTrack(), 0.5, "Wrong track");
     }
 
     @Test
@@ -372,8 +372,8 @@ class WindTest {
         setSimulationTime(20);
         setupWind();
         wind.applyWind(location);
-        assertEquals(8, location.getGroundSpeed(), 1,"Wrong ground speed");
-        assertEquals(30, location.getTrack(), 1, "Wrong track");
+        assertEquals(8, location.getGroundSpeed(), 0.5,"Wrong ground speed");
+        assertEquals(30, location.getTrack(), 0.5, "Wrong track");
     }
 
     @Test
@@ -383,8 +383,8 @@ class WindTest {
         setSimulationTime(20);
         setupWind();
         wind.applyWind(location);
-        assertEquals(7, location.getGroundSpeed(), 1,  "Wrong ground speed");
-        assertEquals(29, location.getTrack(), 1,  "Wrong track");
+        assertEquals(7, location.getGroundSpeed(), 0.5,  "Wrong ground speed");
+        assertEquals(29, location.getTrack(), 0.5,  "Wrong track");
     }
 
     @Test
@@ -394,8 +394,8 @@ class WindTest {
         setSimulationTime(20);
         setupWind();
         wind.applyWind(location);
-        assertEquals(24, location.getGroundSpeed(), 1, "Wrong ground speed");
-        assertEquals(118, location.getTrack(), 1,  "Wrong track");
+        assertEquals(24, location.getGroundSpeed(), 0.5, "Wrong ground speed");
+        assertEquals(118, location.getTrack(), 0.5,  "Wrong track");
     }
 
     @Test
@@ -405,8 +405,8 @@ class WindTest {
         setSimulationTime(20);
         setupWind();
         wind.applyWind(location);
-        assertEquals(7, location.getGroundSpeed(), 1, "Wrong ground speed");
-        assertEquals(331, location.getTrack(), 1, "Wrong track");
+        assertEquals(7, location.getGroundSpeed(), 0.5, "Wrong ground speed");
+        assertEquals(331, location.getTrack(), 0.5, "Wrong track");
     }
 
     @Test
@@ -416,8 +416,8 @@ class WindTest {
         setSimulationTime(20);
         setupWind();
         wind.applyWind(location);
-        assertEquals(14, location.getGroundSpeed(), 1, "Wrong ground speed");
-        assertEquals(15, location.getTrack(),1, "Wrong track");
+        assertEquals(14, location.getGroundSpeed(), 0.5, "Wrong ground speed");
+        assertEquals(15, location.getTrack(),0.5, "Wrong track");
     }
 
     @Test
@@ -427,8 +427,8 @@ class WindTest {
         setSimulationTime(20);
         setupWind();
         wind.applyWind(location);
-        assertEquals(14, location.getGroundSpeed(), 1, "Wrong ground speed");
-        assertEquals(345, location.getTrack(), 1, "Wrong track");
+        assertEquals(14, location.getGroundSpeed(), 0.5, "Wrong ground speed");
+        assertEquals(345, location.getTrack(), 0.5, "Wrong track");
     }
 
     @Test
@@ -438,8 +438,8 @@ class WindTest {
         setSimulationTime(20);
         setupWind();
         wind.applyWind(location);
-        assertEquals(11, location.getGroundSpeed(), 1,  "Wrong ground speed");
-        assertEquals(333, location.getTrack(), 1,  "Wrong track");
+        assertEquals(11, location.getGroundSpeed(), 0.5,  "Wrong ground speed");
+        assertEquals(333, location.getTrack(), 0.5,  "Wrong track");
     }
 
     @Test
@@ -449,8 +449,8 @@ class WindTest {
         setSimulationTime(20);
         setupWind();
         wind.applyWind(location);
-        assertEquals(11, location.getGroundSpeed(), 1,  "Wrong ground speed");
-        assertEquals(27, location.getTrack(), 1,  "Wrong track");
+        assertEquals(11, location.getGroundSpeed(), 0.5,  "Wrong ground speed");
+        assertEquals(27, location.getTrack(), 0.5,  "Wrong track");
     }
 
     @ Test
@@ -481,7 +481,7 @@ class WindTest {
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(30, location.getGroundSpeed());
+        assertEquals(30, location.getGroundSpeed(), 0.5);
     }
 
     @ Test
@@ -496,7 +496,7 @@ class WindTest {
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(22.5, location.getGroundSpeed());
+        assertEquals(22.5, location.getGroundSpeed(), 0.5);
     }
 
     @ Test
@@ -511,7 +511,7 @@ class WindTest {
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(22.5, location.getGroundSpeed());
+        assertEquals(22.5, location.getGroundSpeed(), 0.5);
     }
 
     @Test
@@ -523,8 +523,8 @@ class WindTest {
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(20.6, location.getGroundSpeed(),1, "Wrong ground speed");
-        assertEquals(351.9, location.getTrack(),1, "Wrong track");
+        assertEquals(20.6, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(351.9, location.getTrack(),0.5, "Wrong track");
     }
 
     @Test
@@ -535,8 +535,8 @@ class WindTest {
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(21.4, location.getGroundSpeed(),1, "Wrong ground speed");
-        assertEquals(341.9, location.getTrack(),1, "Wrong track");
+        assertEquals(21.4, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(341.1, location.getTrack(),0.5, "Wrong track");
     }
 
     @Test
@@ -547,20 +547,20 @@ class WindTest {
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(20.6, location.getGroundSpeed(),1, "Wrong ground speed");
-        assertEquals(351.9, location.getTrack(),1, "Wrong track");
+        assertEquals(20.6, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(351.9, location.getTrack(),0.5, "Wrong track");
     }
 
     @Test
     void interpolation_underTop() {
         createLocation(8, 20, 0);
         setSimulationTime(10);
-        windLayers.add(new WindLayer(10, 10, 0, 20, 0, 10, 0));
+        windLayers.add(new WindLayer(10, 10, 0, 20, 0, 10, 90));
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(21.4, location.getGroundSpeed(),1, "Wrong ground speed");
-        assertEquals(341.9, location.getTrack(),1, "Wrong track");
+        assertEquals(21.4, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(341.1, location.getTrack(),0.5, "Wrong track");
     }
 
     @Test
@@ -571,8 +571,8 @@ class WindTest {
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(20, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(0, location.getTrack(), "Wrong track");
+        assertEquals(20, location.getGroundSpeed(), 0.5, "Wrong ground speed");
+        assertEquals(0, location.getTrack(),0.5, "Wrong track");
     }
 
     @Test
@@ -583,34 +583,47 @@ class WindTest {
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(10, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(0, location.getTrack(), "Wrong track");
+        assertEquals(10, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(0, location.getTrack(),0.5, "Wrong track");
     }
 
     @Test
     void interpolation_twoLayersLeft() {
         createLocation(2, 20, 0);
-        setSimulationTime(28);
-        windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 90));
+        setSimulationTime(27);
+        windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 120));
         windLayers.add(new WindLayer(10, 10, 30, 60, 0, 10, 240));
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(22, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(0, location.getTrack(), "Wrong track");
+        assertEquals(25.42, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(348.26, location.getTrack(),0.5, "Wrong track");
     }
 
     @Test
     void interpolation_twoLayersRight() {
         createLocation(2, 20, 0);
         setSimulationTime(32);
-        windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 0));
-        windLayers.add(new WindLayer(10, 10, 30, 60, 0, 10, 180));
+        windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 120));
+        windLayers.add(new WindLayer(10, 10, 30, 60, 0, 10, 240));
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(24, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(0, location.getTrack(), "Wrong track");
+        assertEquals(25.24, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(7.89, location.getTrack(),0.5, "Wrong track");
+    }
+
+    @Test
+    void interpolation_twoLayersCenter() {
+        createLocation(2, 20, 0);
+        setSimulationTime(30);
+        windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 120));
+        windLayers.add(new WindLayer(10, 10, 30, 60, 0, 10, 240));
+        setupWind();
+        wind.applyWind(location);
+
+        assertEquals(25, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(0, location.getTrack(),0.5, "Wrong track");
     }
 
     @Test
@@ -622,8 +635,8 @@ class WindTest {
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(18, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(0, location.getTrack(), "Wrong track");
+        assertEquals(18, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(0, location.getTrack(),0.5, "Wrong track");
     }
 
     @Test
@@ -635,8 +648,8 @@ class WindTest {
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(22, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(0, location.getTrack(), "Wrong track");
+        assertEquals(22, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(0, location.getTrack(),0.5, "Wrong track");
     }
 
     @Test
@@ -650,26 +663,26 @@ class WindTest {
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(20, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(210, location.getTrack(), "Wrong track");
+        assertEquals(17.22, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(334.68, location.getTrack(),0.5, "Wrong track");
     }
     @Test
-    void interpolation_fourLayersTimeFirst() {
+    void interpolation_fourLayersAltitudeFirst() {
         createLocation(13, 20, 0);
         setSimulationTime(18);
         windLayers.add(new WindLayer(10, 10, 0, 20, 0, 20, 30));
-        windLayers.add(new WindLayer(10, 10, 0, 20, 20, 40, 60));
+       // windLayers.add(new WindLayer(10, 10, 0, 20, 20, 40, 60));
         windLayers.add(new WindLayer(10, 10, 20, 40, 0, 10, 90));
         windLayers.add(new WindLayer(10, 10, 20, 40, 10, 40, 120));
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(20, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(210, location.getTrack(), "Wrong track");
+        assertEquals(16.35, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(337.8, location.getTrack(),0.5, "Wrong track");
     }
 
     @Test
-    void interpolation_fourLayersAltFirst_1(){
+    void interpolation_fourLayersTimeFirst_1(){
         createLocation(19, 20, 0);
         setSimulationTime(18);
         windLayers.add(new WindLayer(10, 10, 0, 30, 0, 20, 30));
@@ -679,12 +692,12 @@ class WindTest {
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(20, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(210, location.getTrack(), "Wrong track");
+        assertEquals(14.95, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(333.7, location.getTrack(),0.5, "Wrong track");
     }
 
     @Test
-    void interpolation_fourLayersAltFirst_2() {
+    void interpolation_fourLayersTimeFirst_2() {
         createLocation(19, 20, 0);
         setSimulationTime(32);
         windLayers.add(new WindLayer(10, 10, 0, 30, 0, 20, 30));
@@ -694,8 +707,8 @@ class WindTest {
         setupWind();
         wind.applyWind(location);
 
-        assertEquals(20, location.getGroundSpeed(), "Wrong ground speed");
-        assertEquals(210, location.getTrack(), "Wrong track");
+        assertEquals(22.24, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(337.43, location.getTrack(),0.5, "Wrong track");
     }
 
 
