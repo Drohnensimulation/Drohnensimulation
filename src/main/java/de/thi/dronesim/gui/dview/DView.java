@@ -24,7 +24,7 @@ import java.util.List;
  *
  * @author Michael Weichenrieder
  */
-public class DView extends SimpleApplication implements ISimulationChild {
+public class DView extends SimpleApplication {
 
     /**
      * Enum of possible perspectives
@@ -34,9 +34,6 @@ public class DView extends SimpleApplication implements ISimulationChild {
     public enum Perspective {
         THIRD_PERSON, FIRST_PERSON, BIRD_VIEW
     }
-
-    // Main simulation
-    private Simulation simulation;
 
     // Ground
     private volatile float xMin = 0, xMax = 0, zMin = 0, zMax = 0;
@@ -281,15 +278,5 @@ public class DView extends SimpleApplication implements ISimulationChild {
      */
     public void removeFrameUpdateListener(Runnable listener) {
         frameUpdateListeners.remove(listener);
-    }
-
-    @Override
-    public void setSimulation(Simulation simulation) {
-        this.simulation = simulation;
-    }
-
-    @Override
-    public Simulation getSimulation() {
-        return simulation;
     }
 }
