@@ -361,7 +361,7 @@ public abstract class ASensor {
 	public Set<HitMark> getSensorHits(Vector3f origin, Vector3f orientation, float range, Vector3f opening){
 
 		//returns only dummy data, no real reference to real data
-		Set<HitMark> hitMarks = Set.of();
+		Set<HitMark> hitMarks = new HashSet<>();
 		Random random = new Random();
 
 		origin = new Vector3f(5,5,0);
@@ -411,9 +411,9 @@ public abstract class ASensor {
 			Vector3f worldHit = new Vector3f(x,y,z);
 			relativeHit.x = x - origin.x;
 			relativeHit.y = y - origin.y;
-			relativeHit.z = y - origin.z;
+			relativeHit.z = z - origin.z;
 			float distance = relativeHit.length();
-			HitMark mark = new HitMark(distance, worldHit, relativeHit, obstacle3);
+			HitMark mark = new HitMark(distance, worldHit, relativeHit, obstacle);
 
 			hitMarks.add(mark);
 		}
@@ -479,7 +479,8 @@ public abstract class ASensor {
 			}
 			// creating new Set of marks with the unknown obstacle
 			if(!existing){
-				Set<HitMark> newSet = Set.of(newHitmark);
+				Set<HitMark> newSet = new HashSet<>();
+				newSet.add(newHitmark);
 				hitmarksGroupedByObstacles.add(newSet);
 			}
 		}
@@ -501,13 +502,16 @@ public abstract class ASensor {
 			oADDTO.setAvgDistance(avgDistance);
 			obstacleAndDistanceDTOS.add(oADDTO);
 		}
-		obstacleAndDistanceDTOS.sort((a,b)-> Float.compare(b.getAvgDistance(), a.getAvgDistance()));
+		obstacleAndDistanceDTOS.sort((a,b)-> Float.compare(a.getAvgDistance(),b.getAvgDistance()));
 
 		SensorResultDto sensorResultDto = new SensorResultDto();
 		sensorResultDto.setSensor(this);
 		Obstacle nearest = obstacleAndDistanceDTOS.get(0).getObstacle();
 		sensorResultDto.setObstacle(nearest);
 		//first value of the values-array ist the nearest, the last is the farthest
+		if(sensorResultDto.getValues() == null){
+			sensorResultDto.setValues(new ArrayList<>());
+		}
 		obstacleAndDistanceDTOS.forEach(o -> sensorResultDto.getValues().add(o.getAvgDistance()));
 
 		return sensorResultDto;
