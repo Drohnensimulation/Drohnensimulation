@@ -1,14 +1,12 @@
 package de.thi.dronesim.gui.mview;
 
 import de.thi.dronesim.drone.Location;
-import de.thi.dronesim.gui.jframe.IInstrumentView;
+import de.thi.dronesim.gui.IGuiView;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 
 import javax.swing.*;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Set;
 
 /**
@@ -16,7 +14,7 @@ import java.util.Set;
  *
  * @author Daniel Dunger
  */
-public class MView extends JFrame implements IInstrumentView {
+public class MView extends JFrame implements IGuiView {
 
     // These values are currently set to fit the current information
     private static final int WINDOW_MIN_WIDTH = 550;

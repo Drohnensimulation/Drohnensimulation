@@ -1,20 +1,16 @@
 package de.thi.dronesim.gui.mview;
 
-import com.formdev.flatlaf.FlatDarkLaf;
-import de.thi.dronesim.drone.Drone;
-import de.thi.dronesim.drone.Location;
+import de.thi.dronesim.gui.GuiManager;
 
 /**
- * Tests the MView GUI.
+ * Test for {@link MView}
  *
- * @author Daniel Dunger
+ * @author Daniel Dunger, Michael Weichenrieder
  */
 public class MViewTest {
 
     public static void main(String[] args) {
-        // Dark theme, just to be consistent with DView
-        FlatDarkLaf.install();
-
-        new Thread(() -> new MView()).start();
+        GuiManager guiManager = new GuiManager();
+        guiManager.openMViewGui();
     }
 }
