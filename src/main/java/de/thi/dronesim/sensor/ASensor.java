@@ -16,14 +16,12 @@ public abstract class ASensor {
 	//		-Vervollständigung der Methodenimplementierung
 	
 	protected Drone drone;
-	protected float range;
-	/**
-	 * Da die Methode pruefeSensorCone() als �ffnungswinkel einen Vektor haben m�chte, wurde angleOfViewHorizontal und angleOfViewVertical durch vectorAngel ersetzt
-	 */
+	protected float range; // range from sensor position to cone bottom
 	protected float sensorAngle;
 	protected Vector3f vectorAngle;
 	protected float sensorRadius;
 	protected float measurementAccuracy;
+	protected Vector3f orientationVector;
 	
 	//Relative Ausrichtung zur Drohne.
 	//Eine Drehung der Drohne hat keinen Einfluss auf die folgenden Werte.
@@ -208,30 +206,77 @@ public abstract class ASensor {
 	}
 	
 	/**
-	 * Berechnet die richtung (orientation) des Sensors
+	 * calculates the lenght from origin point to range end. This length is needed to
+	 * create the cone-object. This Method is needed in the "check"-methods (UfoObjs.java)
 	 * 
-	 * Methoden Author: Moris Breitenborn
+	 * @author: Moris Breitenborn
+	 *  
+	 * @return float
+	 */
+	
+	public float getConeHeight() {
+		
+		return this.range + getOriginToPositionLength();
+	}
+
+	/**
+	 * Calculates the length from origin point to sensor position. This length is needed to
+	 * create the cone-object.
 	 * 
+	 * @author: Moris Breitenborn started calculation with intercept theorems.
+	 * @author Daniel Stolle improved method by simplifying it.
+	 * @return length between origin and sensor position
+	 */
+	public float getOriginToPositionLength(){
+		return sensorRadius / (float) Math.tan(Math.toRadians(this.sensorAngle));
+	}
+
+	/**
+	 * Calculate the origin vector from drone center to sensor cone origin point
+	 * by using intercept theorems.
+	 * 
+	 * @author Moris Breitenborn
+	 *  
 	 * @return Vector3f
 	 */
+	public Vector3f getOrigin() {
+
+		// get the distance between origin and position
+		float originToPositionLength = getOriginToPositionLength();
+
+		// normalize the direction vector to multiply it with the range later to get the needed vector
+		Vector3f normalizedOrientationVector = getOrientation().normalize();
+
+		// rotate the normalized direction vector in the opposite direction with scale(-1)
+		normalizedOrientationVector = normalizedOrientationVector.negate();
+
+		// get the normalized Vector on the calculated length with scale(originToPositionLength)
+		normalizedOrientationVector = normalizedOrientationVector.mult(originToPositionLength);
+
+		// with this vector we can calculate the origin point by simply adding the normalizedOrientationVector
+		// to the position point of the Sensor
+		return new Vector3f(posX, posY, posZ).add(normalizedOrientationVector);
+	}
+
+	/**
+	 * Return the direction as a vector.
+	 *
+	 * @author Daniel Stolle
+	 * @return directionX, directionY and directionZ as a vector
+	 */
 	public Vector3f getOrientation() {
-		
-		float directionVectorX = directionX -  posX;
-		float directionVectorY = directionY -  posY;
-		float directionVectorZ = directionZ -  posZ;
-		Vector3f directionVector = new Vector3f(directionVectorX, directionVectorY, directionVectorZ); 
-		return directionVector;
-		
+		return new Vector3f(directionX, directionY, directionZ);
 	}
 	
-	/**
-	 * Um den Körper berechnen zu können wird ein Vektor auf der Kegelwand benötigt.
-	 * Um diesen zu berechnen wird der Richtungsvektor des Sensors (Direction - Position)
-	 * um eine Gradzahl "phi" die Zwischen 0 und 90 liegt mit hilfe einer Transfomrmationsmatrix gedreht.
-	 * Dabei wird der Vektor mit hilfe von matritzen auf die X-Achse gelegt, um die gewünschte Gradzahl
-	 * gedreht und anschließend zurück multipliziert. 
+	public void setOrientation(Vector3f orientationVector) {
+		this.orientationVector=orientationVector;
+	}
+
+	/** 
+	 * This method calculates a vector that is lying on the cone surface. This vector is needed 
+	 * to calculate the entire cone.
 	 * 
-	 * Methoden Author: Moris Breitenborn
+	 * @author: Moris Breitenborn
 	 * 
 	 * @return Vector3f
 	 */
@@ -294,10 +339,9 @@ public abstract class ASensor {
 		
 	}
 	/**
-	 *Um die Letzte Rotation auf die X-Achse zu berechnen, is es nötig den Winkel zwischen dem Vektor auf der XY-Ebene
-	 *und der X-Achse zu berechnen. zurückgegeben wird der Winkel als Radiant. 
+	 *Returns the angle between two vectors
 	 * 
-	 * Methoden Author: Moris Breitenborn
+	 * @author: Moris Breitenborn
 	 * 
 	 * @return float
 	 */
