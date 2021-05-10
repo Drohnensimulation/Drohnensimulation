@@ -21,7 +21,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test class for {@link UfoObjs}
+ *
+ * @author Michael Küchenmeister
  */
+
 public class TestUfoObjs {
     private static UfoObjs instance;
     private static Simulation simulation;
@@ -182,7 +185,7 @@ public class TestUfoObjs {
 
         // Check the value of rayDensity
         ObstacleConfigurationDTO testConfDTO = testDTO.config;
-        assertEquals(100,testConfDTO.rayDensity);
+        assertEquals(10,testConfDTO.rayDensity);
 
         Set<ObstacleDTO> obstacles = testDTO.obstacles;
         int numberObstacles = 0;
@@ -286,7 +289,7 @@ public class TestUfoObjs {
                         "      \"scale\":[0.25,0.25,0.25]" +
                         "    }" +
                         "  ]," +
-                        "  \"config\":{\"rayDensity\":100}" +
+                        "  \"config\":{\"rayDensity\":10}" +
                         "}";
 
         Gson gson = new Gson();
@@ -299,12 +302,6 @@ public class TestUfoObjs {
         config.setObstacleConfigList(configList);
 
         instance.setSimulation(simulation);
-
-        // Add all obstacles
-        Set<ObstacleDTO> obstacleSet = obstacleConfig.obstacles;
-        for(ObstacleDTO obstacle : obstacleSet) {
-            instance.addObstacle(obstacle);
-        }
     }
 
     /**
@@ -364,7 +361,7 @@ public class TestUfoObjs {
                 assertTrue(numberHitObj1 > 0, "Obstacle 1 on position (2.5, 1.0, 3.5) was not hitted!");
                 assertTrue(numberHitObj2 > 0, "Obstacle 2 on position (-0.5, 1.0, 3.5) was not hitted!");
                 assertTrue(numberHitObj3 > 0, "Obstacle 3 on position (1.0, 1.0, 5.0 was not hitted!");
-                assertEquals(numberHitObj4, 0, "Obstacle 4 on position (4.0, 10.0, 1.0) which should be out of range was hitted!");
+                assertEquals(0, numberHitObj4, "Obstacle 4 on position (4.0, 10.0, 1.0) which should be out of range was hitted!");
             }
         } else {
             fail("The returned HitMark set is null");

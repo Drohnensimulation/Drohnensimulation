@@ -13,9 +13,16 @@ import de.thi.dronesim.obstacle.util.JBulletHitMark;
 
 import com.jme3.math.Vector3f;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+
+/**
+ * @author Bakri Aghyourli
+ * @author Christian Schmied
+ * @author Michael Küchenmeister
+ */
 
 public class UfoObjs implements ISimulationChild, IUfoObjs {
     private final JBulletContext jBullet;
@@ -59,7 +66,7 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
     @Override
     public Obstacle addObstacle(ObstacleDTO obstacleDto) {
         // Create new Obstacle from DTO
-        Obstacle obstacle = new Obstacle(obstacleDto.modelName,obstacleDto.modelPath,obstacleDto.id,obstacleDto.position,obstacleDto.rotation,obstacleDto.scale);
+        Obstacle obstacle = new Obstacle(obstacleDto.modelName,obstacleDto.modelPath,obstacleDto.id,obstacleDto.position,obstacleDto.rotation,obstacleDto.scale,obstacleDto.hitboxes);
 
         Set<HitBoxRigidBody> objectHitBoxes = new HashSet<>();
 
@@ -369,8 +376,25 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
     @Override
     public ObstacleJsonDTO save() {
-        //TODO Clone the Current State and write it to an ObstacleJsonDTO
-        return null;
+        Set <Obstacle> obstacles = this.getObstacles();
+        HashSet<ObstacleDTO> obstacleDTOSet = new HashSet<>();
+        for(Obstacle o : obstacles) {
+            // Clone all obstacles and add them to the obstacleDTOSet
+            ObstacleDTO cloneObsDTO = new ObstacleDTO();
+            cloneObsDTO.modelName = o.getModelName();
+            cloneObsDTO.modelPath = o.getModelPath();
+            cloneObsDTO.id = o.getID();
+            cloneObsDTO.hitboxes = new HashSet<>(o.getDtoHitboxes());
+            cloneObsDTO.position = Arrays.copyOf(o.getPosition(),3);
+            cloneObsDTO.rotation = Arrays.copyOf(o.getRotation(), 3);
+            cloneObsDTO.scale = Arrays.copyOf(o.getScale(),3);
+            obstacleDTOSet.add(cloneObsDTO);
+        }
+        ObstacleJsonDTO jsonDTO = new ObstacleJsonDTO();
+        jsonDTO.config.rayDensity = this.config.config.rayDensity;
+        jsonDTO.obstacles = obstacleDTOSet;
+
+        return jsonDTO;
     }
 
     @Override
@@ -378,6 +402,12 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         this.simulation = simulation;
         try {
             this.config = simulation.getConfig().getObstacleConfigList().get(0);
+
+            // Add obstacles to the context
+            Set <ObstacleDTO> obstacleDTOSet = this.config.obstacles;
+            for(ObstacleDTO o : obstacleDTOSet) {
+                this.addObstacle(o);
+            }
         }catch (NullPointerException exception){
             // TODO load default config
         }
