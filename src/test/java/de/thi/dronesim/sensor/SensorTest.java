@@ -9,9 +9,5 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SensorTest {
 
-    @Test
-    void dummyTest() {
-        // TODO: Den Test löschen, dient nur zum Test des Maven Plugins
-        assertTrue(true);
-    }
+    //TODO: Test for the mthods in ASensor
 }

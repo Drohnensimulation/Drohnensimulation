@@ -7,8 +7,9 @@ import de.thi.dronesim.drone.Drone;
 
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
-import java.util.Random;
-import java.util.Set;
+import de.thi.dronesim.sensor.dto.SensorResultDto;
+
+import java.util.*;
 
 public abstract class ASensor {
 	
@@ -21,7 +22,6 @@ public abstract class ASensor {
 	 * Da die Methode pruefeSensorCone() als �ffnungswinkel einen Vektor haben m�chte, wurde angleOfViewHorizontal und angleOfViewVertical durch vectorAngel ersetzt
 	 */
 	protected float sensorAngle;
-	protected Vector3f vectorAngle;
 	protected float sensorRadius;
 	protected float measurementAccuracy;
 	
@@ -173,7 +173,7 @@ public abstract class ASensor {
 	 * Gibt die Reichweite des Sensors zurück.
 	 * @return Reichweite des Sensors
 	 */
-	public double getRange() {
+	public float getRange() {
 		return this.range;
 	}
 
@@ -287,7 +287,7 @@ public abstract class ASensor {
 		sinPhi= (float) Math.sin(rotXY);
 		minSinPhi= (float) (Math.sin(rotXY)*(-1));
 		transformMatrixX = new Matrix3f(1, 0, 0 ,0, cosPhi, minSinPhi, 0, sinPhi, cosPhi);
-		vectorAngle = transformMatrixX.mult(vectorWithAngelXY);
+		Vector3f vectorAngle = transformMatrixX.mult(vectorWithAngelXY);
 		
 		
 		return vectorAngle;
@@ -361,7 +361,7 @@ public abstract class ASensor {
 	public Set<HitMark> getSensorHits(Vector3f origin, Vector3f orientation, float range, Vector3f opening){
 
 		//returns only dummy data, no real reference to real data
-		Set<HitMark> hitMarks = Set.of();
+		Set<HitMark> hitMarks = new HashSet<>();
 		Random random = new Random();
 
 		origin = new Vector3f(5,5,0);
@@ -411,9 +411,9 @@ public abstract class ASensor {
 			Vector3f worldHit = new Vector3f(x,y,z);
 			relativeHit.x = x - origin.x;
 			relativeHit.y = y - origin.y;
-			relativeHit.z = y - origin.z;
+			relativeHit.z = z - origin.z;
 			float distance = relativeHit.length();
-			HitMark mark = new HitMark(distance, worldHit, relativeHit, obstacle3);
+			HitMark mark = new HitMark(distance, worldHit, relativeHit, obstacle);
 
 			hitMarks.add(mark);
 		}
@@ -431,6 +431,90 @@ public abstract class ASensor {
 	private float getHitAngle(HitMark hitMark, Vector3f origin){
 		Vector3f relativ = hitMark.relativeHit();
 		return checkAngel(origin, relativ);
+	}
+
+	public SensorResultDto getSensorResult(Vector3f origin, Vector3f orientation){
+		//Helperclass only used in this method so far
+		class ObstacleAndDistanceDTO{
+			private Obstacle obstacle;
+			private float avgDistance;
+
+			private Obstacle getObstacle() {
+				return obstacle;
+			}
+
+			private void setObstacle(Obstacle obstacle) {
+				this.obstacle = obstacle;
+			}
+
+			private float getAvgDistance() {
+				return avgDistance;
+			}
+
+			private void setAvgDistance(float avgDistance) {
+				this.avgDistance = avgDistance;
+			}
+		}
+
+		Vector3f opening = getVectorAngel();
+		Set<HitMark> hitMarks = getSensorHits(origin, orientation, getRange(), opening);
+		// TODO: Auswertung der Hitmarks Winkelberechnung
+
+		//grouping hitmarks by the hited object
+		List<Set<HitMark>> hitmarksGroupedByObstacles = new ArrayList<>();
+		for(HitMark newHitmark: hitMarks){
+			Obstacle obstacle = newHitmark.getObstacle();
+			boolean existing = false;
+			for(Set<HitMark> setH: hitmarksGroupedByObstacles){
+				if(!setH.isEmpty()) {
+					//first entry of the set
+					Iterator<HitMark> iterator = setH.iterator();
+					HitMark m = iterator.next();
+					//lookup if a set with marks containing this obstacle already exists
+					if (obstacle.equals(m.getObstacle())) {
+						setH.add(newHitmark);
+						existing = true;
+					}
+				}
+			}
+			// creating new Set of marks with the unknown obstacle
+			if(!existing){
+				Set<HitMark> newSet = new HashSet<>();
+				newSet.add(newHitmark);
+				hitmarksGroupedByObstacles.add(newSet);
+			}
+		}
+
+		// sort the grouped hits by the avgDistance
+		List<ObstacleAndDistanceDTO> obstacleAndDistanceDTOS = new ArrayList<>();
+		for(Set<HitMark> setH:hitmarksGroupedByObstacles){
+			ObstacleAndDistanceDTO oADDTO = new ObstacleAndDistanceDTO();
+
+			Iterator<HitMark> iterator = setH.iterator();
+			HitMark m = iterator.next();
+			oADDTO.setObstacle(m.getObstacle());
+
+			float avgDistance = 0.0f;
+			for(HitMark h : setH){
+				avgDistance += h.getDistance();
+			}
+			avgDistance = avgDistance/setH.size();
+			oADDTO.setAvgDistance(avgDistance);
+			obstacleAndDistanceDTOS.add(oADDTO);
+		}
+		obstacleAndDistanceDTOS.sort((a,b)-> Float.compare(a.getAvgDistance(),b.getAvgDistance()));
+
+		SensorResultDto sensorResultDto = new SensorResultDto();
+		sensorResultDto.setSensor(this);
+		Obstacle nearest = obstacleAndDistanceDTOS.get(0).getObstacle();
+		sensorResultDto.setObstacle(nearest);
+		//first value of the values-array ist the nearest, the last is the farthest
+		if(sensorResultDto.getValues() == null){
+			sensorResultDto.setValues(new ArrayList<>());
+		}
+		obstacleAndDistanceDTOS.forEach(o -> sensorResultDto.getValues().add(o.getAvgDistance()));
+
+		return sensorResultDto;
 	}
 	
 	/**
