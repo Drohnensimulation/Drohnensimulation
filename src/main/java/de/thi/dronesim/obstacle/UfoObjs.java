@@ -1,5 +1,6 @@
 package de.thi.dronesim.obstacle;
 
+import com.jme3.math.Quaternion;
 import de.thi.dronesim.ISimulationChild;
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.obstacle.dto.HitBoxDTO;
@@ -242,16 +243,16 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
     }
 
     @Override
-    public Set<HitMark> checkSensorCuboid(Vector3f origin, Vector3f orientation, Vector3f dimension) {
+    public Set<HitMark> checkSensorCuboid(Vector3f origin, Vector3f orientation, Vector3f dimension){
+        return checkSensorCuboid(origin, orientation, dimension, 0);
+    }
 
-        // TODO: calc the rotation from the orientation
-        // Orientation isn't a normal, orientation is more the angles creating the normal...
-        // So its possible to add a Facing Direction to an object...
-        // Think of the Direction your Phone is facing to.
-        // Attach a barbecuescrew to your phone, marking the origin at one end and the Vector being the screw.
-        // You can freely spin your phone around it like a "Spanferkel" while its still having the same vector.
+    @Override
+    public Set<HitMark> checkSensorCuboid(Vector3f origin, Vector3f orientation, Vector3f dimension, float rotation) {
 
-        float rotation = 0;
+        // Orientation is a normal,
+        // The rotation angle is axis aligned, so its the rotation around the orientation vector (so the normal)
+        // Where rotation 0 is like faceing directly upwards...
 
         Set<HitMark> hits = new HashSet<>();
         int ppm = this.config.config.rayDensity;
@@ -261,25 +262,31 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
         Vector3f center = new Vector3f(origin);
 
-        Vector3f verticalVect;
-        Vector3f horizontalVect;
+        //Place the two vectors directly infront of the drone
+        Vector3f verticalVect = new Vector3f(dimension.x/2f,0,0);
+        Vector3f horizontalVect = new Vector3f(0,dimension.y/2f,0);
 
-        Vector3f rotVect = new Vector3f((float) Math.cos(rotation), (float) Math.sin(rotation), 0); // |rotVect| = 1
+        //Rotate upwards (pitch)
+        float angelPitch = orientation.angleBetween(Vector3f.UNIT_X);
+        Quaternion pitchRotation = new Quaternion();
+        pitchRotation.fromAngleAxis(angelPitch, Vector3f.UNIT_X);
 
-        // rotVect * normal = |rotVect|*|normal|*cos(angle(rotVect,normal))
-        // rotVect * normal = cos(phi)
-        float phi = rotVect.dot(normal);
+        //Rotate sideways (yaw)
+        float angelYaw = orientation.angleBetween(Vector3f.UNIT_Z);
+        Quaternion yawRotation = new Quaternion();
+        yawRotation.fromAngleAxis(angelYaw, Vector3f.UNIT_Z);
 
-        if (phi > 0.9999) {
-            // Rotation Vector and Normal are too Paralell
-            // TODO do other calculation for verticalVect and horizontalVect
-            // TODO eg swap x and z Axis
-            throw new IllegalArgumentException("TODO fix Calculations of Vectors when they are too similar");
-        } else {
-            verticalVect = normal.cross(rotVect).normalizeLocal();
-            horizontalVect = normal.cross(verticalVect);
-        }
+        //Rotate the voctors around the orientation vector
+        Quaternion rollRotation = new Quaternion();
+        rollRotation.fromAngleAxis(rotation, orientation);
 
+        //TODO Check if this is correct...
+        pitchRotation.multLocal(verticalVect);
+        pitchRotation.multLocal(horizontalVect);
+        yawRotation.multLocal(verticalVect);
+        yawRotation.multLocal(horizontalVect);
+        rollRotation.multLocal(verticalVect);
+        rollRotation.multLocal(horizontalVect);
 
         //topLeft Should be the Point where the Sensor will start rastering;
         Vector3f topLeft = center.subtract(horizontalVect);

@@ -65,7 +65,18 @@ public interface IUfoObjs {
      * @param dimension Dimension des Quaders (x, y, z/Reichweite)
      * @return Referenz zu einem Getroffenen Objekt
      */
+    @Deprecated
     Set<HitMark> checkSensorCuboid(Vector3f origin, Vector3f orientation, Vector3f dimension);
+
+    /**
+     * Prüft auf Kollisionen entlang eines Quaders
+     * @param origin Fußpunkt
+     * @param orientation Richtung
+     * @param dimension Dimension des Quaders (x, y, z/Reichweite)
+     * @param rotation Roation around the orientation Vector in RAD where 0 is straight up into the sky
+     * @return Referenz zu einem Getroffenen Objekt
+     */
+    Set<HitMark> checkSensorCuboid(Vector3f origin, Vector3f orientation, Vector3f dimension, float rotation);
 
     /**
      * Prüft auf Kollisionen entlang eines Zylinders
