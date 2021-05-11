@@ -4,7 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 import de.thi.dronesim.sensor.types.InfraredSensor;
-
+/**
+ * Class to test getVectorAngel.
+ *
+ * @author Moris Breitenborn
+ */
 class MatrixBerechnung {
 
 	@Test

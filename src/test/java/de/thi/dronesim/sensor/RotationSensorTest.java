@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Class to test Sensors.
+ * Class to test RotationSensors.
  *
  * @author Moris Breitenborn
  */
