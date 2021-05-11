@@ -31,7 +31,6 @@ public class RotationSensor extends ASensor implements ISimulationChild {
 	public int callTimerForSensorValues;
 	public Set<HitMark> values;
 	public Timer callTimerValues = new Timer( );
-	public Timer repositoinTimer = new Timer( );
 	public float startRotationTime;
 	public float endRotationTime;
 
