@@ -267,14 +267,16 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         Vector3f horizontalVect = new Vector3f(0,dimension.y/2f,0);
 
         //Rotate upwards (pitch)
-        float angelPitch = orientation.angleBetween(Vector3f.UNIT_X);
+        Vector3f pitchVect = new Vector3f(0, orientation.y, orientation.z);
+        float angelPitch = pitchVect.angleBetween(Vector3f.UNIT_Y);
         Quaternion pitchRotation = new Quaternion();
         pitchRotation.fromAngleAxis(angelPitch, Vector3f.UNIT_X);
 
         //Rotate sideways (yaw)
-        float angelYaw = orientation.angleBetween(Vector3f.UNIT_Z);
+        Vector3f yawVect = new Vector3f(orientation.x, 0, orientation.z);
+        float angelYaw = yawVect.angleBetween(Vector3f.UNIT_Z);
         Quaternion yawRotation = new Quaternion();
-        yawRotation.fromAngleAxis(angelYaw, Vector3f.UNIT_Z);
+        yawRotation.fromAngleAxis(angelYaw, Vector3f.UNIT_Y);
 
         //Rotate the voctors around the orientation vector
         Quaternion rollRotation = new Quaternion();
