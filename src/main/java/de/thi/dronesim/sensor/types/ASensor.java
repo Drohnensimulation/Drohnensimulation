@@ -289,51 +289,58 @@ public abstract class ASensor implements ISensor {
 		Vector3f directionVector = getOrientation();
 		
 		//Calculate the rotation angle to rotate the directionVector in to the XY-level
-		float rotXY = (float) Math.atan((directionVector.getZ()/directionVector.getY())*(-1));
+		double rotXY;
+		if(directionVector.getY()==0) {
+			rotXY = Math.PI/2;
+		}else {
+			rotXY =  Math.atan((directionVector.getZ()/directionVector.getY())*(-1));
+		}
+
+
 		//calculate all necessary variable for the rotation matrix and create matrix
-		float cosPhi= (float) Math.cos(rotXY);
-		float sinPhi= (float) Math.sin(rotXY);
-		float minSinPhi= (float) (Math.sin(rotXY)*(-1));
-		Matrix3f transformMatrixX = new Matrix3f(1, 0, 0 ,0, cosPhi, minSinPhi, 0, sinPhi, cosPhi);
+		double cosPhi= Math.cos(rotXY);
+		double sinPhi= Math.sin(rotXY);
+		double minSinPhi= (Math.sin(rotXY)*(-1));
+		Matrix3f transformMatrixX = new Matrix3f((float) 1, (float) 0, (float) 0 ,(float) 0, (float) cosPhi, (float) minSinPhi, (float) 0, (float) sinPhi, (float) cosPhi);
 		//multiply the matrix with the vector 
 		Vector3f vectorXY = transformMatrixX.mult(directionVector);
 	
 		//To get the angle between the vectorXY and the x-Axses we call the function checkAngel();
 		Vector3f xAxsis = new Vector3f(1,0,0);
 		//give the angle the right operator to calculate the right vector. calculate variables and matrix
-		float rotX = checkAngel(vectorXY, xAxsis);
+		double rotX = checkAngel(vectorXY, xAxsis);
 		if(directionVector.getY()>0) {
 			rotX=rotX*(-1);
 		}
-		cosPhi= (float) Math.cos(rotX);
-		sinPhi= (float) Math.sin(rotX);
-		minSinPhi= (float) (Math.sin(rotX)*(-1));
-		Matrix3f transformMatrixZ = new Matrix3f(cosPhi, minSinPhi, 0, sinPhi, cosPhi, 0, 0, 0, 1); 
+		cosPhi= Math.cos(rotX);
+		sinPhi= Math.sin(rotX);
+		minSinPhi= (Math.sin(rotX)*(-1));
+		Matrix3f transformMatrixZ = new Matrix3f( (float) cosPhi, (float) minSinPhi, (float) 0, (float) sinPhi, (float) cosPhi, (float) 0, (float) 0, (float) 0, (float) 1);
         //rotate on x-Axsis
 		Vector3f vectorX = transformMatrixZ.mult(vectorXY);
 		
 
 		//now we can rotate the vector around the y-Axses 
-		float sensorAngleAsRadiant = (float) Math.toRadians(sensorAngle);
+		double sensorAngleAsRadiant = Math.toRadians(sensorAngle);
 		cosPhi= (float) Math.cos(sensorAngleAsRadiant);
 		sinPhi= (float) Math.sin(sensorAngleAsRadiant);
 		minSinPhi= (float) (Math.sin(sensorAngleAsRadiant)*(-1));
-		Matrix3f transformMatrixY = new Matrix3f(cosPhi, 0, sinPhi, 0, 1, 0, minSinPhi, 0, cosPhi);
+		Matrix3f transformMatrixY = new Matrix3f((float) cosPhi, (float) 0, (float) sinPhi, (float) 0, (float) 1, (float) 0, (float) minSinPhi, (float) 0, (float) cosPhi);
 		Vector3f vectorWithAngel = transformMatrixY.mult(vectorX);
 		
 		//rerotate the new vectors with all used angles. startt with the last one used 
 		rotX = rotX*(-1);
-		cosPhi= (float) Math.cos(rotX);
-		sinPhi= (float) Math.sin(rotX);
-		minSinPhi= (float) (Math.sin(rotX)*(-1));
-		transformMatrixZ = new Matrix3f(cosPhi, minSinPhi, 0, sinPhi, cosPhi, 0, 0, 0, 1); 
+		cosPhi= Math.cos(rotX);
+		sinPhi= Math.sin(rotX);
+		minSinPhi= (Math.sin(rotX)*(-1));
+		transformMatrixZ = new Matrix3f((float) cosPhi, (float) minSinPhi, (float) 0, (float) sinPhi, (float) cosPhi, (float) 0, (float) 0, (float) 0, (float) 1);
 		Vector3f vectorWithAngelXY = transformMatrixZ.mult(vectorWithAngel);
 		//Rotation at Y
 		rotXY = rotXY*(-1);
-		cosPhi= (float) Math.cos(rotXY);
-		sinPhi= (float) Math.sin(rotXY);
-		minSinPhi= (float) (Math.sin(rotXY)*(-1));
-		transformMatrixX = new Matrix3f(1, 0, 0 ,0, cosPhi, minSinPhi, 0, sinPhi, cosPhi);
+		cosPhi= Math.cos(rotXY);
+		sinPhi= Math.sin(rotXY);
+		minSinPhi= (Math.sin(rotXY)*(-1));
+		transformMatrixX = new Matrix3f((float) 1, (float) 0, (float) 0, (float) 0, (float) cosPhi, (float) minSinPhi, (float) 0, (float) sinPhi, (float) cosPhi);
 		Vector3f vectorAngle = transformMatrixX.mult(vectorWithAngelXY);
 		
 		
@@ -348,17 +355,17 @@ public abstract class ASensor implements ISensor {
 	 * @return float
 	 */
 	
-	public float checkAngel(Vector3f original, Vector3f calculated) {
-		float x1 = original.getX();
-		float y1 = original.getY();
-		float z1 = original.getZ();
-		float x2 = calculated.getX();
-		float y2 = calculated.getY();
-		float z2 = calculated.getZ();
+	public double checkAngel(Vector3f original, Vector3f calculated) {
+		double x1 = original.getX();
+		double y1 = original.getY();
+		double z1 = original.getZ();
+		double x2 = calculated.getX();
+		double y2 = calculated.getY();
+		double z2 = calculated.getZ();
 		
-		float nenner= x1*x2+y1*y2+z1*z2;
-		float zaeler= (float) (Math.sqrt(x1*x1+y1*y1+z1*z1)*Math.sqrt(x2*x2+y2*y2+z2*z2));
-		float ergebnis = (float) Math.acos(nenner/zaeler);
+		double nenner= x1*x2+y1*y2+z1*z2;
+		double zaeler= (Math.sqrt(x1*x1+y1*y1+z1*z1)*Math.sqrt(x2*x2+y2*y2+z2*z2));
+		double ergebnis = Math.acos(nenner/zaeler);
 		return ergebnis;
 	}
 	
@@ -476,7 +483,7 @@ public abstract class ASensor implements ISensor {
 	 */
 	private float getHitAngle(HitMark hitMark, Vector3f origin){
 		Vector3f relativ = hitMark.relativeHit();
-		return checkAngel(origin, relativ);
+		return (float) checkAngel(origin, relativ);
 	}
 
 	public SensorResultDto getSensorResult(Vector3f origin, Vector3f orientation){

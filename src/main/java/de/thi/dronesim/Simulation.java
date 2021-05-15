@@ -20,6 +20,8 @@ public class Simulation {
     private final Map<Class<? extends ISimulationChild>, ISimulationChild> children;
     private final Drone drone;
 
+    private volatile int time;                                           // elapsed simulation time since reset [ms]
+
     /**
      * Constructor with empty SimulationConfig SimulationConfig
      */
@@ -35,6 +37,14 @@ public class Simulation {
         this.config = ConfigReader.readConfig(configPath);
         this.children = new HashMap<>();
         this.drone = new Drone();
+    }
+
+    /**
+     *
+     * @return time Elapsed simulation time in ms
+     */
+    public int getTime() {
+        return time;
     }
 
     /**

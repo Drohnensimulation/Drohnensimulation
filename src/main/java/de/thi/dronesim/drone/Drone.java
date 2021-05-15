@@ -17,4 +17,9 @@ public class Drone {
      */
     private List<ASensor> sensors;
 
+    private static Drone instance;      // singleton instance
+
+    public Drone(){
+
+    }
 }
