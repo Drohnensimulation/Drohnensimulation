@@ -1,7 +1,7 @@
-package de.thi.dronesim.sensor;
+package de.thi.dronesim.sensor.types;
 
-import de.thi.dronesim.sensor.types.UltrasonicSensor;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**

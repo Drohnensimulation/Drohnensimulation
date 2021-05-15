@@ -1,16 +1,13 @@
 package de.thi.dronesim.sensor.types;
 
-import de.thi.dronesim.Simulation;
 import de.thi.dronesim.obstacle.entity.HitMark;
+import de.thi.dronesim.sensor.dto.SensorResultDto;
 
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import de.thi.dronesim.ISimulationChild;
-import de.thi.dronesim.sensor.ASensor;
-
-public class UltrasonicSensor extends ASensor implements ISimulationChild{
+public class UltrasonicSensor extends ASensor {
 	
 	/**
 	 * To simulate a ultrasonic sensor the range get increased with a certain velocity up to the given max range.
@@ -18,9 +15,6 @@ public class UltrasonicSensor extends ASensor implements ISimulationChild{
 	 * @author Moris Breitenborn
 	 */
 
-	//Main simulation
-	private Simulation simulation;
-	
 	public float rangeIncreaseVelocity; // meters per second
 	public float startIncreaseTime;
 	public float endIncreaseTime;
@@ -42,14 +36,16 @@ public class UltrasonicSensor extends ASensor implements ISimulationChild{
 	}
 
 	@Override
-	public void setSimulation(Simulation simulation) {
-		this.simulation = simulation;
+	public void runMeasurement() {
+		// TODO
 	}
 
 	@Override
-	public Simulation getSimulation() {
-		return this.simulation;
+	public SensorResultDto getLastMeasurement() {
+		// TODO
+		return null;
 	}
+
 	// Saves the start time
 	public void startIncrease() {
 		this.startIncreaseTime = System.nanoTime();
