@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class UltrasonicSensor extends ASensor {
+public class UltrasonicSensor extends DistanceSensor {
 	
 	/**
 	 * To simulate a ultrasonic sensor the range get increased with a certain velocity up to the given max range.
@@ -70,7 +70,7 @@ public class UltrasonicSensor extends ASensor {
 			travaledDistance -= getRange();
 		}
 		// return the cone height by adding the OriginToPositionLength to travaledDistance;
-		return (float) travaledDistance+getOriginToPositionLength();
+		return (float) travaledDistance+ calcOriginToPositionLength();
 	}
 	
 	public void startCallSensorValues() {
@@ -80,7 +80,7 @@ public class UltrasonicSensor extends ASensor {
 		    @Override
 		    public void run() {
 		    	float traveledTime =  traveledTime();
-				values =  getSensorHits(getOrigin(), getOrientation(), getCurrentConeHeight(traveledTime), getVectorAngel()); // getCurrentConeHeight()
+				values =  getSensorHits(calcOrigin(), getDirectionVector(), getCurrentConeHeight(traveledTime), calcSurfaceVector()); // getCurrentConeHeight()
 		    }
 
 		}, 0, callTimerForSensorValues);

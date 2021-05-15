@@ -2,7 +2,7 @@ package de.thi.dronesim.sensor.types;
 
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 
-public class InfraredSensor extends ASensor {
+public class InfraredSensor extends DistanceSensor {
 
 	public InfraredSensor() {
 

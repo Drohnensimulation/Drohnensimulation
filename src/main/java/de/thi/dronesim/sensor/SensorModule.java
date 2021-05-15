@@ -7,7 +7,9 @@ import de.thi.dronesim.sensor.dto.SensorResultDto;
 import de.thi.dronesim.sensor.types.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Class to manage all sensors for the Simulation.
@@ -21,7 +23,7 @@ public class SensorModule implements ISimulationChild {
     // /////////////////////////////////////////////////////////////////////////////
 
     private Simulation simulation;
-    private Map<String, ISensor> sensorMap = new HashMap<>();
+    private final Map<String, ISensor> sensorMap = new HashMap<>();
 
     // /////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -46,9 +48,19 @@ public class SensorModule implements ISimulationChild {
     }
 
     /**
+     * Gets the result from the last calculation of every sensor.
+     *
+     * @return a List of all results
+     */
+    public List<SensorResultDto> getResultsFromAllSensors() {
+        return sensorMap.values().stream().map(ISensor::getLastMeasurement).collect(Collectors.toList());
+    }
+
+    /**
      * Initialize the sensor map with the config from the simulation
      */
     private void init() {
+        sensorMap.clear();
         for (SensorConfig config : simulation.getConfig().getSensorConfigList()) {
             if (config.getClassName() == null) {
                 throw new IllegalStateException("Missing className");

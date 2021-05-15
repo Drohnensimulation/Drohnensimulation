@@ -9,13 +9,8 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.jme3.math.Matrix3f;
-import com.jme3.math.Vector3f;
 
-
-
-
-public class RotationSensor extends ASensor {
+public class RotationSensor extends DistanceSensor {
 	/**
 	 * Imagine the rotation like a police blue light. The sensor rotates around the Y-axis
 	 *
@@ -82,7 +77,7 @@ public class RotationSensor extends ASensor {
 	// Calculate new OrientationVector with the getTraveledArcMeasure() return as parameter
 	public Vector3f newOrientation(double traveledArc) {
 		
-		Vector3f orienataion = getOrientation();
+		Vector3f orienataion = getDirectionVector();
 
 		//to reduce inaccuracy we convert the traveledArc <= 1 Rotation
 		double oneRotation = (2*Math.PI);
@@ -108,13 +103,13 @@ public class RotationSensor extends ASensor {
 
 		    @Override
 		    public void run() {
-		    	setOrientation(newOrientation(getTraveledArcMeasure()));
-				values =  getSensorHits(getOrigin(), getOrientation(), getConeHeight(), getVectorAngel());
+		    	setDirection(newOrientation(getTraveledArcMeasure()));
+				values =  getSensorHits(calcOrigin(), getDirectionVector(), calcConeHeight(), calcSurfaceVector());
 		    }
 		}, 0, callTimerForSensorValues);
 	}
 
-public void stopCallingSensorValues() {
+	public void stopCallingSensorValues() {
 		callTimerValues.cancel();
 	}
 

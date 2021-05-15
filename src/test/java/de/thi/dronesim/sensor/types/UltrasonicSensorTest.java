@@ -18,8 +18,8 @@ public class UltrasonicSensorTest {
 	    	UltrasonicSensor sensor = new UltrasonicSensor(1,1);
 
 	    	//setup to get  OriginToPositionLength = 1
-	    	sensor.sensorAngle=45f;
-	    	sensor.sensorRadius=1;
+	    	sensor.setSensorAngle(45);
+	    	sensor.setSize(1);
 	    	
 	    	sensor.setRange(4f);
 	    	float traveledTime = 10;
@@ -39,8 +39,8 @@ public class UltrasonicSensorTest {
 	    	UltrasonicSensor sensor = new UltrasonicSensor(2,1);
 
 	    	//setup to get  OriginToPositionLength = 1
-	    	sensor.sensorAngle=45f;
-	    	sensor.sensorRadius=1;
+			sensor.setSensorAngle(45);
+	    	sensor.setSize(1);
 	    	
 	    	sensor.setRange(5f);
 	    	float traveledTime = 15;

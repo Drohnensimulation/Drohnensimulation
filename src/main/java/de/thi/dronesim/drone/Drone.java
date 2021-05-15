@@ -1,6 +1,6 @@
 package de.thi.dronesim.drone;
 
-import de.thi.dronesim.sensor.types.ASensor;
+import de.thi.dronesim.sensor.types.DistanceSensor;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class Drone {
     /**
      * A Drone has an Collections of Sensors attached to it
      */
-    private List<ASensor> sensors;
+    private List<DistanceSensor> sensors;
 
     private static Drone instance;      // singleton instance
 

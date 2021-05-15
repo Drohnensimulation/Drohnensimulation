@@ -1,6 +1,5 @@
 package de.thi.dronesim.sensor.types;
 
-import de.thi.dronesim.drone.Drone;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.ISensor;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
@@ -29,9 +28,7 @@ public class GpsSensor implements ISensor {
 	private Float vSpeed = null;
 	
 	private String lastResult;
-	
-	private Drone drone;
-	
+
 	/**
 	 * Creates a new GPS Sensor
 	 */
@@ -42,22 +39,6 @@ public class GpsSensor implements ISensor {
 		this.lastVerticalDistanceDeltas = new List<>();
 	}
 	
-	/**
-	 * Adds the Sensor to a drone
-	 * @param drone
-	 */
-	public void setDrone(Drone drone) {
-		this.drone = drone;
-	}
-	
-	/**
-	 * Gets the drone that contains the sensor or null if the sensor was never added to a drone
-	 * @return
-	 */
-	public Drone getDrone() {
-		return this.drone;
-	}
-
 	@Override
 	public String getType() {
 		return "GpsSensor";

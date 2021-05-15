@@ -1,6 +1,5 @@
 package de.thi.dronesim.sensor.types;
 
-import de.thi.dronesim.drone.Drone;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.ISensor;
 import de.thi.dronesim.sensor.Vector3d;
@@ -27,9 +26,6 @@ public class WindSensor implements ISensor {
 	
 	//If the measured wind blows in this direction, the measurement will return an angle of 90 degrees
 	protected Vector3d nintyDegreeDirection;
-	
-	//The drone that the sensor was added to
-	protected Drone drone;
 	
 	/**
 	 * Configures the Wind Sensor. 
@@ -91,22 +87,6 @@ public class WindSensor implements ISensor {
 	 */
 	public Vector3d getRelativeNintyDegreeDirection() {
 		return this.nintyDegreeDirection;
-	}
-	
-	/**
-	 * Adds the Sensor to a drone
-	 * @param drone
-	 */
-	public void setDrone(Drone drone) {
-		this.drone = drone;
-	}
-	
-	/**
-	 * Gets the drone that contains the sensor or null if the sensor was never added to a drone
-	 * @return
-	 */
-	public Drone getDrone() {
-		return this.drone;
 	}
 	
 	/**

@@ -2,7 +2,6 @@
 package de.thi.dronesim.sensor.types;
 
 import com.jme3.math.Vector3f;
-import de.thi.dronesim.sensor.types.RotationSensor;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -91,7 +90,7 @@ public class RotationSensorTest {
     	double oneRotation = (2*Math.PI)*5;
     	
     	rotSen.setDirection(1, 1, 1);
-    	Vector3f origiOrientation = rotSen.getOrientation();
+    	Vector3f origiOrientation = rotSen.getDirectionVector();
     	
     	Vector3f newOrietntation = rotSen.newOrientation(oneRotation);
     	
