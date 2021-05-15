@@ -1,7 +1,7 @@
 package de.thi.dronesim.sensor.dto;
 
 import de.thi.dronesim.obstacle.entity.Obstacle;
-import de.thi.dronesim.sensor.ASensor;
+import de.thi.dronesim.sensor.types.ASensor;
 
 import java.util.List;
 

@@ -1,7 +1,5 @@
 package de.thi.dronesim.persistence.entity;
 
-import com.jme3.math.Vector3f;
-
 /**
  * Object that holds all Configurations to a Sensor.
  *
@@ -9,9 +7,9 @@ import com.jme3.math.Vector3f;
  */
 public class SensorConfig {
 
-    private double range;
-    private double sensorAngle;
-    private double sensorRadius;
+    private String className;
+    private String sensorName;
+
     private double measurementAccuracy;
     private double directionX;
     private double directionY;
@@ -20,61 +18,56 @@ public class SensorConfig {
     private double posY;
     private double posZ;
 
+    // DistanceSensor
+    private double range;
+    private double sensorAngle;
+    private double sensorRadius;
+
+    // WindSensor
+    private double zeroDegreeDirectionX;
+    private double zeroDegreeDirectionY;
+    private double zeroDegreeDirectionZ;
+    private double nintyDegreeDirectionX;
+    private double nintyDegreeDirectionY;
+    private double nintyDegreeDirectionZ;
+
     // /////////////////////////////////////////////////////////////////////////////
     // Object Methods
     // /////////////////////////////////////////////////////////////////////////////
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        SensorConfig that = (SensorConfig) o;
+        SensorConfig config = (SensorConfig) o;
 
-        if (Double.compare(that.range, range) != 0) {
-            return false;
-        }
-        if (Double.compare(that.sensorAngle, sensorAngle) != 0) {
-            return false;
-        }
-        if (Double.compare(that.sensorRadius, sensorRadius) != 0) {
-            return false;
-        }
-        if (Double.compare(that.measurementAccuracy, measurementAccuracy) != 0) {
-            return false;
-        }
-        if (Double.compare(that.directionX, directionX) != 0) {
-            return false;
-        }
-        if (Double.compare(that.directionY, directionY) != 0) {
-            return false;
-        }
-        if (Double.compare(that.directionZ, directionZ) != 0) {
-            return false;
-        }
-        if (Double.compare(that.posX, posX) != 0) {
-            return false;
-        }
-        if (Double.compare(that.posY, posY) != 0) {
-            return false;
-        }
-        return Double.compare(that.posZ, posZ) == 0;
+        if (Double.compare(config.measurementAccuracy, measurementAccuracy) != 0) return false;
+        if (Double.compare(config.directionX, directionX) != 0) return false;
+        if (Double.compare(config.directionY, directionY) != 0) return false;
+        if (Double.compare(config.directionZ, directionZ) != 0) return false;
+        if (Double.compare(config.posX, posX) != 0) return false;
+        if (Double.compare(config.posY, posY) != 0) return false;
+        if (Double.compare(config.posZ, posZ) != 0) return false;
+        if (Double.compare(config.range, range) != 0) return false;
+        if (Double.compare(config.sensorAngle, sensorAngle) != 0) return false;
+        if (Double.compare(config.sensorRadius, sensorRadius) != 0) return false;
+        if (Double.compare(config.zeroDegreeDirectionX, zeroDegreeDirectionX) != 0) return false;
+        if (Double.compare(config.zeroDegreeDirectionY, zeroDegreeDirectionY) != 0) return false;
+        if (Double.compare(config.zeroDegreeDirectionZ, zeroDegreeDirectionZ) != 0) return false;
+        if (Double.compare(config.nintyDegreeDirectionX, nintyDegreeDirectionX) != 0) return false;
+        if (Double.compare(config.nintyDegreeDirectionY, nintyDegreeDirectionY) != 0) return false;
+        if (Double.compare(config.nintyDegreeDirectionZ, nintyDegreeDirectionZ) != 0) return false;
+        if (className != null ? !className.equals(config.className) : config.className != null) return false;
+        return sensorName != null ? sensorName.equals(config.sensorName) : config.sensorName == null;
     }
 
     @Override
     public int hashCode() {
         int result;
         long temp;
-        temp = Double.doubleToLongBits(range);
-        result = (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(sensorAngle);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(sensorRadius);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = className != null ? className.hashCode() : 0;
+        result = 31 * result + (sensorName != null ? sensorName.hashCode() : 0);
         temp = Double.doubleToLongBits(measurementAccuracy);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(directionX);
@@ -89,8 +82,27 @@ public class SensorConfig {
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(posZ);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(range);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(sensorAngle);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(sensorRadius);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(zeroDegreeDirectionX);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(zeroDegreeDirectionY);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(zeroDegreeDirectionZ);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(nintyDegreeDirectionX);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(nintyDegreeDirectionY);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(nintyDegreeDirectionZ);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
+
 
     // /////////////////////////////////////////////////////////////////////////////
     // Getter/Setter
@@ -174,5 +186,69 @@ public class SensorConfig {
 
     public void setPosZ(double posZ) {
         this.posZ = posZ;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public double getZeroDegreeDirectionX() {
+        return zeroDegreeDirectionX;
+    }
+
+    public void setZeroDegreeDirectionX(double zeroDegreeDirectionX) {
+        this.zeroDegreeDirectionX = zeroDegreeDirectionX;
+    }
+
+    public double getZeroDegreeDirectionY() {
+        return zeroDegreeDirectionY;
+    }
+
+    public void setZeroDegreeDirectionY(double zeroDegreeDirectionY) {
+        this.zeroDegreeDirectionY = zeroDegreeDirectionY;
+    }
+
+    public double getZeroDegreeDirectionZ() {
+        return zeroDegreeDirectionZ;
+    }
+
+    public void setZeroDegreeDirectionZ(double zeroDegreeDirectionZ) {
+        this.zeroDegreeDirectionZ = zeroDegreeDirectionZ;
+    }
+
+    public double getNintyDegreeDirectionX() {
+        return nintyDegreeDirectionX;
+    }
+
+    public void setNintyDegreeDirectionX(double nintyDegreeDirectionX) {
+        this.nintyDegreeDirectionX = nintyDegreeDirectionX;
+    }
+
+    public double getNintyDegreeDirectionY() {
+        return nintyDegreeDirectionY;
+    }
+
+    public void setNintyDegreeDirectionY(double nintyDegreeDirectionY) {
+        this.nintyDegreeDirectionY = nintyDegreeDirectionY;
+    }
+
+    public double getNintyDegreeDirectionZ() {
+        return nintyDegreeDirectionZ;
+    }
+
+    public void setNintyDegreeDirectionZ(double nintyDegreeDirectionZ) {
+        this.nintyDegreeDirectionZ = nintyDegreeDirectionZ;
+    }
+
+    public String getSensorName() {
+        return sensorName;
+    }
+
+    public void setSensorName(String sensorName) {
+        this.sensorName = sensorName;
     }
 }

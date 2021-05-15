@@ -1,5 +1,8 @@
 package de.thi.dronesim.sensor;
 
+/**
+ * @deprecated TODO: replace with vector from com.jme3.math
+ */
 public class Vector3d {
 	private final double x;
 	private final double y;

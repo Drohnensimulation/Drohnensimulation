@@ -1,4 +1,4 @@
-package de.thi.dronesim.sensor;
+package de.thi.dronesim.sensor.types;
 
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.obstacle.entity.HitMark;
@@ -7,15 +7,17 @@ import de.thi.dronesim.drone.Drone;
 
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
+import de.thi.dronesim.sensor.ISensor;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 
 import java.util.*;
 
-public abstract class ASensor {
+public abstract class ASensor implements ISensor {
 	
 	//TODO: -Beschreibung des Kegels
 	//		-Vervollständigung der Methodenimplementierung
-	
+
+	protected String name;
 	protected Drone drone;
 	protected float range; // range from sensor position to cone bottom
 	protected float sensorAngle;
@@ -613,4 +615,12 @@ public abstract class ASensor {
 		config.setPosZ(posZ);
 		return config;
 	}
+
+	public String getName() {
+		return name;
+	}
+
+	public abstract void runMeasurement();
+
+	public abstract SensorResultDto getLastMeasurement();
 }

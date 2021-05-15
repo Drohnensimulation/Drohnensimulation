@@ -1,6 +1,6 @@
 package de.thi.dronesim.drone;
 
-import de.thi.dronesim.sensor.ASensor;
+import de.thi.dronesim.sensor.types.ASensor;
 
 import java.util.List;
 

@@ -1,21 +1,19 @@
 package de.thi.dronesim.sensor.types;
 
-import de.thi.dronesim.ISimulationChild;
+import com.jme3.math.Matrix3f;
+import com.jme3.math.Vector3f;
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.obstacle.entity.HitMark;
-import de.thi.dronesim.sensor.ASensor;
-import de.thi.dronesim.obstacle.UfoObjs;
+import de.thi.dronesim.sensor.dto.SensorResultDto;
+
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.jme3.math.Matrix3f;
-import com.jme3.math.Vector3f;
-
 //import com.jme3.math.Vector3f;
 
 
-public class RotationSensor extends ASensor implements ISimulationChild {
+public class RotationSensor extends ASensor {
 	/**
 	 * Man kan sich die Rotation wie die Bewegung wie die Bewegung eines Blaulichts vorstellen
 	 * 
@@ -51,7 +49,7 @@ public class RotationSensor extends ASensor implements ISimulationChild {
 		return name;
 	}
 	
-	// To calculate the rotation we measure the past time. This method starts the timer. 
+	// To calculate the rotation we measure the past time. This method starts the timer.
 	public void startRotation() {
 		startRotationTime = System.currentTimeMillis();
 	}
@@ -99,19 +97,16 @@ public class RotationSensor extends ASensor implements ISimulationChild {
 		    }
 		}, 0, callTimerForSensorValues);
 	}
-	
-	
+
+
 	@Override
-	public void setSimulation(Simulation simulation) {
-		this.simulation = simulation;
+	public void runMeasurement() {
+		// TODO
 	}
 
 	@Override
-	public Simulation getSimulation() {
-		return this.simulation;
+	public SensorResultDto getLastMeasurement() {
+		// TODO
+		return null;
 	}
-
-	
-
-	
 }

@@ -1,18 +1,13 @@
 package de.thi.dronesim.sensor.types;
 
-import de.thi.dronesim.ISimulationChild;
-import de.thi.dronesim.Simulation;
-import de.thi.dronesim.sensor.ASensor;
+import de.thi.dronesim.sensor.dto.SensorResultDto;
 
-public class InfraredSensor extends ASensor implements ISimulationChild {
-
-	//Main simulation
-	private Simulation simulation;
+public class InfraredSensor extends ASensor {
 
 	public InfraredSensor() {
 
 	}
-	
+
 	@Override
 	public String getType() {
 		String name = "InfrarotSensor";
@@ -21,12 +16,13 @@ public class InfraredSensor extends ASensor implements ISimulationChild {
 	}
 
 	@Override
-	public void setSimulation(Simulation simulation) {
-		this.simulation = simulation;
+	public void runMeasurement() {
+		// TODO
 	}
 
 	@Override
-	public Simulation getSimulation() {
-		return this.simulation;
+	public SensorResultDto getLastMeasurement() {
+		// TODO
+		return null;
 	}
 }
