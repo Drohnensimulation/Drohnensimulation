@@ -4,10 +4,7 @@ import de.thi.dronesim.ISimulationChild;
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
-import de.thi.dronesim.sensor.types.GpsSensor;
-import de.thi.dronesim.sensor.types.InfraredSensor;
-import de.thi.dronesim.sensor.types.RotationSensor;
-import de.thi.dronesim.sensor.types.WindSensor;
+import de.thi.dronesim.sensor.types.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -77,6 +74,9 @@ public class SensorModule implements ISimulationChild {
                 return new InfraredSensor();
             case "RotationSensor":
                 return new RotationSensor();
+            case "UltrasonicSensor":
+                return new UltrasonicSensor(config.getRangeIncreaseVelocity(),
+                        config.getCallTimerForSensorValues());
             case "WindSensor":
                 return new WindSensor(config.getSensorName(),
                         new Vector3d(config.getDirectionX(), config.getDirectionY(), config.getDirectionZ()),

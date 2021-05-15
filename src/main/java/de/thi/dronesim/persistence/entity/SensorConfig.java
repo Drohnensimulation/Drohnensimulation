@@ -31,6 +31,10 @@ public class SensorConfig {
     private double nintyDegreeDirectionY;
     private double nintyDegreeDirectionZ;
 
+    // UltrasonicSensor
+    private float rangeIncreaseVelocity;
+    private int callTimerForSensorValues;
+
     // /////////////////////////////////////////////////////////////////////////////
     // Object Methods
     // /////////////////////////////////////////////////////////////////////////////
@@ -58,6 +62,8 @@ public class SensorConfig {
         if (Double.compare(config.nintyDegreeDirectionX, nintyDegreeDirectionX) != 0) return false;
         if (Double.compare(config.nintyDegreeDirectionY, nintyDegreeDirectionY) != 0) return false;
         if (Double.compare(config.nintyDegreeDirectionZ, nintyDegreeDirectionZ) != 0) return false;
+        if (Float.compare(config.rangeIncreaseVelocity, rangeIncreaseVelocity) != 0) return false;
+        if (callTimerForSensorValues != config.callTimerForSensorValues) return false;
         if (className != null ? !className.equals(config.className) : config.className != null) return false;
         return sensorName != null ? sensorName.equals(config.sensorName) : config.sensorName == null;
     }
@@ -100,6 +106,8 @@ public class SensorConfig {
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(nintyDegreeDirectionZ);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (rangeIncreaseVelocity != +0.0f ? Float.floatToIntBits(rangeIncreaseVelocity) : 0);
+        result = 31 * result + callTimerForSensorValues;
         return result;
     }
 
@@ -250,5 +258,21 @@ public class SensorConfig {
 
     public void setSensorName(String sensorName) {
         this.sensorName = sensorName;
+    }
+
+    public float getRangeIncreaseVelocity() {
+        return rangeIncreaseVelocity;
+    }
+
+    public void setRangeIncreaseVelocity(float rangeIncreaseVelocity) {
+        this.rangeIncreaseVelocity = rangeIncreaseVelocity;
+    }
+
+    public int getCallTimerForSensorValues() {
+        return callTimerForSensorValues;
+    }
+
+    public void setCallTimerForSensorValues(int callTimerForSensorValues) {
+        this.callTimerForSensorValues = callTimerForSensorValues;
     }
 }
