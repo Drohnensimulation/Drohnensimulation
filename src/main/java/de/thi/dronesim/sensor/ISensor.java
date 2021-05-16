@@ -13,8 +13,7 @@ public interface ISensor {
 	String getType();
 
 	String getName();
-	
-	void setId(int id);
+
 	int getId();
 
 	SensorConfig saveToConfig();
