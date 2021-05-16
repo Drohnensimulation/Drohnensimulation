@@ -21,7 +21,6 @@ public class Wind implements ISimulationChild {
 
     //Main simulation
     private Simulation simulation;
-    private boolean configLoaded = false;
 
     private List<WindLayer> windLayers;             // list of wind layers      [Windlayer]
     private int latestLayerId = 0;
@@ -31,7 +30,6 @@ public class Wind implements ISimulationChild {
     }
 
     public Wind(List<WindLayer> layers) {
-        this.configLoaded = true;
         this.windLayers = layers;
         load();
     }
@@ -80,7 +78,6 @@ public class Wind implements ISimulationChild {
     private void load() {
         sortWindLayer();
         normalize();
-        this.configLoaded = true;
     }
 
     /**
