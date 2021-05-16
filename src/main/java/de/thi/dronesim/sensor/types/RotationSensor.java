@@ -60,17 +60,18 @@ public class RotationSensor extends DistanceSensor {
 		this.startRotationTime = simulation.getTime();
 	}
 	
-
-	// Calculates the arcMeasure by multiply the traveledTime and the given rotationVelocity
-	public double getTraveledArcMeasure() {
-		//calculate traveled time in nanoseconds
-		endRotationTime = simulation.getTime();
-		// traveled time converted from ms into seconds
-		float travaledTime = (endRotationTime - this.startRotationTime) / 1000;
-		//restart rotation
+	//calculate traveled time in ms
+	private float traveledTime() {
+		float endIncreaseTime = simulation.getTime();
 		startRotation();
-		//return arc measure
-		return travaledTime*rotationVelocity;
+		// traveled time converted into seconds
+		float traveledTime = (endIncreaseTime - this.startRotationTime) / 1000;
+		return traveledTime;
+	}
+	
+	// Calculates the arcMeasure by multiply the traveledTime and the given rotationVelocity
+	public float getTraveledArcMeasure(float traveledTime) {
+		return traveledTime*rotationVelocity;
 	}
 	
 	// Calculate new OrientationVector with the getTraveledArcMeasure() return as parameter
@@ -102,7 +103,7 @@ public class RotationSensor extends DistanceSensor {
 
 		    @Override
 		    public void run() {
-		    	setDirection(newOrientation(getTraveledArcMeasure()));
+		    	setDirection(newOrientation(getTraveledArcMeasure(traveledTime())));
 				values =  getSensorHits(calcOrigin(), getDirectionVector(), calcConeHeight(), calcSurfaceVector());
 		    }
 		}, 0, callTimerForSensorValues);

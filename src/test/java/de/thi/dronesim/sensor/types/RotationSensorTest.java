@@ -31,16 +31,9 @@ public class RotationSensorTest {
     	RotationSensor rotSen = new RotationSensor(spinsPerSeconds,1);
     	// set on one spin per second
     	rotSen.spinsToRotationVelocityConverter(spinsPerSeconds);
-    	// set startTime value
-    	rotSen.startRotation();
     	// let 4 seconds pass
-    	try {
-			TimeUnit.SECONDS.sleep(passingTime);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-    	double ArcMessuretest = rotSen.getTraveledArcMeasure();
+    	 
+    	double ArcMessuretest = rotSen.getTraveledArcMeasure(passingTime);
     	
     	double low = (float) ((2*Math.PI)*spinsPerSeconds*passingTime);
     	double high = low + 0.3;
@@ -58,16 +51,8 @@ public class RotationSensorTest {
     	RotationSensor rotSen = new RotationSensor(spinsPerSeconds,1);
     	// set on one spin per second
     	rotSen.spinsToRotationVelocityConverter(spinsPerSeconds);
-    	// set startTime value
-    	rotSen.startRotation();
-    	// let 4 seconds pass
-    	try {
-			TimeUnit.SECONDS.sleep(passingTime);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-    	double ArcMessuretest = rotSen.getTraveledArcMeasure();
+    	// let 3 seconds pass
+    	double ArcMessuretest = rotSen.getTraveledArcMeasure(passingTime);
     	
     	double low = (float) ((2*Math.PI)*spinsPerSeconds*passingTime);
     	double high = low + 0.3;
