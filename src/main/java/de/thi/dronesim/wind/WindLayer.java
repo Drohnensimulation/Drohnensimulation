@@ -2,18 +2,18 @@ package de.thi.dronesim.wind;
 
 import javax.vecmath.Vector3d;
 
-public class WindLayer implements Comparable<WindLayer> {
+public class WindLayer {
 
-    private static final double GUST_RISE_TIME = 2;     // Time until gust reaches full speed   [s]
-    private static final double MAX_CALM_TIME = 120;    // Maximum time for no gust             [s]
+    protected static final double GUST_RISE_TIME = 2;     // Time until gust reaches full speed   [s]
+    protected static final double MAX_CALM_TIME = 120;    // Maximum time for no gust             [s]
 
-    private double windSpeed;                           // Speed of the steady wind             [m/s]
-    private double gustSpeed;                           // Max Speed of the gusts               [m/s]
+    private final double windSpeed;                           // Speed of the steady wind             [m/s]
+    private final double gustSpeed;                           // Max Speed of the gusts               [m/s]
+    private final double windDirection;                       // current wind direction               [degree]
     private double timeStart;                           // time of wind layer start             [s]
     private double timeEnd;                             // time of wind layer end               [s]
     private double altitudeBottom;                      // height of wind layer bottom          [m]
     private double altitudeTop;                         // height of wind layer top             [m]
-    private double windDirection;                       // current wind direction               [degree]
 
     private double nextGustStart = 0.0;                 // start time of the next gust          [s]
     private double nextGustSpeed = 0.0;                // speed of the next gust               [m/s]
@@ -37,18 +37,6 @@ public class WindLayer implements Comparable<WindLayer> {
         this.altitudeBottom = altitudeBottom;
         this.altitudeTop = altitudeTop;
         this.windDirection = windDirection;
-    }
-
-    protected WindLayer copy() {
-        return new WindLayer(
-                windSpeed,
-                gustSpeed,
-                timeStart,
-                timeEnd,
-                altitudeBottom,
-                altitudeTop,
-                windDirection
-        );
     }
 
     /**
@@ -168,13 +156,6 @@ public class WindLayer implements Comparable<WindLayer> {
         nextGustSpeed = Math.random() * (gustSpeed - windSpeed) + windSpeed;
     }
 
-    protected static double getGustRiseTime() {
-        return GUST_RISE_TIME;
-    }
-
-    protected static double getMaxCalmTime() {
-        return MAX_CALM_TIME;
-    }
 
     protected double getWindSpeed() {
         return windSpeed;
@@ -212,34 +193,6 @@ public class WindLayer implements Comparable<WindLayer> {
         return nextGustSpeed;
     }
 
-    protected void setWindSpeed(double windSpeed) {
-        this.windSpeed = windSpeed;
-    }
-
-    protected void setGustSpeed(double gustSpeed) {
-        this.gustSpeed = gustSpeed;
-    }
-
-    protected void setTimeStart(double timeStart) {
-        this.timeStart = timeStart;
-    }
-
-    protected void setTimeEnd(double timeEnd) {
-        this.timeEnd = timeEnd;
-    }
-
-    protected void setAltitudeBottom(double altitudeBottom) {
-        this.altitudeBottom = altitudeBottom;
-    }
-
-    protected void setAltitudeTop(double altitudeTop) {
-        this.altitudeTop = altitudeTop;
-    }
-
-    protected void setWindDirection(double windDirection) {
-        this.windDirection = windDirection;
-    }
-
     protected void setNextGustStart(double nextGustStart) {
         this.nextGustStart = nextGustStart;
     }
@@ -248,11 +201,4 @@ public class WindLayer implements Comparable<WindLayer> {
         this.nextGustSpeed = nextGustSpeed;
     }
 
-    @Override
-    public int compareTo(WindLayer layer) {
-        if (getTimeStart() == 0.0 || layer.getTimeStart() == 0.0) {
-            return 0;
-        }
-        return layer.compareTo(this);
-    }
 }
