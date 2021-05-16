@@ -25,6 +25,10 @@ class WindTest {
         windLayers.clear();
     }
 
+    private void setupWind() {
+        wind = new Wind(windLayers);
+        wind.setSimulation(simulation);
+    }
 
     @Test
     void sort_timeAlreadySorted() {
@@ -339,9 +343,27 @@ class WindTest {
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
 
-    private void setupWind() {
-        wind = new Wind(windLayers);
-        wind.setSimulation(simulation);
+    @Test
+    void findWindLayer_timeSeries() {
+        createLocation(20,10,210);
+        windLayers.add(new WindLayer(10, 10, 0, 20, 0, 100, 30));
+        windLayers.add(new WindLayer(11, 11, 20, 40, 0, 100, 30));
+        windLayers.add(new WindLayer(12, 12, 40, 60, 0, 100, 30));
+        windLayers.add(new WindLayer(13, 13, 60, 80, 0, 100, 30));
+        windLayers.add(new WindLayer(14, 14, 80, 100, 0, 100, 30));
+        setupWind();
+
+        setSimulationTime(30);
+        wind.applyWind(location);
+        assertEquals(21, location.getGroundSpeed(), 0.5,  "Wrong layer selected for t=30!");
+
+        setSimulationTime(50);
+        wind.applyWind(location);
+        assertEquals(22, location.getGroundSpeed(), 0.5,  "Wrong layer selected for t=50!");
+
+        setSimulationTime(90);
+        wind.applyWind(location);
+        assertEquals(24, location.getGroundSpeed(), 0.5,  "Wrong layer selected for t=90!");
     }
 
     @Test
@@ -654,6 +676,23 @@ class WindTest {
     }
 
     @Test
+    void interpolation_threeLayers() {
+        createLocation(19, 20, 0);
+        setSimulationTime(18);
+
+        windLayers.add(new WindLayer(10, 10, 0, 20, 20, 40, 90));
+        windLayers.add(new WindLayer(10, 10, 20, 40, 0, 20, 180));
+        windLayers.add(new WindLayer(10, 10, 20, 40, 20, 40, 270));
+        setupWind();
+        wind.applyWind(location);
+
+
+
+        assertEquals(21.86, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(355.8, location.getTrack(),0.5, "Wrong track");
+    }
+
+    @Test
     void interpolation_fourLayers() {
         createLocation(19, 20, 0);
         setSimulationTime(18);
@@ -753,6 +792,17 @@ class WindTest {
         location = new Location(0, y, 0);
         location.setAirspeed(airspeed);
         location.setHeading(heading);
+    }
+
+    @Test
+    void getWindAt_noWind() {
+        createLocation(20,10,210);
+        setSimulationTime(20);
+        setupWind();
+        wind.applyWind(location);
+        Wind.CurrentWind wind = Wind.getWindAt(location);
+        assertEquals(0, wind.getWindSpeed(), 1, "Wrong wind speed");
+        assertEquals(210, wind.getWindDirection(), 1, "Wrong wind direction");
     }
 
     @Test
