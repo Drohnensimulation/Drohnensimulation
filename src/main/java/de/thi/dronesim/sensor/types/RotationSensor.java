@@ -37,7 +37,6 @@ public class RotationSensor extends DistanceSensor {
 		this.spinsPerSecond = spinsPerSecond;
 		this.callTimerForSensorValues = callTimerForSensorValues;
 		spinsToRotationVelocityConverter(spinsPerSecond);
-		startRotation();
 	}
 
 	// Why did some one put this Constructor here???????
@@ -56,18 +55,18 @@ public class RotationSensor extends DistanceSensor {
 		this.rotationVelocity = (float) ((2*Math.PI)*this.spinsPerSecond);
 	}
 
-	// To calculate the rotation we measure the past time in nanoseconds. This method starts the timer.
+	// To calculate the rotation we measure the past time in ms based on the simulation time. This method starts the timer.
 	public void startRotation() {
-		this.startRotationTime = System.nanoTime();
+		this.startRotationTime = simulation.getTime();
 	}
 	
 
 	// Calculates the arcMeasure by multiply the traveledTime and the given rotationVelocity
 	public double getTraveledArcMeasure() {
 		//calculate traveled time in nanoseconds
-		endRotationTime = System.nanoTime();
-		// traveled time converted into seconds
-		float travaledTime = (endRotationTime - this.startRotationTime) / 1000000000;
+		endRotationTime = simulation.getTime();
+		// traveled time converted from ms into seconds
+		float travaledTime = (endRotationTime - this.startRotationTime) / 1000;
 		//restart rotation
 		startRotation();
 		//return arc measure
@@ -116,11 +115,12 @@ public class RotationSensor extends DistanceSensor {
 	
 	@Override
 	public void runMeasurement() {
-		// TODO
+		this.startRotation();
 	}
 
 	@Override
 	public SensorResultDto getLastMeasurement() {
+		SensorResultDto measurement = new SensorResultDto();
 		// TODO
 		return null;
 	}

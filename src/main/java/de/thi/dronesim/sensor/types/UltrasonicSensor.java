@@ -1,5 +1,6 @@
 package de.thi.dronesim.sensor.types;
 
+import de.thi.dronesim.Simulation;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 
@@ -21,12 +22,12 @@ public class UltrasonicSensor extends DistanceSensor {
 	public int callTimerForSensorValues;
 	public Timer callTimerValues = new Timer( );
 	public Set<HitMark> values;
+	//Main simulation
+	private Simulation simulation;
 
 	public UltrasonicSensor(float rangeIncreaseVelocity, int callTimerForSensorValues) {
 		this.rangeIncreaseVelocity =rangeIncreaseVelocity;
 		this.callTimerForSensorValues= callTimerForSensorValues;
-		this.startIncrease();
-
 	}
 	
 	@Override
@@ -37,7 +38,7 @@ public class UltrasonicSensor extends DistanceSensor {
 
 	@Override
 	public void runMeasurement() {
-		// TODO
+		this.startIncrease();
 	}
 
 	@Override
@@ -48,19 +49,22 @@ public class UltrasonicSensor extends DistanceSensor {
 
 	// Saves the start time
 	public void startIncrease() {
-		this.startIncreaseTime = System.nanoTime();
+		this.startIncreaseTime = simulation.getTime();
 	}
 	
-	//calculate traveled time in nanoseconds
+	//calculate traveled time in ms
 	private float traveledTime() {
-		float endIncreaseTime = System.nanoTime();
+		float endIncreaseTime = simulation.getTime();
+		startIncrease();
 		// traveled time converted into seconds
-		float traveledTime = (endIncreaseTime - this.startIncreaseTime) / 1000000000;
+		float traveledTime = (endIncreaseTime - this.startIncreaseTime) / 1000;
 		return traveledTime;
 	}
 	
-	// Calculate the current cone height with help the time difference and the rangeIncreaseVelocity. first calculate the current
-	// range and add the getOriginToPositionLength()
+	/**
+	 * Calculate the current cone height with help the time difference and the rangeIncreaseVelocity. first calculate the current
+	 * range and add the getOriginToPositionLength()
+	 */
 	public float getCurrentConeHeight(float traveledTime) {
 		// Multiply the Time with the velocity to get the distance
 		float travaledDistance = traveledTime*this.rangeIncreaseVelocity;
