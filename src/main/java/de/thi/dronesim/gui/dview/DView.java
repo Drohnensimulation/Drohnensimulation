@@ -6,65 +6,60 @@ import de.thi.dronesim.drone.Location;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
+/**
+ * @author Niklas Thurner
+ */
 public class DView extends JFrame implements IGuiView {
 
-    private JPanel mainPanel;
+    private boolean toggleWind = false;
+    private boolean toggleObstacles = false;
     private JLabel xCord;
     private JLabel yCord;
     private JLabel zCord;
     private JLabel direction;
-    private JPanel coordinatePanel;
     private JPanel graphicPanel;
-    private JPanel dataPanel;
-    private JPanel directionPanel;
-    private JPanel airSpeedPanel;
-    private JPanel zCordPanel;
-    private JPanel yCordPanel;
-    private JPanel xCordPanel;
-    private JButton startSimulationButton;
-    private JPanel startPanel;
-    private JButton button1;
-    private JButton button2;
-    private JButton button3;
-    private JPanel scenarioPanel;
-    private JButton birdViewButton;
-    private JButton thirdPersonButton;
     private JLabel airSpeed;
     private JLabel groundSpeed;
+    private JButton thirdPerson;
+    private JButton birdView;
+    private JButton firstPerson;
+    private JButton nearbyObstaclesButton;
+    private JButton windButton;
+    private JPanel obstacles;
+    private JPanel airSpeedPanel;
     private JPanel groundSpeedPanel;
-    private JButton firstPersonButton;
+    private JPanel directionPanel;
+    private JPanel xCordPanel;
+    private JPanel yCordPanel;
+    private JPanel zCordPanel;
+    private JPanel buttons;
+    private JPanel wind;
+    private JPanel mainPanel;
+    private JPanel dataPanel;
 
-    public DView(DRenderer dView) {
+    public DView(DRenderer dRenderer) {
         super("Ufo Simulation");
         getContentPane().add(mainPanel);
-        Canvas canvas = dView.getCanvas();
+        Canvas canvas = dRenderer.getCanvas();
         graphicPanel.add(canvas);
-        thirdPersonButton.addActionListener(e -> dView.setPerspective(DRenderer.Perspective.THIRD_PERSON));
-        birdViewButton.addActionListener(e -> dView.setPerspective(DRenderer.Perspective.BIRD_VIEW));
-        firstPersonButton.addActionListener(e -> dView.setPerspective(DRenderer.Perspective.FIRST_PERSON));
+        thirdPerson.addActionListener(e -> dRenderer.setPerspective(DRenderer.Perspective.THIRD_PERSON));
+        birdView.addActionListener(e -> dRenderer.setPerspective(DRenderer.Perspective.BIRD_VIEW));
+        firstPerson.addActionListener(e -> dRenderer.setPerspective(DRenderer.Perspective.FIRST_PERSON));
+        nearbyObstaclesButton.addActionListener(this::toggleObstacles);
+        windButton.addActionListener(this::toggleWind);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        disableObstacleSidebar();
+        disableWindSidebar();
         pack();
         setVisible(true);
-
-        mainPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        coordinatePanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        graphicPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        dataPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        groundSpeedPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        airSpeedPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        directionPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        zCordPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        yCordPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        xCordPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        startPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        scenarioPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        startSimulationButton.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        button1.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        button2.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        button3.setBorder(BorderFactory.createLineBorder(Color.BLACK));
     }
 
+    /**
+     * updates the data displayed in the GUI
+     * @param location
+     */
     @Override
     public void updateDroneStatus(Location location) {
         xCord.setText(String.valueOf(location.getX()));
@@ -73,5 +68,49 @@ public class DView extends JFrame implements IGuiView {
         airSpeed.setText(String.valueOf(location.getAirspeed()));
         groundSpeed.setText(String.valueOf(location.getGroundSpeed()));
         direction.setText(String.valueOf(location.getHeading()));
+    }
+
+    public void disableObstacleSidebar () {
+        toggleObstacles = false;
+        obstacles.setVisible(false);
+    }
+
+    public void enableObstacleSidebar () {
+        toggleObstacles = true;
+        obstacles.setVisible(true);
+    }
+
+    /**
+     * Opens/collapses the obstacles-sidebar
+     */
+    public void toggleObstacles(ActionEvent e) {
+        if(toggleObstacles) {
+            disableObstacleSidebar();
+        } else {
+            enableObstacleSidebar();
+        }
+        this.pack();
+    }
+
+    private void disableWindSidebar() {
+        toggleWind = false;
+        wind.setVisible(false);
+    }
+
+    private void enableWindSidebar() {
+        toggleWind = true;
+        wind.setVisible(true);
+    }
+
+    /**
+     * Opens/collapses the wind-sidebar
+     */
+    public void toggleWind(ActionEvent e) {
+        if(toggleWind) {
+            disableWindSidebar();
+        } else {
+            enableWindSidebar();
+        }
+        this.pack();
     }
 }
