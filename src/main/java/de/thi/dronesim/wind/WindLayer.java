@@ -165,7 +165,7 @@ public class WindLayer implements Comparable<WindLayer> {
      */
     private void calcNextGust(double time) {
         nextGustStart = Math.random() * MAX_CALM_TIME + time;
-        nextGustSpeed = Math.random() * gustSpeed;
+        nextGustSpeed = Math.random() * (gustSpeed - windSpeed) + windSpeed;
     }
 
     protected static double getGustRiseTime() {

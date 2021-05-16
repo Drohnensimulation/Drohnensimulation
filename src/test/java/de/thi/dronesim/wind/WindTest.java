@@ -3,6 +3,7 @@ package de.thi.dronesim.wind;
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.drone.Location;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -453,7 +454,7 @@ class WindTest {
         assertEquals(27, location.getTrack(), 0.5,  "Wrong track");
     }
 
-    @ Test
+    @RepeatedTest(100)
     void applyWind_gustGeneration() {
         WindLayer gustLayer = new WindLayer(5, 10, 0, 100, 0, 100, 135);
         windLayers.add(gustLayer);
@@ -465,11 +466,11 @@ class WindTest {
 
         assertTrue(gustLayer.isValid(),"Layer is invalid");
         assertTrue(gustLayer.getNextGustStart() > 0, "Start time was not generated");
-        assertTrue(gustLayer.getNextGustSpeed() > gustLayer.getWindSpeed(), "Gust speed is smaller " +
+        assertTrue(gustLayer.getNextGustSpeed() >= gustLayer.getWindSpeed(), "Gust speed is smaller " +
                 "than wind speed");
     }
 
-    @ Test
+    @Test
     void applyWind_gustCenter() {
         WindLayer gustLayer = new WindLayer(5, 20, 0, 100, 0, 100, 180);
         gustLayer.setNextGustStart(20);
@@ -484,7 +485,7 @@ class WindTest {
         assertEquals(30, location.getGroundSpeed(), 0.5);
     }
 
-    @ Test
+    @Test
     void applyWind_gustRise() {
         WindLayer gustLayer = new WindLayer(5, 20, 0, 100, 0, 100, 180);
         gustLayer.setNextGustStart(20);
@@ -499,7 +500,7 @@ class WindTest {
         assertEquals(22.5, location.getGroundSpeed(), 0.5);
     }
 
-    @ Test
+    @Test
     void applyWind_gustFall() {
         WindLayer gustLayer = new WindLayer(5, 20, 0, 100, 0, 100, 180);
         gustLayer.setNextGustStart(20);
