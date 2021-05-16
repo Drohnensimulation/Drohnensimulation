@@ -118,8 +118,8 @@ public class DRenderer extends SimpleApplication {
      * @param perspective Perspective
      */
     public void setPerspective(Perspective perspective) {
+        dronePerspectiveId = drones.size() > 0 ? drones.get(drones.keySet().toArray()[0]).getId() : -1;
         this.perspective = perspective;
-        dronePerspectiveId = drones.size() > 0 ? drones.get(0).getId() : -1;
     }
 
     /**
@@ -129,8 +129,8 @@ public class DRenderer extends SimpleApplication {
      * @param droneId ID of the perspectives drone
      */
     public void setPerspective(Perspective perspective, int droneId) {
-        this.perspective = perspective;
         dronePerspectiveId = droneId;
+        this.perspective = perspective;
     }
 
     /**
@@ -140,8 +140,8 @@ public class DRenderer extends SimpleApplication {
      * @param drone Drone thats perspective is requested
      */
     public void setPerspective(Perspective perspective, RenderableDrone drone) {
-        this.perspective = perspective;
         dronePerspectiveId = drone.getId();
+        this.perspective = perspective;
     }
 
     /**

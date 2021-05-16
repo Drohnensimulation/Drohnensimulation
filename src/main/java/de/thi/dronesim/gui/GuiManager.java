@@ -52,8 +52,8 @@ public class GuiManager implements ISimulationChild {
      */
     public void openDViewGui() {
         if(!existsGui()) {
-            DRenderer dView = initDView();
-            instrumentView = new DView(dView);
+            DRenderer dRenderer = initDRenderer();
+            instrumentView = new DView(dRenderer);
             isDView = true;
         }
     }
@@ -72,7 +72,7 @@ public class GuiManager implements ISimulationChild {
         return isDView;
     }
 
-    private DRenderer initDView() {
+    private DRenderer initDRenderer() {
         // Create DView
         DRenderer dView = new DRenderer();
 
