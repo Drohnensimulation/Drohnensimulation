@@ -6,6 +6,8 @@ import de.thi.dronesim.drone.Location;
 import de.thi.dronesim.persistence.ConfigReader;
 import de.thi.dronesim.persistence.entity.SimulationConfig;
 import de.thi.dronesim.persistence.entity.WindConfig;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.vecmath.Vector3d;
 import java.util.*;
@@ -14,6 +16,8 @@ public class Wind implements ISimulationChild {
 
     protected static final double WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE = 5;        // range in m
     protected static final double WIND_LAYER_INTERPOLATION_TIME_RANGE = 5;            // range in s
+
+    private final Logger logger = LogManager.getLogger();
 
     //Main simulation
     private Simulation simulation;
@@ -131,11 +135,8 @@ public class Wind implements ISimulationChild {
                 if (currentLayer.overlapsWith(followingLayer)) {
                     // Remove layer from list
                     removed.add(followingLayer);
-
-                    // TODO use logger here
-                    System.err.println("[Wind] Wind layer ("+x
-                            +") violates the border of another layer and is therefore removed!");
-                    System.out.println("[Wind] Borders of different wind layers must not overlap.");
+                    logger.error("Wind layer ({}) violates the border of another layer and is therefore removed!",x);
+                    logger.error("Borders of different wind layers must not overlap.");
                 }
             }
         }
@@ -396,6 +397,5 @@ public class Wind implements ISimulationChild {
             return windDirection;
         }
     }
-
 
 }
