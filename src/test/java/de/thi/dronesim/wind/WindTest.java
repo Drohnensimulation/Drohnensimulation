@@ -20,7 +20,7 @@ class WindTest {
     private final List<WindLayer> windLayers = new ArrayList<>();
 
     @BeforeEach
-    public void setUpWind() throws Exception {
+    public void setup() {
         simulation = new Simulation();
         windLayers.clear();
     }
@@ -378,6 +378,28 @@ class WindTest {
     }
 
     @Test
+    void applyWind_tailWindEast() {
+        createLocation(20,10,90);
+        windLayers.add(new WindLayer(10, 10, 0, 100, 0, 100, 270));
+        setSimulationTime(20);
+        setupWind();
+        wind.applyWind(location);
+        assertEquals(20, location.getGroundSpeed(), 0.5,  "Wrong ground speed");
+        assertEquals(90, location.getTrack(), 0.5,  "Wrong track");
+    }
+
+    @Test
+    void applyWind_tailWindWest() {
+        createLocation(20,10,270);
+        windLayers.add(new WindLayer(10, 10, 0, 100, 0, 100, 90));
+        setSimulationTime(20);
+        setupWind();
+        wind.applyWind(location);
+        assertEquals(20, location.getGroundSpeed(), 0.5,  "Wrong ground speed");
+        assertEquals(270, location.getTrack(), 0.5,  "Wrong track");
+    }
+
+    @Test
     void applyWind_headWind() {
         createLocation(20,5,210);
         windLayers.add(new WindLayer(3, 3, 0, 100, 0, 100, 210));
@@ -676,6 +698,19 @@ class WindTest {
     }
 
     @Test
+    void interpolation_twoLayersAbove() {
+        createLocation(8, 20, 0);
+        setSimulationTime(19);
+        windLayers.add(new WindLayer(10, 10, 0, 20, 10, 20, 90));
+        windLayers.add(new WindLayer(10, 10, 20, 40, 10, 20, 270));
+        setupWind();
+        wind.applyWind(location);
+
+        assertEquals(20.01, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(358.28, location.getTrack(),0.5, "Wrong track");
+    }
+
+    @Test
     void interpolation_threeLayers() {
         createLocation(19, 20, 0);
         setSimulationTime(18);
@@ -706,6 +741,9 @@ class WindTest {
         assertEquals(17.22, location.getGroundSpeed(),0.5, "Wrong ground speed");
         assertEquals(334.68, location.getTrack(),0.5, "Wrong track");
     }
+
+
+
     @Test
     void interpolation_fourLayersAltitudeFirst() {
         createLocation(13, 20, 0);
