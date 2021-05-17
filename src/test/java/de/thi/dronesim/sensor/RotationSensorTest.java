@@ -4,8 +4,8 @@ package de.thi.dronesim.sensor;
 import com.jme3.math.Vector3f;
 import de.thi.dronesim.sensor.types.RotationSensor;
 import org.junit.jupiter.api.Test;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.TimeUnit;
 
@@ -46,8 +46,8 @@ public class RotationSensorTest {
     	double low = (float) ((2*Math.PI)*spinsPerSeconds*passingTime);
     	double high = low + 0.3;
     	
-    	 assertTrue("Error,  ArcMessure is too low",  low  <= ArcMessuretest);
-    	 assertTrue("Error,  ArcMessure is too high", high >= ArcMessuretest);
+    	 assertTrue(low  <= ArcMessuretest, "Error,  ArcMessure is too low");
+    	 assertTrue(high >= ArcMessuretest, "Error,  ArcMessure is too high");
     }
     
     @Test
@@ -73,8 +73,8 @@ public class RotationSensorTest {
     	double low = (float) ((2*Math.PI)*spinsPerSeconds*passingTime);
     	double high = low + 0.3;
     	
-    	 assertTrue("Error,  ArcMessure is too low",  low  <= ArcMessuretest);
-    	 assertTrue("Error,  ArcMessure is too high", high >= ArcMessuretest);
+    	 assertTrue(low  <= ArcMessuretest, "Error,  ArcMessure is too low");
+    	 assertTrue(high >= ArcMessuretest, "Error,  ArcMessure is too high");
     }
     
     /**
