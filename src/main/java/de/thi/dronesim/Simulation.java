@@ -212,8 +212,10 @@ public class Simulation {
                 ISimulationChild instance = constructor.newInstance();
                 instance.initialize(this);
                 this.children.put(childClass, instance);
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
+            } catch (InstantiationException ignored) {
+                // Allow abstract classes to inherit the interface
             }
         }
     }
