@@ -28,6 +28,7 @@ public class Simulation {
 
     private double time;                                           // elapsed simulation time since reset [s]
     private int tps = 32;
+    private double speed = 1;
     private final ScheduledExecutorService executorService;
     private ScheduledFuture<?> status;
 
@@ -73,7 +74,30 @@ public class Simulation {
      * @param tps Ticks per second
      */
     public void setTps(int tps) {
+        if (tps <= 0) throw new IllegalArgumentException("Tps must be at least 1");
         this.tps = tps;
+        if (isRunning()) {
+            reschedule();
+        }
+    }
+
+    /**
+     * @return Simulation speed scale. One equals to real time
+     */
+    public double getSpeed() {
+        return speed;
+    }
+
+    /**
+     * @param speed Speed of the simulation. A speed less that 1 causes the simulation to slow down.
+     * @throws IllegalArgumentException When speedup is less than or equals zero
+     */
+    public void setSpeed(double speed) {
+        if (speed <= 0) throw new IllegalArgumentException("Speedup must be greater than zero");
+        this.speed = speed;
+        if (isRunning()) {
+            reschedule();
+        }
     }
 
     /**
@@ -92,7 +116,7 @@ public class Simulation {
      * <p>If the simulation is already running, nothing will happen.</p>
      */
     public void start() {
-        if (status != null && !status.isCancelled() && !status.isDone()) {
+        if (isRunning()) {
             // Simulation already running
             return;
         }
@@ -100,6 +124,15 @@ public class Simulation {
         // Notify all children that the simulation is about to start
         children.forEach((key1, value1) -> value1.onSimulationStart());
         // Start execution
+        schedule();
+
+        logger.info("Simulation started");
+    }
+
+    /**
+     * Schedules the task by the tps and speed
+     */
+    private void schedule() {
         status = executorService.scheduleAtFixedRate(() -> {
             // Create event
             final SimulationUpdateEvent event = new SimulationUpdateEvent(drone, time, tps);
@@ -107,14 +140,22 @@ public class Simulation {
             updateListeners.forEach((priority, listener) -> listener.onUpdate(event));
             // Update time
             time += 1000.0 / tps;
-        }, 0, 1000000 / tps, TimeUnit.MICROSECONDS);
-
-        logger.info("Simulation started");
+        }, 0, (int) (1e6 / tps * speed), TimeUnit.MICROSECONDS);
     }
 
     /**
-     * Stop the simulation.
-     * <p>If some tasks are still scheduled, they will still be executed</p>
+     * Stops the current task and schedules it again.
+     * Should be used when either the speed or the tps has changed.
+     */
+    private void reschedule() {
+        if (isRunning()) {
+            status.cancel(true);
+        }
+        schedule();
+    }
+
+    /**
+     * Stops the simulation.
      */
     public void stop() {
         status.cancel(true);
@@ -129,7 +170,7 @@ public class Simulation {
      * @return True if the simulation is running
      */
     public boolean isRunning() {
-        return executorService.isTerminated();
+        return status != null && !status.isCancelled() && !status.isDone();
     }
 
     /**
