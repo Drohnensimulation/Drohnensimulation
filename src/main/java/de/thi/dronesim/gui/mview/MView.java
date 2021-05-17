@@ -1,11 +1,11 @@
 package de.thi.dronesim.gui.mview;
 
 import de.thi.dronesim.drone.Location;
+import de.thi.dronesim.gui.GuiManager;
 import de.thi.dronesim.gui.IGuiView;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 
 import javax.swing.*;
-
 import java.awt.*;
 import java.util.Set;
 
@@ -18,7 +18,10 @@ public class MView extends JFrame implements IGuiView {
 
     // These values are currently set to fit the current information
     private static final int WINDOW_MIN_WIDTH = 550;
-    private static final int WINDOW_MIN_HEIGHT = 700;
+    private static final int WINDOW_MIN_HEIGHT = 500;
+
+    // Current Manager
+    private final GuiManager guiManager;
 
     // Main Panel
     private final JPanel contentPane;
@@ -69,11 +72,14 @@ public class MView extends JFrame implements IGuiView {
     private final JLabel yawValue;
 
     // Obstacles
-    private final JPanel panelObstaclesInner;
-    private final JLabel obstacles;
+    private final JPanel panelObstaclesWindInner;
+    private final JLabel obstacleWind;
 
-    private final JPanel panelObstaclesOuter;
-    private JLabel obstaclesInfo;
+    private final JPanel panelObstaclesWindOuter;
+    private final JLabel obstacle;
+    private final JLabel obstacleValue;
+    private final JLabel wind;
+    private final JLabel windValue;
 
     // Buttons
     private final JButton startButton;
@@ -90,8 +96,11 @@ public class MView extends JFrame implements IGuiView {
 
     private SIM_STATUS currentStatus = SIM_STATUS.NOT_RUNNING;
 
-    public MView() {
+    public MView(GuiManager guiManager) {
         super("Drone Simulatione (No GFX)");
+
+        // Holding a ref to the manager, so we can access the simulation, so our buttons can start/pause it.
+        this.guiManager = guiManager;
 
         // Init
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -110,8 +119,8 @@ public class MView extends JFrame implements IGuiView {
         panelVelocityInner = new JPanel();
         panelDirectionOuter = new JPanel();
         panelDirectionInner = new JPanel();
-        panelObstaclesOuter = new JPanel();
-        panelObstaclesInner = new JPanel();
+        panelObstaclesWindOuter = new JPanel();
+        panelObstaclesWindInner = new JPanel();
 
         startButton = new JButton("Start | Pause | Stop Simulation");
         loadButton = new JButton("Load Scenario");
@@ -127,6 +136,7 @@ public class MView extends JFrame implements IGuiView {
 
         // Group Layout setup of the main panel
         GroupLayout gl_contentPane = new GroupLayout(contentPane);
+        // Horizontal Layout:
         gl_contentPane.setHorizontalGroup(
                 gl_contentPane.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(gl_contentPane.createSequentialGroup()
@@ -141,10 +151,11 @@ public class MView extends JFrame implements IGuiView {
                                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                                 .addGroup(gl_contentPane.createParallelGroup(GroupLayout.Alignment.LEADING, false)
                                                         .addComponent(loadButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(panelObstaclesOuter, GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+                                                        .addComponent(panelObstaclesWindOuter, GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
                                                         .addComponent(panelVelocityOuter, GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE))))
                                 .addContainerGap(18, Short.MAX_VALUE))
         );
+        // Vertical Layout:
         gl_contentPane.setVerticalGroup(
                 gl_contentPane.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(gl_contentPane.createSequentialGroup()
@@ -152,12 +163,12 @@ public class MView extends JFrame implements IGuiView {
                                 .addComponent(panelTop, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
                                 .addGap(10)
                                 .addGroup(gl_contentPane.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(panelVelocityOuter, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(panelCoordsOuter, GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE))
+                                        .addComponent(panelVelocityOuter, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(panelCoordsOuter, GroupLayout.DEFAULT_SIZE, 150, GroupLayout.PREFERRED_SIZE))
                                 .addGap(10)
                                 .addGroup(gl_contentPane.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                                        .addComponent(panelObstaclesOuter, GroupLayout.PREFERRED_SIZE, 50, Short.MAX_VALUE)
-                                        .addComponent(panelDirectionOuter, GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE))
+                                        .addComponent(panelObstaclesWindOuter, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(panelDirectionOuter, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(gl_contentPane.createParallelGroup(GroupLayout.Alignment.LEADING, false)
                                         .addComponent(startButton, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
@@ -165,28 +176,46 @@ public class MView extends JFrame implements IGuiView {
                                 .addContainerGap())
         );
 
-        // Obstacles
-        GridBagLayout gbl_panelObstacles = new GridBagLayout();
-        gbl_panelObstacles.columnWidths = new int[]{250};
-        gbl_panelObstacles.rowHeights = new int[]{50, 200};
-        gbl_panelObstacles.columnWeights = new double[]{1.0};
-        gbl_panelObstacles.rowWeights = new double[]{0.0, 1.0};
-        panelObstaclesOuter.setLayout(gbl_panelObstacles);
+        // Panels and Labels:
 
-        obstacles = new JLabel("Obstacles");
+        // Obstacles
+        GridBagLayout gbl_panelObstaclesWind = new GridBagLayout();
+        gbl_panelObstaclesWind.columnWidths = new int[]{250};
+        gbl_panelObstaclesWind.rowHeights = new int[]{50, 200};
+        gbl_panelObstaclesWind.columnWeights = new double[]{1.0};
+        gbl_panelObstaclesWind.rowWeights = new double[]{0.0, 1.0};
+        panelObstaclesWindOuter.setLayout(gbl_panelObstaclesWind);
+
+        obstacleWind = new JLabel("Obstacles");
         GridBagConstraints gbc_obstacles = new GridBagConstraints();
         gbc_obstacles.insets = new Insets(0, 0, 5, 0);
         gbc_obstacles.gridx = 0;
         gbc_obstacles.gridy = 0;
-        panelObstaclesOuter.add(obstacles, gbc_obstacles);
+        panelObstaclesWindOuter.add(obstacleWind, gbc_obstacles);
 
         GridBagConstraints gbc_panelObstaclesInner = new GridBagConstraints();
-        gbc_panelObstaclesInner.insets = new Insets(0, 10, 0, 10);
+        gbc_panelObstaclesInner.insets = new Insets(0, 10, 10, 10);
         gbc_panelObstaclesInner.fill = GridBagConstraints.BOTH;
         gbc_panelObstaclesInner.gridx = 0;
         gbc_panelObstaclesInner.gridy = 1;
-        panelObstaclesOuter.add(panelObstaclesInner, gbc_panelObstaclesInner);
-        panelObstaclesInner.setLayout(new GridLayout(4, 0, 0, 0));
+        panelObstaclesWindOuter.add(panelObstaclesWindInner, gbc_panelObstaclesInner);
+        panelObstaclesWindInner.setLayout(new GridLayout(0, 2, 0, 0));
+
+        obstacle = new JLabel("Next Obstacle");
+        obstacle.setHorizontalAlignment(SwingConstants.CENTER);
+        panelObstaclesWindInner.add(obstacle);
+
+        obstacleValue = new JLabel("[50 m] [NE]");
+        obstacleValue.setHorizontalAlignment(SwingConstants.CENTER);
+        panelObstaclesWindInner.add(obstacleValue);
+
+        wind = new JLabel("Current Wind");
+        wind.setHorizontalAlignment(SwingConstants.CENTER);
+        panelObstaclesWindInner.add(wind);
+
+        windValue = new JLabel("[3 m/s] [SW]");
+        windValue.setHorizontalAlignment(SwingConstants.CENTER);
+        panelObstaclesWindInner.add(windValue);
 
         // Direction and Tilts
         GridBagLayout gbl_panelDirection = new GridBagLayout();
@@ -204,7 +233,7 @@ public class MView extends JFrame implements IGuiView {
         panelDirectionOuter.add(directionTilts, gbc_directionTilts);
 
         GridBagConstraints gbc_DirectionPanelInner = new GridBagConstraints();
-        gbc_DirectionPanelInner.insets = new Insets(0, 10, 0, 10);
+        gbc_DirectionPanelInner.insets = new Insets(0, 10, 10, 10);
         gbc_DirectionPanelInner.fill = GridBagConstraints.BOTH;
         gbc_DirectionPanelInner.gridx = 0;
         gbc_DirectionPanelInner.gridy = 1;
@@ -267,7 +296,7 @@ public class MView extends JFrame implements IGuiView {
         gbl_panelVelocityOuter.rowHeights = new int[]{50, 200};
         gbl_panelVelocityOuter.columnWidths = new int[]{250};
         gbl_panelVelocityOuter.columnWeights = new double[]{1.0};
-        gbl_panelVelocityOuter.rowWeights = new double[]{0.0, 0.0};
+        gbl_panelVelocityOuter.rowWeights = new double[]{0.0, 1.0};
         panelVelocityOuter.setLayout(gbl_panelVelocityOuter);
 
         velocities = new JLabel("Velocities");
@@ -278,12 +307,12 @@ public class MView extends JFrame implements IGuiView {
 
         panelVelocityInner = new JPanel();
         GridBagConstraints gbc_panelVelocityInner = new GridBagConstraints();
-        gbc_panelVelocityInner.insets = new Insets(0, 10, 0, 10);
+        gbc_panelVelocityInner.insets = new Insets(0, 10, 10, 10);
         gbc_panelVelocityInner.fill = GridBagConstraints.BOTH;
         gbc_panelVelocityInner.gridx = 0;
         gbc_panelVelocityInner.gridy = 1;
         panelVelocityOuter.add(panelVelocityInner, gbc_panelVelocityInner);
-        panelVelocityInner.setLayout(new GridLayout(3, 2, 10, 0));
+        panelVelocityInner.setLayout(new GridLayout(3, 2, 0, 0));
 
         airSpeed = new JLabel("Airspeed");
         airSpeed.setHorizontalAlignment(SwingConstants.CENTER);
@@ -312,7 +341,7 @@ public class MView extends JFrame implements IGuiView {
         // Position / Coordinates
         GridBagLayout gbl_panelCoordsOuter = new GridBagLayout();
         gbl_panelCoordsOuter.columnWidths = new int[]{250};
-        gbl_panelCoordsOuter.rowHeights = new int[]{50, 200};
+        gbl_panelCoordsOuter.rowHeights = new int[]{50, 100};
         gbl_panelCoordsOuter.columnWeights = new double[]{0.0};
         gbl_panelCoordsOuter.rowWeights = new double[]{0.0, 0.0};
         panelCoordsOuter.setLayout(gbl_panelCoordsOuter);
@@ -326,12 +355,12 @@ public class MView extends JFrame implements IGuiView {
         panelCoordsOuter.add(coords, gbc_position);
 
         GridBagConstraints gbc_panelCoordsInner = new GridBagConstraints();
-        gbc_panelCoordsInner.insets = new Insets(0, 10, 0, 10);
+        gbc_panelCoordsInner.insets = new Insets(0, 5, 10, 5);
         gbc_panelCoordsInner.fill = GridBagConstraints.BOTH;
         gbc_panelCoordsInner.gridx = 0;
         gbc_panelCoordsInner.gridy = 1;
         panelCoordsOuter.add(panelCoordsInner, gbc_panelCoordsInner);
-        panelCoordsInner.setLayout(new GridLayout(3, 2, 10, 0));
+        panelCoordsInner.setLayout(new GridLayout(3, 2, 0, 0));
 
         coordX = new JLabel("X:");
         coordX.setHorizontalAlignment(SwingConstants.CENTER);
@@ -367,8 +396,8 @@ public class MView extends JFrame implements IGuiView {
         panelVelocityInner.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         panelDirectionOuter.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         panelDirectionInner.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        panelObstaclesOuter.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        panelObstaclesInner.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        panelObstaclesWindOuter.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        panelObstaclesWindInner.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         setVisible(true);
     }
@@ -404,7 +433,7 @@ public class MView extends JFrame implements IGuiView {
 
         headingValue.setText(dir.concat(" @ " + hdg + " Degree"));
         pitchValue.setText(String.valueOf(location.getPitch()));
-        // These values do not exist currently TODO: Discuss if they will ever be added
+        // These values do not exist currently TODO: Discuss if they will ever be added, else remove this (+labels), will screw the layout so adjust accordingly
         //rollValue.setText(String.valueOf(location.getRoll()));
         //yawValue.setText(String.valueOf(location.getYaw()));
 
@@ -414,10 +443,10 @@ public class MView extends JFrame implements IGuiView {
         groundSpeedValue.setText(String.valueOf(l.getGroundSpeed()));
     }
 
-    private void updateObstacles(Set<Obstacle> obstacles)
-    {
+    private void updateObstacles(Set<Obstacle> obstacles) {
         // TODO: Check how obstacles are passed and parse them.
     }
+
     /**
      * Everything from here on forward can be deleted, as it is just for testing and should be moved to the main class.
      */

@@ -42,7 +42,7 @@ public class GuiManager implements ISimulationChild {
      */
     public void openMViewGui() {
         if(!existsGui()) {
-            instrumentView = new MView();
+            instrumentView = new MView(this);
             isDView = false;
         }
     }
