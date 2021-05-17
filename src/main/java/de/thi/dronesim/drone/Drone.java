@@ -19,7 +19,12 @@ public class Drone {
 
     private static Drone instance;      // singleton instance
 
-    public Drone(){
-
+    public Drone() {
+        location = new Location(0, 0, 0);
     }
+
+    public Location getLocation() {
+        return location;
+    }
+
 }

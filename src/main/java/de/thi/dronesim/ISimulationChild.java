@@ -14,4 +14,14 @@ public interface ISimulationChild {
     void initialize(Simulation simulation);
 
     Simulation getSimulation();
+
+    /**
+     * Handles the start of the simulation
+     */
+    default void onSimulationStart() {}
+
+    /**
+     * Handles the end of the simulation
+     */
+    default void onSimulationStop() {}
 }
