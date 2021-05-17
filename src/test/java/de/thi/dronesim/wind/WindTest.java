@@ -30,7 +30,7 @@ class WindTest {
     @BeforeEach
     public void setUpWind() throws Exception{
         wind = new Wind(createWindLayerList());
-        wind.setSimulation(new Simulation());
+        wind.initialize(new Simulation());
         windGust = new Wind(createWindGustLayerList());
     }
 

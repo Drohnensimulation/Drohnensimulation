@@ -94,7 +94,7 @@ public class Simulation {
             try {
                 Constructor<? extends ISimulationChild> constructor = childClass.getConstructor();
                 ISimulationChild instance = constructor.newInstance();
-                instance.setSimulation(this);
+                instance.initialize(this);
                 this.children.put(childClass, instance);
             } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);

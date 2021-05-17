@@ -102,7 +102,7 @@ public class RotationSensor extends ASensor implements ISimulationChild {
 	
 	
 	@Override
-	public void setSimulation(Simulation simulation) {
+	public void initialize(Simulation simulation) {
 		this.simulation = simulation;
 	}
 

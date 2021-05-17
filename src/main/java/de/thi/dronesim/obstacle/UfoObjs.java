@@ -225,7 +225,7 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
     }
 
     @Override
-    public void setSimulation(Simulation simulation) {
+    public void initialize(Simulation simulation) {
         this.simulation = simulation;
         try {
             this.config = simulation.getConfig().getObstacleConfigList().get(0);
