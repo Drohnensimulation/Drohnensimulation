@@ -24,6 +24,10 @@ public class Wind implements ISimulationChild {
     private List<WindLayer> windLayers;             // list of wind layers      [Windlayer]
     private int latestLayerId = 0;
 
+    public Wind() {
+
+    }
+
     public Wind(String configPath) {
         this.configPath = configPath;
         load();
