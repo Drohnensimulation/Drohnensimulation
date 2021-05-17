@@ -19,15 +19,20 @@ public class UltrasonicSensor extends DistanceSensor {
 	public float rangeIncreaseVelocity; // meters per second
 	public float startIncreaseTime;
 	public float endIncreaseTime;
-	public int callTimerForSensorValues;
-	public Timer callTimerValues = new Timer( );
-	public Set<HitMark> values;
+	public SensorResultDto sensorResultDtovalues;
 	//Main simulation
 	private Simulation simulation;
-
-	public UltrasonicSensor(float rangeIncreaseVelocity, int callTimerForSensorValues) {
+	
+	/**
+	 * Constructor:
+	 * 
+	 * @param rangeIncreaseVelocity: defines how fast the sensor increase in one second
+	 * @param startIncreaseTime: defines the time when the Sensor starts to increase. if the value is 5 the increase starts
+	 * after the Simulation is running for 5 seconds. 
+	 */
+	public UltrasonicSensor(float rangeIncreaseVelocity, int startIncreaseTime) {
 		this.rangeIncreaseVelocity =rangeIncreaseVelocity;
-		this.callTimerForSensorValues= callTimerForSensorValues;
+		this.startIncreaseTime= startIncreaseTime;
 	}
 	
 	@Override
@@ -36,34 +41,36 @@ public class UltrasonicSensor extends DistanceSensor {
 		return name;
 	}
 
-	@Override
-	public void runMeasurement() {
-		this.startIncrease();
-	}
 
-	@Override
-	public SensorResultDto getLastMeasurement() {
-		// TODO
-		return null;
-	}
-
-	// Saves the start time
+	/**
+	 *  This Method is resetting the startIncreaseTime to calculate the next measurement
+	 */
 	public void startIncrease() {
 		this.startIncreaseTime = simulation.getTime();
 	}
 	
-	//calculate traveled time in ms
+	/**
+	 *  This Method calculate the time between this.startIncreaseTime and endIncreaseTime.
+	 *  If this.startIncreaseTime is smaller than endIncreaseTime the increase did not start yet. There for the traveled 
+	 *  time is 0. The return value got converted to seconds.
+	 */
 	private float traveledTime() {
 		float endIncreaseTime = simulation.getTime();
-		startIncrease();
-		// traveled time converted into seconds
-		float traveledTime = (endIncreaseTime - this.startIncreaseTime) / 1000;
+		float traveledTime;
+		if(this.startIncreaseTime<endIncreaseTime) {
+			traveledTime = (endIncreaseTime - this.startIncreaseTime) / 1000;
+			startIncrease();
+		}else {
+			traveledTime = 0;
+		}
 		return traveledTime;
 	}
 	
 	/**
 	 * Calculate the current cone height with help the time difference and the rangeIncreaseVelocity. first calculate the current
 	 * range and add the getOriginToPositionLength()
+	 * 
+	 * @param traveledTime
 	 */
 	public float getCurrentConeHeight(float traveledTime) {
 		// Multiply the Time with the velocity to get the distance
@@ -77,20 +84,20 @@ public class UltrasonicSensor extends DistanceSensor {
 		return (float) travaledDistance+ calcOriginToPositionLength();
 	}
 	
-	public void startCallSensorValues() {
-		
-		callTimerValues.scheduleAtFixedRate(new TimerTask() {
-
-		    @Override
-		    public void run() {
-		    	float traveledTime =  traveledTime();
-				values =  getSensorHits(calcOrigin(), getDirectionVector(), getCurrentConeHeight(traveledTime), calcSurfaceVector()); // getCurrentConeHeight()
-		    }
-
-		}, 0, callTimerForSensorValues);
+	/**
+	 * Calculate the current cone height with help the time difference and the rangeIncreaseVelocity an passes these parameters to
+	 * getSensorResult(); The result get saved into this.sensorResultDtovalues 
+	 * 
+	 * @param traveledTime
+	 */
+	@Override
+	public void runMeasurement() {
+		float traveledTime =  traveledTime();
+		this.sensorResultDtovalues = getSensorResult(calcOrigin(), getDirectionVector(), getCurrentConeHeight(traveledTime), calcSurfaceVector()); // getCurrentConeHeight()
 	}
-	
-	public void stopCallingSensorValues() {
-		callTimerValues.cancel();
+
+	@Override
+	public SensorResultDto getLastMeasurement() {
+		return this.sensorResultDtovalues;
 	}
 }

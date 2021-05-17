@@ -56,9 +56,9 @@ public abstract class DistanceSensor implements ISensor {
      *
      * @param origin
      * @param orientation
-     * @return
+     * @return SensorResultDto
      */
-    public SensorResultDto getSensorResult(Vector3f origin, Vector3f orientation) {
+    public SensorResultDto getSensorResult(Vector3f origin, Vector3f direction, float range, Vector3f opening) {
         //Helperclass only used in this method so far
         class ObstacleAndDistanceDTO {
             private Obstacle obstacle;
@@ -81,8 +81,7 @@ public abstract class DistanceSensor implements ISensor {
             }
         }
 
-        Vector3f opening = calcSurfaceVector();
-        Set<HitMark> hitMarks = getSensorHits(origin, orientation, getRange(), opening);
+        Set<HitMark> hitMarks = getSensorHits(origin, direction, range, opening);
         // TODO: Auswertung der Hitmarks Winkelberechnung
 
         //grouping hitmarks by the hited object
