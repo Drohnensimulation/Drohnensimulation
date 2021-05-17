@@ -1,0 +1,54 @@
+{
+  "obstacles": [{
+    "modelName": "testObj1",
+    "modelPath": "/test1",
+    "id": 1,
+    "hitboxes": [{
+      "position": [2.5, 1.0, 3.5],
+      "rotation": [0.0, 0.0, 0.0],
+      "dimension": [0.5, 0.5, 0.5]
+    }],
+    "position": [2.5, 1.0, 3.5],
+    "rotation": [0.0, 0.0, 0.0],
+    "scale": [0.25, 0.25, 0.25]
+  }, {
+    "modelName": "testObj2",
+    "modelPath": "/test2",
+    "id": 2,
+    "hitboxes": [{
+      "position": [-0.5, 1.0, 3.5],
+      "rotation": [0.0, 0.0, 0.0],
+      "dimension": [0.5, 0.5, 0.5]
+    }],
+    "position": [-0.5, 1.0, 3.5],
+    "rotation": [0.0, 0.0, 0.0],
+    "scale": [0.25, 0.25, 0.25]
+  }, {
+    "modelName": "testObj3",
+    "modelPath": "/test3",
+    "id": 3,
+    "hitboxes": [{
+      "position": [1.0, 1.0, 5.0],
+      "rotation": [0.0, 0.0, 0.0],
+      "dimension": [0.5, 0.5, 0.5]
+    }],
+    "position": [1.0, 1.0, 5.0],
+    "rotation": [0.0, 0.0, 0.0],
+    "scale": [0.25, 0.25, 0.25]
+  }, {
+    "modelName": "testObj4",
+    "modelPath": "/test4",
+    "id": 4,
+    "hitboxes": [{
+      "position": [4.0, 10.0, 1.0],
+      "rotation": [0.0, 0.0, 0.0],
+      "dimension": [0.5, 0.5, 0.5]
+    }],
+    "position": [4.0, 10.0, 1.0],
+    "rotation": [0.0, 0.0, 0.0],
+    "scale": [0.25, 0.25, 0.25]
+  }],
+  "config": {
+    "rayDensity": 100
+  }
+}

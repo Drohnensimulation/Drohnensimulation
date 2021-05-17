@@ -1,5 +1,7 @@
 package de.thi.dronesim.wind;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import de.thi.dronesim.ISimulationChild;
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.drone.Location;
@@ -8,6 +10,10 @@ import de.thi.dronesim.persistence.entity.SimulationConfig;
 import de.thi.dronesim.persistence.entity.WindConfig;
 
 import javax.vecmath.Vector3d;
+import java.io.Reader;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Wind implements ISimulationChild {
@@ -19,7 +25,7 @@ public class Wind implements ISimulationChild {
     private Simulation simulation;
     private boolean configLoaded = false;
 
-    private List<WindLayer> windLayers;             // list of wind layers      [Windlayer]
+    private List<WindLayer> windLayers = new ArrayList<WindLayer>();             // list of wind layers      [Windlayer]
     private int latestLayerId = 0;
 
     public Wind(String configPath) {
@@ -30,6 +36,10 @@ public class Wind implements ISimulationChild {
         this.configLoaded = true;
         this.windLayers = layers;
         load();
+    }
+
+    public Wind(){
+        this("src/main/java/de/thi/dronesim/example/windconf.json");
     }
 
     /**
@@ -84,14 +94,22 @@ public class Wind implements ISimulationChild {
      * @param configPath path to the WindLayer configuration File
      */
     private void loadFromConfig(String configPath) {
-        SimulationConfig windSimulationConfig =  ConfigReader.readConfig(configPath);
-        List<WindConfig> windConfigList = windSimulationConfig.getWindConfigList();
-        for (WindConfig windConfig : windConfigList) {
-            WindLayer windLayer = new WindLayer(windConfig.getWindSpeed(),
-                    windConfig.getGustSpeed(), windConfig.getTimeStart(),
-                    windConfig.getTimeEnd(), windConfig.getAltitudeBottom(),
-                    windConfig.getAltitudeTop(), windConfig.getWindDirection());
-            windLayers.add(windLayer);
+        //SimulationConfig windSimulationConfig =  ConfigReader.readConfig(configPath);
+        List<WindConfig> windConfigList = null;
+        Gson gson = new Gson();
+        try {
+            Reader reader = Files.newBufferedReader(Paths.get(configPath));
+            Type list = new TypeToken<ArrayList<WindConfig>>(){}.getType();
+            windConfigList = gson.fromJson(reader, list);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i < (windConfigList.size()); i++) {
+            this.windLayers.add(new WindLayer(windConfigList.get(i).getWindSpeed(), windConfigList.get(i).getGustSpeed(),
+                    windConfigList.get(i).getTimeStart(), windConfigList.get(i).getTimeEnd(),
+                    windConfigList.get(i).getAltitudeBottom(), windConfigList.get(i).getAltitudeTop(),
+                    windConfigList.get(i).getWindDirection()));
         }
         load();
     }
@@ -351,7 +369,7 @@ public class Wind implements ISimulationChild {
         return result;
     }
 
-    protected List<WindLayer> getWindLayers() {
+    public List<WindLayer> getWindLayers() {
         return windLayers;
     }
 

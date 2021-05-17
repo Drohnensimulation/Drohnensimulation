@@ -1,12 +1,21 @@
 package de.thi.dronesim;
 
+import com.google.gson.Gson;
 import de.thi.dronesim.drone.Drone;
+import de.thi.dronesim.gui.GuiManager;
+import de.thi.dronesim.obstacle.UfoObjs;
+import de.thi.dronesim.obstacle.dto.ObstacleDTO;
 import de.thi.dronesim.persistence.ConfigReader;
+import de.thi.dronesim.persistence.entity.ObstacleConfig;
 import de.thi.dronesim.persistence.entity.SimulationConfig;
+import de.thi.dronesim.wind.Wind;
 import org.reflections.Reflections;
 
+import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -19,6 +28,7 @@ public class Simulation {
     private final SimulationConfig config;
     private final Map<Class<? extends ISimulationChild>, ISimulationChild> children;
     private final Drone drone;
+    private boolean start = false;
 
     private volatile int time;                                           // elapsed simulation time since reset [ms]
 
@@ -47,11 +57,47 @@ public class Simulation {
         return time;
     }
 
+    public boolean getStart() {return start;}
+
+    public void setStart() {
+        start= !start;
+    }
+
     /**
      * Create Child Instances and propably start the Simulation...
      */
     public void prepare() {
         this.instantiateChildren();
+        //System.out.println(children);
+        UfoObjs obs = this.getChild(UfoObjs.class);
+        Gson gson = new Gson();
+        ObstacleConfig obstacleConfig = null;
+
+
+        /**
+         * Reads a obstacle config file and adds all obstacles to the Simulation-Obstacle class
+         */
+        try {
+            Reader reader = Files.newBufferedReader(Paths.get("src/main/java/de/thi/dronesim/example/obsconf.json"));
+            obstacleConfig = gson.fromJson(reader, ObstacleConfig.class);
+        } catch (Exception e) {
+            System.out.println("Obstacle config could not be loaded.");
+            e.printStackTrace();
+        }
+
+        for(ObstacleDTO dto : obstacleConfig.obstacles) {
+            obs.addObstacle(dto);
+        }
+        //System.out.println(obs.getObstacles());
+
+        Wind wind = this.getChild(Wind.class);
+        //System.out.println(wind.getWindLayers());
+
+
+        GuiManager gui = this.getChild(GuiManager.class);
+
+        //gui.openDViewGui();
+
     }
 
     //TODO start the Simulation and provide an way how to inform the Children about a Tick

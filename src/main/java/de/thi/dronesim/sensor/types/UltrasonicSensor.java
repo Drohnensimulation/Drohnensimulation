@@ -34,6 +34,8 @@ public class UltrasonicSensor extends ASensor implements ISimulationChild{
 		this.startIncrease();
 
 	}
+
+	public UltrasonicSensor() {}
 	
 	@Override
 	public String getType() {
