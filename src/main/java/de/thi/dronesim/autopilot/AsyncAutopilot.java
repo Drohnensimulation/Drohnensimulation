@@ -52,13 +52,13 @@ public abstract class AsyncAutopilot implements ISimulationChild, SimulationUpda
     }
 
     @Override
-    public void onUpdate(final SimulationUpdateEvent event) {
+    public synchronized void onUpdate(final SimulationUpdateEvent event) {
         lastEvent = event;
 
         // CHeck if statement is meat
         if (expectation.evaluate(event)) {
             conditionValid = true;
-            thread.notify();
+            this.notifyAll();
         }
 
         // Apply requested changes
@@ -82,13 +82,11 @@ public abstract class AsyncAutopilot implements ISimulationChild, SimulationUpda
      * Wait until a given statement becomes true
      * @param expectation Statement to be checked
      */
-    public void awaitCondition(EventExpectation expectation) throws InterruptedException {
+    public synchronized void awaitCondition(EventExpectation expectation) throws InterruptedException {
         this.expectation = expectation;
         conditionValid = false;
         while (!conditionValid) {
-            synchronized (this) {
-                this.wait();
-            }
+            this.wait();
        }
     }
 
