@@ -28,7 +28,7 @@ public class Simulation {
     private final SimulationConfig config;
     private final Map<Class<? extends ISimulationChild>, ISimulationChild> children;
     private final Drone drone;
-    private boolean start = false;
+    private boolean running = false;
 
     private volatile int time;                                           // elapsed simulation time since reset [ms]
 
@@ -57,10 +57,12 @@ public class Simulation {
         return time;
     }
 
-    public boolean getStart() {return start;}
+    public boolean isRunning() {
+        return running;
+    }
 
-    public void setStart() {
-        start= !start;
+    public void toggleRunning() {
+        running = !running;
     }
 
     /**

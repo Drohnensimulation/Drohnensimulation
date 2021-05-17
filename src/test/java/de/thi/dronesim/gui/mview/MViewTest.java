@@ -1,5 +1,6 @@
 package de.thi.dronesim.gui.mview;
 
+import de.thi.dronesim.Simulation;
 import de.thi.dronesim.gui.GuiManager;
 
 /**
@@ -10,7 +11,9 @@ import de.thi.dronesim.gui.GuiManager;
 public class MViewTest {
 
     public static void main(String[] args) {
-        GuiManager guiManager = new GuiManager();
-        guiManager.openMViewGui();
+
+        Simulation simulation = new Simulation();
+        simulation.prepare();
+        simulation.getChild(GuiManager.class).openMViewGui();
     }
 }

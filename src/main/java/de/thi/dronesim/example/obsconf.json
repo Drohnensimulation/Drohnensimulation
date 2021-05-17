@@ -1,52 +1,108 @@
 {
   "obstacles": [{
-    "modelName": "testObj1",
-    "modelPath": "/test1",
+    "modelName": "red_cube",
+    "modelPath": "",
     "id": 1,
     "hitboxes": [{
-      "position": [2.5, 1.0, 3.5],
+      "position": [0.0, 0.5, 0.0],
       "rotation": [0.0, 0.0, 0.0],
-      "dimension": [0.5, 0.5, 0.5]
+      "dimension": [1.0, 1.0, 1.0]
     }],
-    "position": [2.5, 1.0, 3.5],
+    "position": [0.0, 0.5, 0.0],
     "rotation": [0.0, 0.0, 0.0],
-    "scale": [0.25, 0.25, 0.25]
-  }, {
-    "modelName": "testObj2",
-    "modelPath": "/test2",
+    "scale": [1.0, 1.0, 1.0]
+  },{
+    "modelName": "red_cube",
+    "modelPath": "",
     "id": 2,
     "hitboxes": [{
-      "position": [-0.5, 1.0, 3.5],
+      "position": [1.0, 0.5, 0.0],
       "rotation": [0.0, 0.0, 0.0],
-      "dimension": [0.5, 0.5, 0.5]
+      "dimension": [1.0, 1.0, 1.0]
     }],
-    "position": [-0.5, 1.0, 3.5],
+    "position": [1.0, 0.5, 0.0],
     "rotation": [0.0, 0.0, 0.0],
-    "scale": [0.25, 0.25, 0.25]
-  }, {
-    "modelName": "testObj3",
-    "modelPath": "/test3",
+    "scale": [1.0, 1.0, 1.0]
+  },{
+    "modelName": "red_cube",
+    "modelPath": "",
     "id": 3,
     "hitboxes": [{
-      "position": [1.0, 1.0, 5.0],
+      "position": [0.0, 0.5, -1.0],
       "rotation": [0.0, 0.0, 0.0],
-      "dimension": [0.5, 0.5, 0.5]
+      "dimension": [1.0, 1.0, 1.0]
     }],
-    "position": [1.0, 1.0, 5.0],
+    "position": [0.0, 0.5, -1.0],
     "rotation": [0.0, 0.0, 0.0],
-    "scale": [0.25, 0.25, 0.25]
-  }, {
-    "modelName": "testObj4",
-    "modelPath": "/test4",
+    "scale": [1.0, 1.0, 1.0]
+  },{
+    "modelName": "red_cube",
+    "modelPath": "",
     "id": 4,
     "hitboxes": [{
-      "position": [4.0, 10.0, 1.0],
+      "position": [0.0, 1.5, -1.0],
       "rotation": [0.0, 0.0, 0.0],
-      "dimension": [0.5, 0.5, 0.5]
+      "dimension": [1.0, 1.0, 1.0]
     }],
-    "position": [4.0, 10.0, 1.0],
+    "position": [0.0, 1.5, -1.0],
     "rotation": [0.0, 0.0, 0.0],
-    "scale": [0.25, 0.25, 0.25]
+    "scale": [1.0, 1.0, 1.0]
+  },{
+    "modelName": "red_cube",
+    "modelPath": "",
+    "id": 5,
+    "hitboxes": [{
+      "position": [1.0, 0.5, 0.0],
+      "rotation": [0.0, 0.0, 0.0],
+      "dimension": [1.0, 1.0, 1.0]
+    }],
+    "position": [1.0, 0.5, 0.0],
+    "rotation": [0.0, 0.0, 0.0],
+    "scale": [1.0, 1.0, 1.0]
+  },{
+    "modelName": "red_sphere",
+    "modelPath": "",
+    "id": 6,
+    "hitboxes": [{
+      "position": [0.0, 0.5, 2.0],
+      "rotation": [0.0, 0.0, 0.0],
+      "dimension": [1.0, 1.0, 1.0]
+    }],
+    "position": [0.0, 0.5, 2.0],
+    "rotation": [0.0, 0.0, 0.0],
+    "scale": [1.0, 1.0, 1.0]
+  },{
+    "modelName": "red_sphere",
+    "modelPath": "",
+    "id": 7,
+    "hitboxes": [{
+      "position": [0.0, 1.5, 2.0],
+      "rotation": [0.0, 0.0, 0.0],
+      "dimension": [1.0, 1.0, 1.0]
+    }],
+    "position": [0.0, 1.5, 2.0],
+    "rotation": [0.0, 0.0, 0.0],
+    "scale": [1.0, 1.0, 1.0]
+  },{
+    "modelName": "red_sphere",
+    "modelPath": "",
+    "id": 8,
+    "hitboxes": [{
+      "position": [-1.0, 0.5, -2.0],
+      "rotation": [0.0, 0.0, 0.0],
+      "dimension": [1.0, 1.0, 1.0]
+    }],
+    "position": [-1.0, 0.5, -2.0],
+    "rotation": [0.0, 0.0, 0.0],
+    "scale": [1.0, 1.0, 1.0]
+  },{
+    "modelName": "marker",
+    "modelPath": "",
+    "id": 9,
+    "hitboxes": [],
+    "position": [0.0, 1.0, 0.0],
+    "rotation": [0.0, 0.0, 0.0],
+    "scale": [1.0, 1.0, 1.0]
   }],
   "config": {
     "rayDensity": 100

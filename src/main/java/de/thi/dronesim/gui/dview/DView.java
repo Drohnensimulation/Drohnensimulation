@@ -1,5 +1,6 @@
 package de.thi.dronesim.gui.dview;
 
+import de.thi.dronesim.gui.GuiManager;
 import de.thi.dronesim.gui.IGuiView;
 import de.thi.dronesim.gui.drenderer.DRenderer;
 import de.thi.dronesim.drone.Location;
@@ -39,7 +40,7 @@ public class DView extends JFrame implements IGuiView {
     private JPanel mainPanel;
     private JPanel dataPanel;
 
-    public DView(DRenderer dRenderer) {
+    public DView(GuiManager guiManager, DRenderer dRenderer) {
         super("Ufo Simulation");
         getContentPane().add(mainPanel);
         Canvas canvas = dRenderer.getCanvas();
