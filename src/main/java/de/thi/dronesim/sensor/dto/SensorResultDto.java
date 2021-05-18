@@ -8,7 +8,7 @@ import java.util.List;
 
 public class SensorResultDto {
     private ISensor sensor;
-    private Obstacle obstacle;
+    private List<Obstacle> obstacle;
     private List<Float> values;
 
     public ISensor getSensor() {
@@ -19,11 +19,11 @@ public class SensorResultDto {
         this.sensor = sensor;
     }
 
-    public Obstacle getObstacle() {
+    public List<Obstacle> getObstacle() {
         return obstacle;
     }
 
-    public void setObstacle(Obstacle obstacle) {
+    public void setObstacle(List<Obstacle> obstacle) {
         this.obstacle = obstacle;
     }
 

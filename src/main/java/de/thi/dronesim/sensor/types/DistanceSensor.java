@@ -8,6 +8,7 @@ import de.thi.dronesim.obstacle.entity.Obstacle;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.ISensor;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
+import de.thi.dronesim.sensor.enums.CalcType;
 import de.thi.dronesim.sensor.enums.SensorForm;
 
 import java.util.*;
@@ -38,6 +39,7 @@ public abstract class DistanceSensor implements ISensor {
     private Vector3f directionVector;
     private Vector3f positionVector;
     private SensorForm sensorForm;
+    private CalcType calcType;
     protected SensorResultDto sensorResultDtoValues;
 
     // /////////////////////////////////////////////////////////////////////////////
@@ -137,20 +139,47 @@ public abstract class DistanceSensor implements ISensor {
             HitMark m = iterator.next();
             oADDTO.setObstacle(m.getObstacle());
 
-            float avgDistance = 0.0f;
-            for (HitMark h : setH) {
-                avgDistance += h.getDistance();
+            float distance = -1f;
+            switch (getCalcType()){
+                case NEAREST:
+                    for (HitMark h : setH){
+                        if(distance == -1 ){
+                            distance = h.getDistance();
+                        }else if(distance > h.getDistance()){
+                            distance = h.getDistance();
+
+                        }
+                    }
+                    oADDTO.setAvgDistance(distance);
+                    obstacleAndDistanceDTOS.add(oADDTO);
+                    break;
+                case FAREST:
+                    for (HitMark h : setH){
+                        if(distance < h.getDistance()){
+                            distance = h.getDistance();
+
+                        }
+                    }
+                    oADDTO.setAvgDistance(distance);
+                    obstacleAndDistanceDTOS.add(oADDTO);
+                    break;
+                case AVG:
+                    for (HitMark h : setH) {
+                        distance += h.getDistance();
+                    }
+                    distance = distance / setH.size();
+                    oADDTO.setAvgDistance(distance);
+                    obstacleAndDistanceDTOS.add(oADDTO);
+                    break;
             }
-            avgDistance = avgDistance / setH.size();
-            oADDTO.setAvgDistance(avgDistance);
-            obstacleAndDistanceDTOS.add(oADDTO);
+
         }
         obstacleAndDistanceDTOS.sort((a, b) -> Float.compare(a.getAvgDistance(), b.getAvgDistance()));
 
         SensorResultDto sensorResultDto = new SensorResultDto();
         sensorResultDto.setSensor(this);
         Obstacle nearest = obstacleAndDistanceDTOS.get(0).getObstacle();
-        sensorResultDto.setObstacle(nearest);
+        obstacleAndDistanceDTOS.forEach(o -> sensorResultDto.getObstacle().add(o.getObstacle()));
         //first value of the values-array ist the nearest, the last is the farthest
         if (sensorResultDto.getValues() == null) {
             sensorResultDto.setValues(new ArrayList<>());
@@ -571,5 +600,13 @@ public abstract class DistanceSensor implements ISensor {
 
     protected void setSensorForm(SensorForm sensorForm) {
         this.sensorForm = sensorForm;
+    }
+
+    protected CalcType getCalcType() {
+        return calcType;
+    }
+
+    protected void setCalcType(CalcType calcType) {
+        this.calcType = calcType;
     }
 }
