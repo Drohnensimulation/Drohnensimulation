@@ -1,10 +1,19 @@
 package de.thi.dronesim.drone;
 
-import  com.jme3.math.Vector3f;
+import com.jme3.math.Vector3f;
+import de.thi.dronesim.ISimulationChild;
+import de.thi.dronesim.Simulation;
 
-public class Location {
+public class Location implements ISimulationChild {
 
-    private final Vector3f position;     // Vector of current position               [m]
+    private Simulation simulation;
+
+    private static final double ACCELERATION_HORIZONTAL = 10 / 3.6;     // Constant horizontal acceleration     [m/s^2]
+    private static final double ACCELERATION_VERTICAL = 10 / 3.6;       // Constant vertical acceleration       [m/s^2]
+    private static final double V_HORIZONTAL_MAX = 50 / 3.6;            // Maximum horizontal speed             [m/s]
+    private static final double V_VERTICAL_MAX = 50 / 3.6;              // Maximum horizontal speed             [m/s]
+
+    private Vector3f position;     // Vector of current position               [m]
     private final Vector3f movement;     // Vector of travel direction               [m/s]
 
     private double track = 0;           // True movement direction                  [deg]
@@ -23,21 +32,25 @@ public class Location {
         this.movement = new Vector3f(0, 0, 0);
     }
 
+    public Location() {
+        this(0.0f, 0.0f, 0.0f);
+    }
+
     /**
      * Updates the position and movement vector based on the track, ground speed and vertical speed.
      * @param updateRate Updates per second.
      */
     public void updatePosition(int updateRate) {
-        movement.x = (float) (Math.cos(Math.toRadians((track + -90) % 360)) * gs);
-        movement.z = (float) vs;
-        movement.y = (float) (Math.cos(Math.toRadians(track)) * gs);
+        movement.x = (float) (Math.cos(Math.toRadians((track + 90) % 360)) * gs);
+        movement.z = (float) (Math.cos(Math.toRadians(track)) * gs);
+        movement.y = (float) vs;
         // Apply updateRate to movement
         movement.x *= 1.0/updateRate;
         movement.z *= 1.0/updateRate;
         movement.y *= 1.0/updateRate;
 
         // Calculate position based on movement
-        position.add(movement);
+        position = position.add(movement);
     }
 
     /**
@@ -49,17 +62,11 @@ public class Location {
      * @param updateRate Amount of updates per second
      */
     public void updateDelta(int updateRate) {
-        // Acceleration
-        double zAcceleration = UfoSim.ACCELERATION / updateRate;
-        double xyAcceleration = UfoSim.ACCELERATION / updateRate;
-        // Max speed
-        double yVMax = UfoSim.VMAX;
-        double xzVMax = UfoSim.VMAX;
-
         DeltaUpdate speedUpdate;
         // True Air Speed
         if (deltaTas != 0) {
-            speedUpdate = updateSpeed(tas, deltaTas, 0, xzVMax, xyAcceleration);
+            double acceleration = ACCELERATION_HORIZONTAL / updateRate;
+            speedUpdate = updateSpeed(tas, deltaTas, 0, V_HORIZONTAL_MAX, acceleration);
             tas = speedUpdate.value;
             deltaTas = speedUpdate.delta;
             // Set airspeed as ground speed
@@ -68,7 +75,8 @@ public class Location {
 
         // Vertical Speed
         if (deltaVs != 0) {
-            speedUpdate = updateSpeed(vs, deltaVs, -UfoSim.VMAX, yVMax, zAcceleration);
+            double acceleration = ACCELERATION_VERTICAL / updateRate;
+            speedUpdate = updateSpeed(vs, deltaVs, -V_VERTICAL_MAX, V_VERTICAL_MAX, acceleration);
             vs = speedUpdate.value;
             deltaVs = speedUpdate.delta;
         }
@@ -352,6 +360,16 @@ public class Location {
      */
     public synchronized void requestDeltaVerticalSpeed(double delta) {
         this.deltaVs += delta;
+    }
+
+    @Override
+    public void setSimulation(Simulation simulation) {
+        this.simulation = simulation;
+    }
+
+    @Override
+    public Simulation getSimulation() {
+        return simulation;
     }
 
     /**

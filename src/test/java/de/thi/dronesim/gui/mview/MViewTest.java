@@ -1,18 +1,19 @@
-package de.thi.dronesim.gui.dview;
+package de.thi.dronesim.gui.mview;
 
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.gui.GuiManager;
 
 /**
- * Test for {@link DView}
+ * Test for {@link MView}
  *
- * @author Michael Weichenrieder
+ * @author Daniel Dunger, Michael Weichenrieder
  */
-public class DViewTest {
+public class MViewTest {
 
     public static void main(String[] args) {
+
         Simulation simulation = new Simulation();
         simulation.prepare();
-        simulation.getChild(GuiManager.class).openDViewGui();
+        simulation.getChild(GuiManager.class).openMViewGui();
     }
 }

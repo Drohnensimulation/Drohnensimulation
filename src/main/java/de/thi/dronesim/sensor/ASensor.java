@@ -5,9 +5,11 @@ import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 import de.thi.dronesim.drone.Drone;
 
+import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
-import java.util.Random;
-import java.util.Set;
+import de.thi.dronesim.sensor.dto.SensorResultDto;
+
+import java.util.*;
 
 public abstract class ASensor {
 	
@@ -15,11 +17,11 @@ public abstract class ASensor {
 	//		-Vervollständigung der Methodenimplementierung
 	
 	protected Drone drone;
-	protected double range;
-	protected double angleOfViewHorizontal;
-	protected double angleOfViewVertical;
-	protected double sensorRadius;
-	protected double measurementAccuracy;
+	protected float range; // range from sensor position to cone bottom
+	protected float sensorAngle;
+	protected float sensorRadius;
+	protected float measurementAccuracy;
+	protected Vector3f orientationVector;
 	
 	//Relative Ausrichtung zur Drohne.
 	//Eine Drehung der Drohne hat keinen Einfluss auf die folgenden Werte.
@@ -27,9 +29,9 @@ public abstract class ASensor {
 	//Ausrichtung nach senkrecht nach oben: (x,y,z) = (0,1,0)
 	//Ausrichtung von Kopfrichtung nach links: (x,y,z) = (0,0,1)
 	//Bildliche Vorstellung: Drohne schaut in x-Achsen-Richtung
-	protected double directionX;
-	protected double directionY;
-	protected double directionZ;
+	protected float directionX;
+	protected float directionY;
+	protected float directionZ;
 	
 	//Relative Anordnung zum Drohnenmittelpunkt.
 	//Eine Drehung der Drohne hat keinen Einfluss auf die folgenden Werte.
@@ -37,23 +39,22 @@ public abstract class ASensor {
 	//Eine Einheit nach oben bewegen: (x,y,z) = (0,1,0)
 	//Eine Einheit von Kopfrichtung aus nach links bewegen: (x,y,z) = (0,0,1)
 	//Bildliche Vorstellung: Drohne schaut in x-Achsen-Richtung
-	protected double posX; 
-	protected double posY;
-	protected double posZ;
+	protected float posX; 
+	protected float posY;
+	protected float posZ;
 		
 	public void initSensor() {
 		this.drone = null;
-		this.range = 1.0;
-		this.angleOfViewHorizontal = 0.0;
-		this.angleOfViewVertical = 0.0;
-		this.sensorRadius = 1.0;
-		this.measurementAccuracy = 0.0;
-		this.directionX = 0.0;
-		this.directionY = 0.0;
-		this.directionZ = 0.0;
-		this.posX = 0.0;
-		this.posY = 0.0;
-		this.posZ = 0.0;
+		this.range = 1.0f;
+		this.sensorAngle = 45.0f;
+		this.sensorRadius = 1.0f;
+		this.measurementAccuracy = 0.0f;
+		this.directionX = 0.0f;
+		this.directionY = 0.0f;
+		this.directionZ = 0.0f;
+		this.posX = 0.0f;
+		this.posY = 0.0f;
+		this.posZ = 0.0f;
 	}
 	
 	/**
@@ -95,7 +96,7 @@ public abstract class ASensor {
 	 * @param y
 	 * @param z
 	 */
-	public void setDirection(double x, double y, double z) {
+	public void setDirection(float x, float y, float z) {
 		this.directionX = x;
 		this.directionY = y;
 		this.directionZ = z;
@@ -112,7 +113,7 @@ public abstract class ASensor {
 	 * @param y
 	 * @param z
 	 */
-	public void setPosition(double x, double y, double z) {
+	public void setPosition(float x, float y, float z) {
 		this.posX = x;
 		this.posY = y;
 		this.posZ = z;
@@ -170,7 +171,7 @@ public abstract class ASensor {
 	 * Gibt die Reichweite des Sensors zurück.
 	 * @return Reichweite des Sensors
 	 */
-	public double getRange() {
+	public float getRange() {
 		return this.range;
 	}
 
@@ -178,7 +179,7 @@ public abstract class ASensor {
 	 * Setzt die Reichweite
 	 * @param range
 	 */
-	protected void setRange(double range) {
+	protected void setRange(float range) {
 		if(Double.compare(range, 0.0) <= 0) {
 			throw new IllegalArgumentException("Range must be greater than zero!");
 		}
@@ -197,7 +198,7 @@ public abstract class ASensor {
 	 * Setzt den Radius der Sensorfläche in Metern
 	 * @param size Radius der Sensorfläche in Metern
 	 */
-	protected void setSize(double size) {
+	protected void setSize(float size) {
 		if(Double.compare(size, 0.0) <= 0) {
 			throw new IllegalArgumentException("Size must be greater than zero!");
 		}
@@ -205,48 +206,183 @@ public abstract class ASensor {
 	}
 	
 	/**
-	 * Gibt den Bildwinkel des Sensors in horizontaler Richtung im Gradmaß zurück
-	 * @return Bildwinkel im Gradmaß
+	 * calculates the lenght from origin point to range end. This length is needed to
+	 * create the cone-object. This Method is needed in the "check"-methods (UfoObjs.java)
+	 * 
+	 * @author: Moris Breitenborn
+	 *  
+	 * @return float
 	 */
-	public double getAngleOfViewHorizontal() {
-		return this.angleOfViewHorizontal;
+	
+	public float getConeHeight() {
+		
+		return this.range + getOriginToPositionLength();
 	}
 
 	/**
-	 * Legt den horizontalen Bildwinkel des Sensors im Gradmaß fest
-	 * @param deg Gültiges Interval [0;90]
+	 * Calculates the length from origin point to sensor position. This length is needed to
+	 * create the cone-object.
+	 * 
+	 * @author: Moris Breitenborn started calculation with intercept theorems.
+	 * @author Daniel Stolle improved method by simplifying it.
+	 * @return length between origin and sensor position
 	 */
-	protected void setAngleOfViewHorizontal(double deg) {
-		if(Double.compare(deg, 0.0) < 0) {
-			throw new IllegalArgumentException("Horizontal angle of view must not be less than zero!");
-		}
-		if(Double.compare(deg, 90.0) > 0) {
-			throw new IllegalArgumentException("Horizontal angle of view must not be greater than 90!");
-		}
-		this.angleOfViewHorizontal = deg;
+	public float getOriginToPositionLength(){
+		return sensorRadius / (float) Math.tan(Math.toRadians(this.sensorAngle));
+	}
+
+	/**
+	 * Calculate the origin vector from drone center to sensor cone origin point
+	 * by using intercept theorems.
+	 * 
+	 * @author Moris Breitenborn
+	 *  
+	 * @return Vector3f
+	 */
+	public Vector3f getOrigin() {
+
+		// get the distance between origin and position
+		float originToPositionLength = getOriginToPositionLength();
+
+		// normalize the direction vector to multiply it with the range later to get the needed vector
+		Vector3f normalizedOrientationVector = getOrientation().normalize();
+
+		// rotate the normalized direction vector in the opposite direction with scale(-1)
+		normalizedOrientationVector = normalizedOrientationVector.negate();
+
+		// get the normalized Vector on the calculated length with scale(originToPositionLength)
+		normalizedOrientationVector = normalizedOrientationVector.mult(originToPositionLength);
+
+		// with this vector we can calculate the origin point by simply adding the normalizedOrientationVector
+		// to the position point of the Sensor
+		return new Vector3f(posX, posY, posZ).add(normalizedOrientationVector);
+	}
+
+	/**
+	 * Return the direction as a vector.
+	 *
+	 * @author Daniel Stolle
+	 * @return directionX, directionY and directionZ as a vector
+	 */
+	public Vector3f getOrientation() {
+		return new Vector3f(directionX, directionY, directionZ);
 	}
 	
-	/**
-	 * Gibt den Bildwinkel des Sensors in vertikaler Richtung im Gradmaß zurück
-	 * @return Bildwinkel im Gradmaß
-	 */
-	public double getAngleOfViewVertical() {
-		return this.angleOfViewVertical;
+	public void setOrientation(Vector3f orientationVector) {
+		this.orientationVector=orientationVector;
 	}
 
+	/** 
+	 * This method calculates a vector that is lying on the cone surface. This vector is needed 
+	 * to calculate the entire cone.
+	 * 
+	 * @author: Moris Breitenborn
+	 * 
+	 * @return Vector3f
+	 */
+	
+	public Vector3f getVectorAngel() {
+		
+		//Get the Vector of the Sensor orientation
+		Vector3f directionVector = getOrientation();
+		
+		//Calculate the rotation angle to rotate the directionVector in to the XY-level
+		double rotXY;
+		if(directionVector.getY()==0) {
+			rotXY = Math.PI/2;
+		}else {
+			rotXY =  Math.atan((directionVector.getZ()/directionVector.getY())*(-1));
+		}
+		
+		
+		//calculate all necessary variable for the rotation matrix and create matrix
+		double cosPhi= Math.cos(rotXY);
+		double sinPhi= Math.sin(rotXY);
+		double minSinPhi= (Math.sin(rotXY)*(-1));
+		Matrix3f transformMatrixX = new Matrix3f((float) 1, (float) 0, (float) 0 ,(float) 0, (float) cosPhi, (float) minSinPhi, (float) 0, (float) sinPhi, (float) cosPhi);
+		//multiply the matrix with the vector 
+		Vector3f vectorXY = transformMatrixX.mult(directionVector);
+	
+		//To get the angle between the vectorXY and the x-Axses we call the function checkAngel();
+		Vector3f xAxsis = new Vector3f(1,0,0);
+		//give the angle the right operator to calculate the right vector. calculate variables and matrix
+		double rotX = checkAngel(vectorXY, xAxsis);
+		if(directionVector.getY()>0) {
+			rotX=rotX*(-1);
+		}
+		cosPhi= Math.cos(rotX);
+		sinPhi= Math.sin(rotX);
+		minSinPhi= (Math.sin(rotX)*(-1));
+		Matrix3f transformMatrixZ = new Matrix3f( (float) cosPhi, (float) minSinPhi, (float) 0, (float) sinPhi, (float) cosPhi, (float) 0, (float) 0, (float) 0, (float) 1); 
+        //rotate on x-Axsis
+		Vector3f vectorX = transformMatrixZ.mult(vectorXY);
+		
+
+		//now we can rotate the vector around the y-Axses 
+		double sensorAngleAsRadiant = Math.toRadians(sensorAngle);
+		cosPhi= (float) Math.cos(sensorAngleAsRadiant);
+		sinPhi= (float) Math.sin(sensorAngleAsRadiant);
+		minSinPhi= (float) (Math.sin(sensorAngleAsRadiant)*(-1));
+		Matrix3f transformMatrixY = new Matrix3f((float) cosPhi, (float) 0, (float) sinPhi, (float) 0, (float) 1, (float) 0, (float) minSinPhi, (float) 0, (float) cosPhi);
+		Vector3f vectorWithAngel = transformMatrixY.mult(vectorX);
+		
+		//rerotate the new vectors with all used angles. startt with the last one used 
+		rotX = rotX*(-1);
+		cosPhi= Math.cos(rotX);
+		sinPhi= Math.sin(rotX);
+		minSinPhi= (Math.sin(rotX)*(-1));
+		transformMatrixZ = new Matrix3f((float) cosPhi, (float) minSinPhi, (float) 0, (float) sinPhi, (float) cosPhi, (float) 0, (float) 0, (float) 0, (float) 1); 
+		Vector3f vectorWithAngelXY = transformMatrixZ.mult(vectorWithAngel);
+		//Rotation at Y
+		rotXY = rotXY*(-1);
+		cosPhi= Math.cos(rotXY);
+		sinPhi= Math.sin(rotXY);
+		minSinPhi= (Math.sin(rotXY)*(-1));
+		transformMatrixX = new Matrix3f((float) 1, (float) 0, (float) 0, (float) 0, (float) cosPhi, (float) minSinPhi, (float) 0, (float) sinPhi, (float) cosPhi);
+		Vector3f vectorAngle = transformMatrixX.mult(vectorWithAngelXY);
+		
+		
+		return vectorAngle;
+		
+	}
 	/**
-	 * Legt den vertikalen Bildwinkel des Sensors im Gradmaß fest
+	 *Returns the angle between two vectors
+	 * 
+	 * @author: Moris Breitenborn
+	 * 
+	 * @return float
+	 */
+	
+	public double checkAngel(Vector3f original, Vector3f calculated) {
+		double x1 = original.getX();
+		double y1 = original.getY();
+		double z1 = original.getZ();
+		double x2 = calculated.getX();
+		double y2 = calculated.getY();
+		double z2 = calculated.getZ();
+		
+		double nenner= x1*x2+y1*y2+z1*z2;
+		double zaeler= (Math.sqrt(x1*x1+y1*y1+z1*z1)*Math.sqrt(x2*x2+y2*y2+z2*z2));
+		double ergebnis = Math.acos(nenner/zaeler);
+		return ergebnis;
+	}
+	
+	
+
+	/**
+	 * Legt den Bildwinkel des Sensors im Gradmaß fest
 	 * @param deg Gültiges Interval [0;90]
 	 */
-	protected void setAngleOfViewVertical(double deg) {
+	protected void setSensorAngle(float deg) {
 		if(Double.compare(deg, 0.0) < 0) {
-			throw new IllegalArgumentException("Vertical angle of view must not be less than zero!");
+			throw new IllegalArgumentException("angle of view must not be less than zero!");
 		}
-		if(Double.compare(deg, 90.0) > 0) {
-			throw new IllegalArgumentException("Vertical angle of view must not be greater than 90!");
+		if(Double.compare(deg, 90.0) >= 0) {
+			throw new IllegalArgumentException("angle of view must not be greater or equal than 90!");
 		}
-		this.angleOfViewVertical = deg;
+		this.sensorAngle = deg;
 	}
+	
 	
 	/**
 	 * Legt eine Messungenauigkeit fest (soll das von außerhalb möglich sein?)
@@ -255,7 +391,7 @@ public abstract class ASensor {
 	 * 					 	 0.0 -> Es wird der exakte (ungerundete) Entfernungswert zurückgegeben,
 	 * 			Double.MAX_VALUE -> Es wird nur zurückgegeben, ob der Sensor ein Hindernis sieht (1) oder nicht (0)
 	 */
-	protected void setMeasurementAccuracy(double accuracy) {
+	protected void setMeasurementAccuracy(float accuracy) {
 		if(Double.compare(accuracy, 0.0) < 0) {
 			throw new IllegalArgumentException("Accuracy may not be less than zero!");
 		}
@@ -276,7 +412,7 @@ public abstract class ASensor {
 	public Set<HitMark> getSensorHits(Vector3f origin, Vector3f orientation, float range, Vector3f opening){
 
 		//returns only dummy data, no real reference to real data
-		Set<HitMark> hitMarks = Set.of();
+		Set<HitMark> hitMarks = new HashSet<>();
 		Random random = new Random();
 
 		origin = new Vector3f(5,5,0);
@@ -326,14 +462,110 @@ public abstract class ASensor {
 			Vector3f worldHit = new Vector3f(x,y,z);
 			relativeHit.x = x - origin.x;
 			relativeHit.y = y - origin.y;
-			relativeHit.z = y - origin.z;
+			relativeHit.z = z - origin.z;
 			float distance = relativeHit.length();
-			HitMark mark = new HitMark(distance, worldHit, relativeHit, obstacle3);
+			HitMark mark = new HitMark(distance, worldHit, relativeHit, obstacle);
 
 			hitMarks.add(mark);
 		}
 
 		return hitMarks;
+	}
+
+	/**
+	 * Method to get the angle between the orientation of the drone and a hitpoint
+	 *
+	 * @param hitMark 	the hitpoint of an ray
+	 * @param origin 	the position of the drone
+	 * @return 			the angel of the orientation of the drone and the hitpoint
+	 */
+	private float getHitAngle(HitMark hitMark, Vector3f origin){
+		Vector3f relativ = hitMark.relativeHit();
+		return (float) checkAngel(origin, relativ);
+	}
+
+	public SensorResultDto getSensorResult(Vector3f origin, Vector3f orientation){
+		//Helperclass only used in this method so far
+		class ObstacleAndDistanceDTO{
+			private Obstacle obstacle;
+			private float avgDistance;
+
+			private Obstacle getObstacle() {
+				return obstacle;
+			}
+
+			private void setObstacle(Obstacle obstacle) {
+				this.obstacle = obstacle;
+			}
+
+			private float getAvgDistance() {
+				return avgDistance;
+			}
+
+			private void setAvgDistance(float avgDistance) {
+				this.avgDistance = avgDistance;
+			}
+		}
+
+		Vector3f opening = getVectorAngel();
+		Set<HitMark> hitMarks = getSensorHits(origin, orientation, getRange(), opening);
+		// TODO: Auswertung der Hitmarks Winkelberechnung
+
+		//grouping hitmarks by the hited object
+		List<Set<HitMark>> hitmarksGroupedByObstacles = new ArrayList<>();
+		for(HitMark newHitmark: hitMarks){
+			Obstacle obstacle = newHitmark.getObstacle();
+			boolean existing = false;
+			for(Set<HitMark> setH: hitmarksGroupedByObstacles){
+				if(!setH.isEmpty()) {
+					//first entry of the set
+					Iterator<HitMark> iterator = setH.iterator();
+					HitMark m = iterator.next();
+					//lookup if a set with marks containing this obstacle already exists
+					if (obstacle.equals(m.getObstacle())) {
+						setH.add(newHitmark);
+						existing = true;
+					}
+				}
+			}
+			// creating new Set of marks with the unknown obstacle
+			if(!existing){
+				Set<HitMark> newSet = new HashSet<>();
+				newSet.add(newHitmark);
+				hitmarksGroupedByObstacles.add(newSet);
+			}
+		}
+
+		// sort the grouped hits by the avgDistance
+		List<ObstacleAndDistanceDTO> obstacleAndDistanceDTOS = new ArrayList<>();
+		for(Set<HitMark> setH:hitmarksGroupedByObstacles){
+			ObstacleAndDistanceDTO oADDTO = new ObstacleAndDistanceDTO();
+
+			Iterator<HitMark> iterator = setH.iterator();
+			HitMark m = iterator.next();
+			oADDTO.setObstacle(m.getObstacle());
+
+			float avgDistance = 0.0f;
+			for(HitMark h : setH){
+				avgDistance += h.getDistance();
+			}
+			avgDistance = avgDistance/setH.size();
+			oADDTO.setAvgDistance(avgDistance);
+			obstacleAndDistanceDTOS.add(oADDTO);
+		}
+		obstacleAndDistanceDTOS.sort((a,b)-> Float.compare(a.getAvgDistance(),b.getAvgDistance()));
+
+		SensorResultDto sensorResultDto = new SensorResultDto();
+		sensorResultDto.setSensor(this);
+		Obstacle nearest = obstacleAndDistanceDTOS.get(0).getObstacle();
+		sensorResultDto.setObstacle(nearest);
+		//first value of the values-array ist the nearest, the last is the farthest
+		if(sensorResultDto.getValues() == null){
+			sensorResultDto.setValues(new ArrayList<>());
+		}
+		obstacleAndDistanceDTOS.forEach(o -> sensorResultDto.getValues().add(o.getAvgDistance()));
+
+		return sensorResultDto;
 	}
 	
 	/**
@@ -362,24 +594,22 @@ public abstract class ASensor {
 	}
 	
 	public void loadFromConfig(SensorConfig config) {
-		range = config.getRange();
-		angleOfViewHorizontal = config.getAngleOfViewHorizontal();
-		angleOfViewVertical = config.getAngleOfViewVertical();
-		sensorRadius = config.getSensorRadius();
-		measurementAccuracy = config.getMeasurementAccuracy();
-		directionX = config.getDirectionX();
-		directionY = config.getDirectionY();
-		directionZ = config.getDirectionZ();
-		posX = config.getPosX();
-		posY = config.getPosY();
-		posZ = config.getPosZ();
+		range = (float) config.getRange();
+		sensorAngle = (float) config.getSensorAngle();
+		sensorRadius = (float) config.getSensorRadius();
+		measurementAccuracy = (float) config.getMeasurementAccuracy();
+		directionX = (float) config.getDirectionX();
+		directionY = (float) config.getDirectionY();
+		directionZ = (float) config.getDirectionZ();
+		posX = (float) config.getPosX();
+		posY = (float) config.getPosY();
+		posZ = (float)config.getPosZ();
 	}
 	
 	public SensorConfig saveToConfig() {
 		SensorConfig config = new SensorConfig();
 		config.setRange(range);
-		config.setAngleOfViewHorizontal(angleOfViewHorizontal);
-		config.setAngleOfViewVertical(angleOfViewVertical);
+		config.setSensorAngle(sensorAngle);
 		config.setSensorRadius(sensorRadius);
 		config.setMeasurementAccuracy(measurementAccuracy);
 		config.setDirectionX(directionX);

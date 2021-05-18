@@ -5,6 +5,8 @@ import java.util.Objects;
 
 /**
  * Object that holds all configurations for the Simulation.
+ *
+ * @author Daniel Stolle
  */
 public class SimulationConfig {
 
