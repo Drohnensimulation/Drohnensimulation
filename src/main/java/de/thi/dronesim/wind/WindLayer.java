@@ -76,7 +76,7 @@ public class WindLayer {
     public Vector3d getSpeedVector(double time) {
         double ws = calcWindSpeed(time);
         double wd = (windDirection + 180) % 360;
-        return Wind.createSpeedVector(wd, ws);
+        return Wind.createSpeedVector(wd, ws, 0);
     }
 
     /**

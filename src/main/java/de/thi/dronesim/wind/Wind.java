@@ -20,10 +20,12 @@ public class Wind implements ISimulationChild {
     //Main simulation
     private Simulation simulation;
 
-    private List<WindLayer> windLayers = new ArrayList<WindLayer>();             // list of wind layers      [Windlayer]
+    private final List<WindLayer> windLayers;             // list of wind layers      [Windlayer]
     private int latestLayerId = 0;
 
-    public Wind() { }
+    public Wind() {
+        windLayers = new ArrayList<>();
+    }
 
     public Wind(List<WindLayer> layers) {
         this.windLayers = layers;
@@ -263,14 +265,17 @@ public class Wind implements ISimulationChild {
             }
         }
 
-        Vector3d speedVector = createSpeedVector(location.getHeading(), location.getAirspeed());
+        Vector3d speedVector = createSpeedVector(location.getHeading(), location.getAirspeed(),
+                location.getVerticalSpeed());
         speedVector.add(windSpeedVector);
 
 
         double track = calculateAngleOfVector(speedVector);
         // Apply changes
         location.setTrack(track);
-        location.setGroundSpeed(speedVector.length());
+        location.setGroundSpeed(Math.sqrt(speedVector.x * speedVector.x + speedVector.z * speedVector.z));
+        location.setVerticalSpeed(speedVector.y);
+
     }
 
     /**
@@ -279,10 +284,10 @@ public class Wind implements ISimulationChild {
      * @param speed Speed in m/s
      * @return A vector with x for east speed and z for north speed
      */
-    public static Vector3d createSpeedVector(double direction, double speed) {
+    public static Vector3d createSpeedVector(double direction, double speed, double verticalSpeed) {
         Vector3d vector = new Vector3d();
         vector.x = speed * Math.cos(Math.toRadians(direction));
-        vector.y = 0;
+        vector.y = verticalSpeed;
         vector.z = speed * Math.sin(Math.toRadians(direction));
         return vector;
     }
