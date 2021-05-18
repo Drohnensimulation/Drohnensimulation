@@ -7,6 +7,9 @@ import com.jme3.math.Vector3f;
 
 import java.util.Objects;
 
+/**
+ * @author Christian Schmied
+ */
 public class HitMark {
     private final float distance;
     private final Vector3f worldHit;

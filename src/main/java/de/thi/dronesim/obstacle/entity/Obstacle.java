@@ -5,6 +5,10 @@ import de.thi.dronesim.obstacle.util.HitBoxRigidBody;
 
 import java.util.Set;
 
+/**
+ * @author Christian Schmied
+ * @author Michael Küchenmeister
+ */
 public class Obstacle {
     private String modelName;
     private String modelPath;

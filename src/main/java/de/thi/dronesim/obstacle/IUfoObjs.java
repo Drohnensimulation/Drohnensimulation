@@ -8,6 +8,9 @@ import de.thi.dronesim.obstacle.entity.Obstacle;
 
 import java.util.Set;
 
+/**
+ * @author Christian Schmied
+ */
 public interface IUfoObjs {
 
     /**

@@ -21,6 +21,9 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
+/**
+ * @author Christian Schmied
+ */
 public class JBulletContext {
     private static final Vector3f GRAVITY = null;//new Vector3f(0, -9.81f, 0);
     private final DynamicsWorld dynamicsWorld;
