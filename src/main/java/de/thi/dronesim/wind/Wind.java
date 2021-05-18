@@ -28,6 +28,10 @@ public class Wind implements ISimulationChild {
     private List<WindLayer> windLayers = new ArrayList<WindLayer>();             // list of wind layers      [Windlayer]
     private int latestLayerId = 0;
 
+    public Wind() {
+
+    }
+
     public Wind(String configPath) {
         loadFromConfig(configPath);
     }
@@ -36,10 +40,6 @@ public class Wind implements ISimulationChild {
         this.configLoaded = true;
         this.windLayers = layers;
         load();
-    }
-
-    public Wind(){
-        this("src/main/java/de/thi/dronesim/example/windconf.json");
     }
 
     /**
@@ -200,7 +200,7 @@ public class Wind implements ISimulationChild {
      * @param location Location of the drone
      */
     public void applyWind(Location location) {
-        int time = simulation.getTime();
+        double time = simulation.getTime();
 
         // Update oldest layer to set start point of search algorithm
         updateLatestLayer(time - WIND_LAYER_INTERPOLATION_TIME_RANGE);
@@ -318,7 +318,7 @@ public class Wind implements ISimulationChild {
     }
 
     private Vector3d interpolateTimeLayers(WindLayer prevLayer, WindLayer nextLayer) {
-        int time = simulation.getTime();
+        double time = simulation.getTime();
 
         Vector3d prevSpeed = WindLayer.convertSpeedOrZero(prevLayer, time);
         // Check if layers are identical in which case an interpolation would be unnecessary
@@ -339,7 +339,7 @@ public class Wind implements ISimulationChild {
      * @param altitude Altitude of reference point
      * @return A vector with the interpolated wind speed
      */
-    private Vector3d interpolateAltitudeLayers(WindLayer lowerLayer, WindLayer upperLayer, double altitude, int time) {
+    private Vector3d interpolateAltitudeLayers(WindLayer lowerLayer, WindLayer upperLayer, double altitude, double time) {
         Vector3d prevSpeed = WindLayer.convertSpeedOrZero(lowerLayer, time);
         // Check if layers are identical in which case an interpolation would be unnecessary
         if (lowerLayer == upperLayer)
@@ -374,7 +374,7 @@ public class Wind implements ISimulationChild {
     }
 
     @Override
-    public void setSimulation(Simulation simulation) {
+    public void initialize(Simulation simulation) {
         this.simulation = simulation;
     }
 
