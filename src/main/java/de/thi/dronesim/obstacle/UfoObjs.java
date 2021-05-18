@@ -148,8 +148,8 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
     	 * this algorithm uses golden ratio ((1 + sqrt(5))/2) to create a golden angle and
     	 * use this angle to rotate a vector around its origin n times depending on vector number
     	 * then creating a point at the end of the vector. The end result looks like sunflower seeds
-    	 * distributed evenly on a disc. Then those points coordinations to send rays in a cone shaped
-    	 * object.
+    	 * distributed evenly on a disc. Then use those points coordinations to send rays in a cone
+    	 * shaped projection.
     	 * 
     	 * To read more about golden ratio and distributing points evenly on a disc check:
     	 * http://blog.marmakoide.org/?p=1
@@ -164,6 +164,7 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         Vector3f angleVec = opening.normalize();
         Vector3f direction = orientation.normalize();
         //create a projection of angleVec on direction (to use for creating 2 perpendicular vectors to direction)
+    	//proj(d) a = d * a / (|d|² == 1)
         Vector3f angleProjOnDir = direction.mult(angleVec.dot(direction));
         //use the projected vector to create a vector perpendicular to direction
         Vector3f i = angleProjOnDir.subtract(angleVec);
@@ -209,29 +210,38 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
     	
     	Vector3f direction = orientation.normalize();
     	Vector3f angleVec = opening.normalize();
+        //create a projection of angleVec on direction (to use for creating 2 perpendicular vectors to direction)
+    	//proj(d) a = d * a / (|d|² == 1)
     	Vector3f angleProjOnDir = direction.mult(direction.dot(angleVec));
+        //use the projected vector to create a vector perpendicular to direction
     	Vector3f i = angleVec.subtract(angleProjOnDir);
+        //record the width range to use for distributing rays
     	float width = 2 * i.length();
     	i.normalizeLocal();
+        //create a second vector that is perpendicular to direction vector and i vector
     	Vector3f j = i.cross(direction).normalizeLocal();
     	
         //reuse loop variables
         Vector3f dI = new Vector3f();
         Vector3f dJ = new Vector3f();
         Vector3f ray = new Vector3f();
-        
+      
+        //rays count is dependent on pyramid base area and given density/m
         int rayPerRow = (int) (width / angleProjOnDir.length() * range * config.config.rayDensity);
         float step = width / rayPerRow;
         
         for (float y = -width/2; y <= width/2; y += step) {
             for (float x = -width/2; x <= width/2; x += step) {
             	
+            	//get x and y coordinates relative to rectangle center
+            	//and transform it to world x, y, z coordinates
                 dI.set(i.mult(x));
                 dJ.set(j.mult(y));
                 ray.set(angleProjOnDir.x + dI.x + dJ.x,
                         angleProjOnDir.y + dI.y + dJ.y,
                         angleProjOnDir.z + dI.z + dJ.z).normalizeLocal();
                 
+                //check for collisions and add the hitmark to the list if a collision is found
                 HitMark hit = this.rayTest(origin, ray, range);
                 if(hit != null) {
                 	hits.add(hit);
@@ -252,7 +262,7 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
         // Orientation is a normal,
         // The rotation angle is axis aligned, so its the rotation around the orientation vector (so the normal)
-        // Where rotation 0 is like faceing directly upwards...
+        // Where rotation 0 is like facing directly upwards...
 
         Set<HitMark> hits = new HashSet<>();
         int ppm = this.config.config.rayDensity;
@@ -324,8 +334,8 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
     	 * this algorithm uses golden ratio ((1 + sqrt(5))/2) to create a golden angle and
     	 * use this angle to rotate a vector around its origin n times depending on vector number
     	 * then creating a point at the end of the vector. The end result looks like sunflower seeds
-    	 * distributed evenly on a disc. Then those points coordinations to send rays in a cylinder
-    	 * shaped object.
+    	 * distributed evenly on a disc. Then use those points coordinations to send rays in a cone
+    	 * shaped projection.
     	 * 
     	 * To read more about golden ratio and distributing points evenly on a disc check:
     	 * http://blog.marmakoide.org/?p=1
@@ -346,6 +356,7 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         //create a random Point to generate a vector perpendicular to direction 
         Vector3f direction = orientation.normalize();
         Vector3f randomPoint = new Vector3f(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
+    	//proj(d) p = d * p / (|d|² == 1)
         Vector3f pointProjOnDir = direction.mult(randomPoint.dot(direction));
         
         //use the projected point to create a vector perpendicular to direction
