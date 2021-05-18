@@ -2,11 +2,13 @@ package de.thi.dronesim.sensor.types;
 
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
+import de.thi.dronesim.obstacle.UfoObjs;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.ISensor;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
+import de.thi.dronesim.sensor.enums.SensorForm;
 
 import java.util.*;
 
@@ -35,6 +37,7 @@ public abstract class DistanceSensor implements ISensor {
     private float measurementAccuracy;
     private Vector3f directionVector;
     private Vector3f positionVector;
+    private SensorForm sensorForm;
 
     // /////////////////////////////////////////////////////////////////////////////
     // Init
@@ -52,11 +55,27 @@ public abstract class DistanceSensor implements ISensor {
     // /////////////////////////////////////////////////////////////////////////////
 
     /**
-     * TODO: document this method
+     * A GENERALLY interpretation of the calculation of the SensorResult.
+     *
+     * Steps:
+     * 1. Group the Hitmarks by the hit obstacle -> a List wich contains Sets of Hitmarks
+     * 2. Sorting the List by the avg distance of each Set:
+     *      - building the Average Distance of each Set
+     *      - storing the new information in the ObstacleAndDistanceDto with the affected obstacle
+     *      -> List of ObstacleAndDistanceDtos sorted by the avg Distance
+     * 3. Storing in the SensorResultDto:
+     *      Sensor: is the used Sensor (this)
+     *      Obstacle: is the nearest Obstacle
+     *      values: the avg Distances of all ObstacleAndDistanceDtos sorted, so that the smalest float is on the first place
      *
      * @param origin
-     * @param orientation
+     * @param direction
+     * @param range
+     * @param opening
+     *
      * @return SensorResultDto
+     *
+     * @author Johannes Steierl
      */
     public SensorResultDto getSensorResult(Vector3f origin, Vector3f direction, float range, Vector3f opening) {
         //Helperclass only used in this method so far
@@ -81,10 +100,9 @@ public abstract class DistanceSensor implements ISensor {
             }
         }
 
-        Set<HitMark> hitMarks = getSensorHits(origin, direction, range, opening);
-        // TODO: Auswertung der Hitmarks Winkelberechnung
+        Set<HitMark> hitMarks = getSensorHits(origin, direction, range, opening, getSensorForm());
 
-        //grouping hitmarks by the hited object
+        //grouping hitmarks by the hit object
         List<Set<HitMark>> hitmarksGroupedByObstacles = new ArrayList<>();
         for (HitMark newHitmark : hitMarks) {
             Obstacle obstacle = newHitmark.getObstacle();
@@ -358,85 +376,47 @@ public abstract class DistanceSensor implements ISensor {
      * @param hitMark the hitpoint of an ray
      * @param origin  the position of the drone
      * @return the angel of the orientation of the drone and the hitpoint
+     *
+     * @author Johannes Steierl
      */
     private float calcHitAngle(HitMark hitMark, Vector3f origin) {
         Vector3f relativ = hitMark.relativeHit();
         return (float) calcAngel(origin, relativ);
     }
 
+
     /**
-     * Gets the Rays that hit an Obstacle
+     *Gets the Rays that hit an Obstacle
      *
-     * @param origin      coords of the drone
+     * the dimension Vector represents the sensorform, so by a cubuid the x = width, y = length and z = height
+     *
+     * @param origin coords of the top of the sensorform
      * @param orientation Drone is heading this direction
-     * @param range       sensorrange
-     * @param opening     Example: if the angle is 45° the vector would be 	1 (x)
-     *                    0 (y)
-     *                    1 (z)
+     * @param range sensorrange
+     * @param opening Example: if the angle is 45° the vector would be 	1 (x)
+     *                													0 (y)
+     *                													1 (z)
+     * @param sensorForm indicates the form of the sensor
      * @return a Set of the rays that hit objects
+     *
+     * @author Johannes Steierl
      */
-    protected Set<HitMark> getSensorHits(Vector3f origin, Vector3f orientation, float range, Vector3f opening) {
-
-        //returns only dummy data, no real reference to real data
-        Set<HitMark> hitMarks = new HashSet<>();
-        Random random = new Random();
-
-        origin = new Vector3f(5, 5, 0);
-
-        Obstacle obstacle1 = new Obstacle();
-        Obstacle obstacle2 = new Obstacle();
-        Obstacle obstacle3 = new Obstacle();
-        Obstacle obstacle = new Obstacle();
-
-
-        Vector3f relativeHit = new Vector3f(5, 7, 0);
-
-        float x;
-        float y;
-        float z;
-
-        for (int i = 0; i < 30; i++) {
-            int xmax;
-            int xmin;
-            int ymax;
-            int ymin;
-            if (i < 10) {
-                xmax = 14;
-                xmin = 8;
-                ymax = 14;
-                ymin = 10;
-                obstacle = obstacle1;
-
-            } else if (i > 10 && i < 20) {
-                xmax = 20;
-                xmin = 15;
-                ymax = 4;
-                ymin = 1;
-                obstacle = obstacle2;
-
-            } else {
-                xmax = 5;
-                xmin = 1;
-                ymax = 13;
-                ymin = 10;
-                obstacle = obstacle3;
-
-            }
-            x = Float.parseFloat(Integer.toString(random.nextInt(xmax - xmin + 1) + xmin));
-            y = Float.parseFloat(Integer.toString(random.nextInt(ymax - ymin + 1) + ymin));
-            z = 3;
-            Vector3f worldHit = new Vector3f(x, y, z);
-            relativeHit.x = x - origin.x;
-            relativeHit.y = y - origin.y;
-            relativeHit.z = z - origin.z;
-            float distance = relativeHit.length();
-            HitMark mark = new HitMark(distance, worldHit, relativeHit, obstacle);
-
-            hitMarks.add(mark);
+    private Set<HitMark> getSensorHits(Vector3f origin, Vector3f orientation, float range, Vector3f opening, SensorForm sensorForm) {
+        UfoObjs ufoObjs = new UfoObjs();
+        Vector3f dimension = new Vector3f(0,0,0);
+        switch (sensorForm){
+            case CONE:      return ufoObjs.checkSensorCone(origin, orientation, range, opening);
+            case CUBOID:
+                dimension = new Vector3f(sensorRadius, sensorRadius, range);
+                return ufoObjs.checkSensorCuboid(origin,orientation, dimension);
+            case PYRAMID: 	return ufoObjs.checkSensorPyramid(origin,orientation,range,opening);
+            case CYLINDER:
+                dimension = new Vector3f(sensorRadius, sensorRadius, range);
+                return ufoObjs.checkSensorCylinder(origin,orientation,dimension);
+            default: throw new IllegalArgumentException("No supported SensorForm given (CONE, CYLINDER, CUBOID, PYRAMID");
         }
-
-        return hitMarks;
     }
+
 
     // /////////////////////////////////////////////////////////////////////////////
     // Getter/Setter
@@ -583,4 +563,12 @@ public abstract class DistanceSensor implements ISensor {
 		}
 		this.measurementAccuracy = accuracy;
 	}
+
+    protected SensorForm getSensorForm() {
+        return sensorForm;
+    }
+
+    protected void setSensorForm(SensorForm sensorForm) {
+        this.sensorForm = sensorForm;
+    }
 }
