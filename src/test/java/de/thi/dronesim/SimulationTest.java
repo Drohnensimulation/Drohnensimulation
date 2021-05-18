@@ -12,7 +12,7 @@ public class SimulationTest {
 
         private Simulation simulation;
 
-        public MyTestChild(){
+        public MyTestChild() {
         }
 
         public String foo() {
@@ -27,6 +27,27 @@ public class SimulationTest {
         @Override
         public Simulation getSimulation() {
             return simulation;
+        }
+    }
+
+    public static abstract class AnAbstractChild implements ISimulationChild {
+        public String foo() {
+            return "bar";
+        }
+
+        @Override
+        public void initialize(Simulation simulation) {
+        }
+
+        @Override
+        public Simulation getSimulation() {
+            return null;
+        }
+    }
+
+    public static class ExtendedAbstractChild extends AnAbstractChild {
+        public String foo() {
+            return "foo" + super.foo();
         }
     }
 
@@ -58,12 +79,32 @@ public class SimulationTest {
     }
 
     @Test
-    public void hasSimulation(){
+    public void hasSimulation() {
         Simulation simulation = new Simulation();
         simulation.prepare();
 
         MyTestChild childA = simulation.getChild(MyTestChild.class);
         assertNotNull(childA.getSimulation());
+    }
+
+    @Test
+    public void skipAbstractClass(){
+        Simulation simulation = new Simulation();
+        simulation.prepare();
+
+        AnAbstractChild abstractChild = simulation.getChild(AnAbstractChild.class);
+        assertNull(abstractChild);
+    }
+
+    @Test
+    public void instanceOfExtendedClass() {
+        Simulation simulation = new Simulation();
+        simulation.prepare();
+
+        ExtendedAbstractChild extendedAbstractChild = simulation.getChild(ExtendedAbstractChild.class);
+        assertNotNull(extendedAbstractChild);
+
+        assertEquals("foobar", extendedAbstractChild.foo());
     }
 
     @Test
