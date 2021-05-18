@@ -1,12 +1,8 @@
 package de.thi.dronesim.drone;
 
 import com.jme3.math.Vector3f;
-import de.thi.dronesim.ISimulationChild;
-import de.thi.dronesim.Simulation;
 
-public class Location implements ISimulationChild {
-
-    private Simulation simulation;
+public class Location {
 
     private static final double ACCELERATION_HORIZONTAL = 10 / 3.6;     // Constant horizontal acceleration     [m/s^2]
     private static final double ACCELERATION_VERTICAL = 10 / 3.6;       // Constant vertical acceleration       [m/s^2]
@@ -368,16 +364,6 @@ public class Location implements ISimulationChild {
      */
     public void requestDeltaVerticalSpeed(double delta) {
         this.deltaVs += delta;
-    }
-
-    @Override
-    public void setSimulation(Simulation simulation) {
-        this.simulation = simulation;
-    }
-
-    @Override
-    public Simulation getSimulation() {
-        return simulation;
     }
 
     /**

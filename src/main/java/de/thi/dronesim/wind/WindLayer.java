@@ -85,7 +85,7 @@ public class WindLayer implements Comparable<WindLayer> {
      * @param time The time at which the speeds occur
      * @return A vector with the speed
      */
-    public Vector3d getSpeedVector(int time) {
+    public Vector3d getSpeedVector(double time) {
         double ws = calcWindSpeed(time);
         double wd = (windDirection + 180) % 360;
         return Wind.createSpeedVector(wd, ws);
@@ -117,7 +117,7 @@ public class WindLayer implements Comparable<WindLayer> {
      * @param time The time at which the wind occurs
      * @return A vector with the wind speed or a null vector
      */
-    protected static Vector3d convertSpeedOrZero(WindLayer windLayer, int time) {
+    protected static Vector3d convertSpeedOrZero(WindLayer windLayer, double time) {
         return windLayer != null ? windLayer.getSpeedVector(time) : new Vector3d(0, 0, 0);
     }
 

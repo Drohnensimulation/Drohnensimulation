@@ -25,7 +25,7 @@ public class GuiManager implements ISimulationChild {
     private boolean isDView;
 
     @Override
-    public void setSimulation(Simulation simulation) {
+    public void initialize(Simulation simulation) {
         this.simulation = simulation;
     }
 
