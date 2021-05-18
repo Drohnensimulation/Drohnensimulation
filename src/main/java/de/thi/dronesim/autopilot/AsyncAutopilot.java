@@ -67,6 +67,7 @@ public abstract class AsyncAutopilot implements ISimulationChild, SimulationUpda
             location.requestDeltaAirspeed(deltaRequest.tas);
             location.requestDeltaVerticalSpeed(deltaRequest.vas);
             location.requestDeltaHeading(deltaRequest.hdg);
+            deltaRequest = null;
         }
     }
 
