@@ -1,4 +1,4 @@
-package de.thi.dronesim.gui.jframe;
+package de.thi.dronesim.gui;
 
 import de.thi.dronesim.drone.Location;
 
@@ -7,7 +7,7 @@ import de.thi.dronesim.drone.Location;
  *
  * @author Michael Weichenrieder
  */
-public interface IInstrumentView {
+public interface IGuiView {
 
     void updateDroneStatus(Location location);
 }

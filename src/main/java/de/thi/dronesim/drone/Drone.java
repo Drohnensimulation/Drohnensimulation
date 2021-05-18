@@ -10,7 +10,7 @@ public class Drone {
     /**
      * A Drone has a sort of Location State
      */
-    private Location location;
+    private final Location location;
 
     /**
      * A Drone has an Collections of Sensors attached to it
@@ -19,7 +19,12 @@ public class Drone {
 
     private static Drone instance;      // singleton instance
 
-    public Drone(){
-
+    public Drone() {
+        location = new Location(0, 0, 0);
     }
+
+    public Location getLocation() {
+        return location;
+    }
+
 }

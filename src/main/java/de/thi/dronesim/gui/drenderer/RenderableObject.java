@@ -1,4 +1,4 @@
-package de.thi.dronesim.gui.dview;
+package de.thi.dronesim.gui.drenderer;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.math.Quaternion;

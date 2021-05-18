@@ -27,7 +27,7 @@ class WindTest {
 
     private void setupWind() {
         wind = new Wind(windLayers);
-        wind.setSimulation(simulation);
+        wind.initialize(simulation);
     }
 
     @Test
@@ -742,8 +742,6 @@ class WindTest {
         assertEquals(334.68, location.getTrack(),0.5, "Wrong track");
     }
 
-
-
     @Test
     void interpolation_fourLayersAltitudeFirst() {
         createLocation(13, 20, 0);
@@ -788,8 +786,6 @@ class WindTest {
         assertEquals(22.24, location.getGroundSpeed(),0.5, "Wrong ground speed");
         assertEquals(337.43, location.getTrack(),0.5, "Wrong track");
     }
-
-
 
     @Test
     void load(){
