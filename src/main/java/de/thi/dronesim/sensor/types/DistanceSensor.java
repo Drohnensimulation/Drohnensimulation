@@ -38,6 +38,7 @@ public abstract class DistanceSensor implements ISensor {
     private Vector3f directionVector;
     private Vector3f positionVector;
     private SensorForm sensorForm;
+    protected SensorResultDto sensorResultDtoValues;
 
     // /////////////////////////////////////////////////////////////////////////////
     // Init

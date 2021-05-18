@@ -1,12 +1,7 @@
 package de.thi.dronesim.sensor.types;
 
 import de.thi.dronesim.Simulation;
-import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
-
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class UltrasonicSensor extends DistanceSensor {
 	
@@ -16,10 +11,8 @@ public class UltrasonicSensor extends DistanceSensor {
 	 * @author Moris Breitenborn
 	 */
 
-	public float rangeIncreaseVelocity; // meters per second
-	public float startIncreaseTime;
-	public float endIncreaseTime;
-	public SensorResultDto sensorResultDtovalues;
+	private float rangeIncreaseVelocity; // meters per second
+	private float startIncreaseTime;
 	//Main simulation
 	private Simulation simulation;
 	
@@ -87,17 +80,16 @@ public class UltrasonicSensor extends DistanceSensor {
 	/**
 	 * Calculate the current cone height with help the time difference and the rangeIncreaseVelocity an passes these parameters to
 	 * getSensorResult(); The result get saved into this.sensorResultDtovalues 
-	 * 
-	 * @param traveledTime
+	 *
 	 */
 	@Override
 	public void runMeasurement() {
 		float traveledTime =  traveledTime();
-		this.sensorResultDtovalues = getSensorResult(calcOrigin(), getDirectionVector(), getCurrentConeHeight(traveledTime), calcSurfaceVector()); // getCurrentConeHeight()
+		this.sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), getCurrentConeHeight(traveledTime), calcSurfaceVector()); // getCurrentConeHeight()
 	}
 
 	@Override
 	public SensorResultDto getLastMeasurement() {
-		return this.sensorResultDtovalues;
+		return this.sensorResultDtoValues;
 	}
 }

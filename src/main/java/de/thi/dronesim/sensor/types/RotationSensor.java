@@ -3,11 +3,7 @@ package de.thi.dronesim.sensor.types;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
 import de.thi.dronesim.Simulation;
-import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 
 public class RotationSensor extends DistanceSensor {
@@ -22,11 +18,9 @@ public class RotationSensor extends DistanceSensor {
 	 * @author Moris Breitenborn
 	 */
 	
-	public int spinsPerSecond;
-	public float rotationVelocity; // 2Pi/s == one spin in one second as radiant
-	public float startRotationTime;
-	public float endRotationTime;
-	public SensorResultDto sensorResultDtoValues;
+	private int spinsPerSecond;
+	private float rotationVelocity; // 2Pi/s == one spin in one second as radiant
+	private float startRotationTime;
 
 	//Main simulation
 	private Simulation simulation;
@@ -35,7 +29,7 @@ public class RotationSensor extends DistanceSensor {
 	 * Constructor:
 	 * 
 	 * @param spinsPerSecond: defines how often the sensor circulate in one second
-	 * @param startMeasureTime: defines the time when the Sensor starts to spin. if the value is 5 the rotation starts
+	 * @param startRotationTime: defines the time when the Sensor starts to spin. if the value is 5 the rotation starts
 	 * after the Simulation is running for 5 seconds. 
 	 */
 	public RotationSensor(int spinsPerSecond, float startRotationTime) {
@@ -75,9 +69,9 @@ public class RotationSensor extends DistanceSensor {
 	 *  time is 0. The return value got converted to seconds.
 	 */
 	private float traveledTime() {
-		endRotationTime = simulation.getTime();
+		float endRotationTime = simulation.getTime();
 		float traveledTime;
-		if(this.startRotationTime<endRotationTime) {
+		if(this.startRotationTime< endRotationTime) {
 			traveledTime = (endRotationTime - this.startRotationTime) / 1000;
 			startRotation();
 		}else {
@@ -88,7 +82,7 @@ public class RotationSensor extends DistanceSensor {
 	
 	/**
 	 *  Calculates the arcMeasure by multiply the traveledTime and the given rotationVelocity.
-	 *  @param traveledTime.
+	 *  @param traveledTime
 	 */
 	public float getTraveledArcMeasure(float traveledTime) {
 		return traveledTime*rotationVelocity;
@@ -98,7 +92,7 @@ public class RotationSensor extends DistanceSensor {
 	 *  Calculate new OrientationVector by rotating the orientation vector around the
 	 *  y-axis by the traveledArc value.
 	 *  
-	 *  @param traveledArc.
+	 *  @param traveledArc
 	 */
 	public Vector3f newOrientation(double traveledArc) {
 		
@@ -127,11 +121,11 @@ public class RotationSensor extends DistanceSensor {
 	@Override
 	public void runMeasurement() {
 		setDirection(newOrientation(getTraveledArcMeasure(traveledTime())));
-		this.sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), calcConeHeight(), calcSurfaceVector());
+		sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), calcConeHeight(), calcSurfaceVector());
 	}
 
 	@Override
 	public SensorResultDto getLastMeasurement() {
-		return this.sensorResultDtoValues;
+		return sensorResultDtoValues;
 	}
 }
