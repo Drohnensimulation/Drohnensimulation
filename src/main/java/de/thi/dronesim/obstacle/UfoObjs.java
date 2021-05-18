@@ -409,6 +409,13 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
     @Override
     public void setSimulation(Simulation simulation) {
         this.simulation = simulation;
+        // Clear old Obstacles when Simulation is changed
+        if(!this.obstacles.isEmpty()){
+            Set<Obstacle> obs = new HashSet<>(this.getObstacles());
+            for(Obstacle o: obs){
+                this.removeObstacle(o);
+            }
+        }
         try {
             this.config = simulation.getConfig().getObstacleConfigList().get(0);
 
