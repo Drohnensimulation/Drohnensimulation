@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -248,15 +249,16 @@ public class Simulation {
      */
     private void instantiateChildren() {
         for (Class<? extends ISimulationChild> childClass : implementingChildren) {
+            if (Modifier.isAbstract(childClass.getModifiers())) {
+                continue;
+            }
             try {
                 Constructor<? extends ISimulationChild> constructor = childClass.getConstructor();
                 ISimulationChild instance = constructor.newInstance();
                 instance.initialize(this);
                 this.children.put(childClass, instance);
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            } catch (InstantiationException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
-            } catch (InstantiationException ignored) {
-                // Allow abstract classes to inherit the interface
             }
         }
     }
