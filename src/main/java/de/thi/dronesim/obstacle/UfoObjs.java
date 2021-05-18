@@ -295,12 +295,12 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         topLeft.subtract(verticalVect, topLeft);
 
         //Rasterization based on width (needed rays to match roughly density of rays)
-        int neededRaysX = (int) dimension.x * ppm;
-        int neededRaysY = (int) dimension.y * ppm;
+        int neededRaysX = (int) Math.ceil(dimension.x * ppm);
+        int neededRaysY = (int) Math.ceil(dimension.y * ppm);
         float stepSizeX = dimension.x / neededRaysX;
         float stepSizeY = dimension.y / neededRaysY;
         Vector3f horizontalStep = horizontalVect.mult(stepSizeX);
-        Vector3f verticalStep = horizontalVect.mult(stepSizeY);
+        Vector3f verticalStep = verticalVect.mult(stepSizeY);
 
         for (int y = 0; y < neededRaysY; y++) {
             Vector3f currentPoint = topLeft.add(verticalStep.mult(y));
