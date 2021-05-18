@@ -9,6 +9,7 @@ public class SensorConfig {
 
     private String className;
     private String sensorName;
+    private int sensorId;
 
     private double measurementAccuracy;
     private double directionX;
@@ -65,6 +66,7 @@ public class SensorConfig {
         if (Float.compare(config.rangeIncreaseVelocity, rangeIncreaseVelocity) != 0) return false;
         if (callTimerForSensorValues != config.callTimerForSensorValues) return false;
         if (className != null ? !className.equals(config.className) : config.className != null) return false;
+        if (sensorId != config.sensorId) return false;
         return sensorName != null ? sensorName.equals(config.sensorName) : config.sensorName == null;
     }
 
@@ -74,6 +76,7 @@ public class SensorConfig {
         long temp;
         result = className != null ? className.hashCode() : 0;
         result = 31 * result + (sensorName != null ? sensorName.hashCode() : 0);
+        result = 31 * result + sensorId;
         temp = Double.doubleToLongBits(measurementAccuracy);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(directionX);
@@ -258,6 +261,14 @@ public class SensorConfig {
 
     public void setSensorName(String sensorName) {
         this.sensorName = sensorName;
+    }
+    
+    public int getSensorId() {
+    	return sensorId;
+    }
+    
+    public void setSensorId(int id) {
+    	this.sensorId = id;
     }
 
     public float getRangeIncreaseVelocity() {

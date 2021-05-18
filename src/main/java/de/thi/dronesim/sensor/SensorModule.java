@@ -81,7 +81,7 @@ public class SensorModule implements ISimulationChild {
     private ISensor createSensor(SensorConfig config) {
         switch (config.getClassName()) {
             case "GpsSensor":
-                return new GpsSensor(config.getSensorName());
+                return new GpsSensor(config, this.simulation);
             case "InfraredSensor":
                 return new InfraredSensor();
             case "RotationSensor":
@@ -90,10 +90,7 @@ public class SensorModule implements ISimulationChild {
                 return new UltrasonicSensor(config.getRangeIncreaseVelocity(),
                         config.getCallTimerForSensorValues());
             case "WindSensor":
-                return new WindSensor(config.getSensorName(),
-                        new Vector3d(config.getDirectionX(), config.getDirectionY(), config.getDirectionZ()),
-                        new Vector3d(config.getZeroDegreeDirectionX(), config.getZeroDegreeDirectionY(), config.getZeroDegreeDirectionZ()),
-                        new Vector3d(config.getNintyDegreeDirectionX(), config.getNintyDegreeDirectionY(), config.getNintyDegreeDirectionZ()));
+                return new WindSensor(config, this.simulation);
             default:
                 throw new IllegalStateException("No sensor implementation available for value: " + config.getClassName());
         }

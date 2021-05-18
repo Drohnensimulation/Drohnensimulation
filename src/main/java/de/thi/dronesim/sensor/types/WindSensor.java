@@ -1,9 +1,15 @@
 package de.thi.dronesim.sensor.types;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import de.thi.dronesim.Simulation;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.ISensor;
 import de.thi.dronesim.sensor.Vector3d;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
+import de.thi.dronesim.wind.Wind;
+import de.thi.dronesim.wind.Wind.CurrentWind;
 
 /**
  * The wind sensor can measure the wind direction and strength for a two dimensional plain.
@@ -14,7 +20,10 @@ import de.thi.dronesim.sensor.dto.SensorResultDto;
 public class WindSensor implements ISensor {
 
 	private String name;
-
+	private int id;
+	
+	private SensorResultDto lastMeasurement;
+	
 	private final Vector3d defaultDroneHeading = new Vector3d(1, 0, 0);
 	
 	//Sensor direction when drone is looking to defaultDroneHeading
@@ -26,6 +35,8 @@ public class WindSensor implements ISensor {
 	
 	//If the measured wind blows in this direction, the measurement will return an angle of 90 degrees
 	protected Vector3d nintyDegreeDirection;
+	
+	private Simulation simulation;
 	
 	/**
 	 * Configures the Wind Sensor. 
@@ -43,9 +54,11 @@ public class WindSensor implements ISensor {
 	 * @param zeroDegreeDirection
 	 * @param nintyDegreeDirection
 	 */
-	public WindSensor(String name, Vector3d sensorDirection, Vector3d zeroDegreeDirection, Vector3d nintyDegreeDirection) {
-		this.name = name;
-		this.relativeDirection = sensorDirection.copy();
+	public WindSensor(SensorConfig config, Simulation simulation) {
+		this.simulation = simulation;
+		this.name = config.getSensorName();
+		this.id = config.getSensorId();
+		this.relativeDirection = new Vector3d(config.getDirectionX(), config.getDirectionY(), config.getDirectionZ());
 		
 		if(Double.compare(this.relativeDirection.getX(), 0) == 0 &&
 		   Double.compare(this.relativeDirection.getY(), 0) == 0 &&
@@ -54,8 +67,8 @@ public class WindSensor implements ISensor {
 			throw new IllegalArgumentException("sensorDirection must not be (0,0,0)!");
 		}
 		
-		this.zeroDegreeDirection = zeroDegreeDirection.copy();
-		this.nintyDegreeDirection = nintyDegreeDirection.copy();
+		this.zeroDegreeDirection = new Vector3d(config.getZeroDegreeDirectionX(), config.getZeroDegreeDirectionY(), config.getZeroDegreeDirectionZ());
+		this.nintyDegreeDirection = new Vector3d(config.getNintyDegreeDirectionX(), config.getNintyDegreeDirectionY(), config.getNintyDegreeDirectionZ());
 		
 		if(Double.compare(this.scalarProduct(this.relativeDirection, this.zeroDegreeDirection), 0) != 0 ||
 		   Double.compare(this.scalarProduct(this.relativeDirection, this.nintyDegreeDirection), 0) != 0 ||
@@ -93,18 +106,17 @@ public class WindSensor implements ISensor {
 	 * Gets the sensor measurement
 	 * @return
 	 */
-	public String getMeasurement() {
+	@Override
+	public void runMeasurement() {
 		//Dummy values for compiling.
-		double droneHeadingDeg = 225;
-		double droneMovementDeg = 225;
-		double windDirectionDeg = 135; //Direction in which the wind blows
-		double windSpeed = 200;
-		double droneHorizontalSpeed = 50;
-		double droneVerticalSpeed = 0; //Speed >0 means drone goes upwards, <0 drone goes downwards => -20 means drone goes down with 20 m/s 
-		//TODO: which direction is 0 deg?
-		
-		//TODO: Get values from Drone / Wind interface
-		
+		double droneHeadingDeg = this.simulation.getDrone().getHeading();
+		double droneMovementDeg = this.simulation.getDrone().getMovementDirection();
+		double droneHorizontalSpeed = this.simulation.getDrone().getHorizontalSpeed();
+		double droneVerticalSpeed = this.simulation.getDrone().getVerticalSpeed(); //TODO: Speed >0 means drone goes upwards, <0 drone goes downwards => -20 means drone goes down with 20 m/s 
+		CurrentWind cw = Wind.getWindAt(this.simulation.getDrone().getLocation());
+		double windDirectionDeg = cw.getWindDirection(); //Direction in which the wind blows
+		double windSpeed = cw.getWindSpeed();
+				
 		Vector3d droneHeadingVec;
 		Vector3d droneMovementVec;
 		Vector3d windDirection;
@@ -169,9 +181,12 @@ public class WindSensor implements ISensor {
 		Vector3d absZeroDegreeVec = this.mimicTransformation(this.defaultDroneHeading, droneHeadingVec, this.zeroDegreeDirection);
 		Vector3d absNintyDegreeVec = this.mimicTransformation(this.defaultDroneHeading, droneHeadingVec, this.nintyDegreeDirection);
 		
+		List<Float> list = new ArrayList<>(2);
+		this.lastMeasurement = new SensorResultDto();
 		if(Double.compare(this.getLength(measuredWindVec), 0) == 0) {
 			//If no wind is measured, we return a default value
-			return "{\"direction\": -1, \"strength\": 0}";
+			list.add(-1f);
+			list.add(0f);
 		} else {
 			double measuredWindAngle;
 			
@@ -195,8 +210,10 @@ public class WindSensor implements ISensor {
 				measuredWindAngle = Math.toDegrees(smallAngle);
 			}
 			
-			return "{\"direction\": " + Double.toString(measuredWindAngle) + ", \"strength\": " + Double.toString(this.getLength(measuredWindVec)) + "}";
+			list.add((float) measuredWindAngle);
+			list.add((float) this.getLength(measuredWindVec));
 		}
+		this.lastMeasurement.setValues(list);
 	}
 	
 	/**
@@ -278,16 +295,20 @@ public class WindSensor implements ISensor {
 		return absSensorDirection;
 	}
 	
+	@Override
+	public SensorResultDto getLastMeasurement() {
+		return this.lastMeasurement;
+	}
+	
 	/**
 	 * Converts the angles obtained from the wind interface into a 3d vector
 	 * @param deg
 	 * @return a 3d vector
 	 */
 	private Vector3d degToVector(double deg) {
-		//TODO: which direction is 0 deg?
-		return new Vector3d(Math.cos(Math.toRadians(deg)),
-				   			0,
-				   			-Math.sin(Math.toRadians(deg)));
+		return new Vector3d(Math.sin(Math.toRadians(deg)),
+				0,
+				Math.cos(Math.toRadians(deg)));
 	}
 	
 	/**
@@ -378,23 +399,29 @@ public class WindSensor implements ISensor {
 
 	@Override
 	public String getName() {
-		return name;
+		return this.name;
+	}
+	
+	@Override
+	public int getId() {
+		return this.id;
 	}
 
 	@Override
 	public SensorConfig saveToConfig() {
-		// TODO
-		return null;
-	}
-
-	@Override
-	public void runMeasurement() {
-	// TODO
-	}
-
-	@Override
-	public SensorResultDto getLastMeasurement() {
-		// TODO
-		return null;
+		SensorConfig config = new SensorConfig();
+		config.setClassName(this.getType());
+		config.setSensorName(this.getName());
+		config.setSensorId(this.getId());
+		config.setDirectionX(this.relativeDirection.getX());
+		config.setDirectionY(this.relativeDirection.getY());
+		config.setDirectionZ(this.relativeDirection.getZ());
+		config.setZeroDegreeDirectionX(this.zeroDegreeDirection.getX());
+		config.setZeroDegreeDirectionY(this.zeroDegreeDirection.getY());
+		config.setZeroDegreeDirectionZ(this.zeroDegreeDirection.getZ());
+		config.setNintyDegreeDirectionX(this.nintyDegreeDirection.getX());
+		config.setNintyDegreeDirectionY(this.nintyDegreeDirection.getY());
+		config.setNintyDegreeDirectionZ(this.nintyDegreeDirection.getZ());
+		return config;
 	}
 }
