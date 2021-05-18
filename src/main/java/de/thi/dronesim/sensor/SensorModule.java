@@ -23,7 +23,7 @@ public class SensorModule implements ISimulationChild {
     // /////////////////////////////////////////////////////////////////////////////
 
     private Simulation simulation;
-    private final Map<String, ISensor> sensorMap = new HashMap<>();
+    private final Map<Integer, ISensor> sensorMap = new HashMap<>();
 
     // /////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -39,11 +39,11 @@ public class SensorModule implements ISimulationChild {
     /**
      * Gets the result from the last calculation of a sensor.
      *
-     * @param sensorName the name of the Sensor
+     * @param sensorId the ID of the Sensor
      * @return the {@link SensorResultDto} of the last calculation
      */
-    public SensorResultDto getResultFromSensor(String sensorName) {
-        ISensor sensor = sensorMap.get(sensorName);
+    public SensorResultDto getResultFromSensor(Integer sensorId) {
+        ISensor sensor = sensorMap.get(sensorId);
         return sensor == null ? null : sensor.getLastMeasurement();
     }
 
@@ -53,7 +53,9 @@ public class SensorModule implements ISimulationChild {
      * @return a List of all results
      */
     public List<SensorResultDto> getResultsFromAllSensors() {
-        return sensorMap.values().stream().map(ISensor::getLastMeasurement).collect(Collectors.toList());
+        return sensorMap.values().stream()
+                .map(ISensor::getLastMeasurement)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -61,14 +63,18 @@ public class SensorModule implements ISimulationChild {
      */
     private void init() {
         sensorMap.clear();
-        for (SensorConfig config : simulation.getConfig().getSensorConfigList()) {
+        List<SensorConfig> sensorConfigList = simulation.getConfig().getSensorConfigList();
+        if (sensorConfigList == null) {
+            return;
+        }
+        for (SensorConfig config : sensorConfigList) {
             if (config.getClassName() == null) {
-                throw new IllegalStateException("Missing className");
+                throw new IllegalArgumentException("Missing className");
             }
-            if (config.getSensorName() == null) {
-                throw new IllegalStateException("Missing sensorName");
+            ISensor res = sensorMap.put(config.getSensorId(), createSensor(config));
+            if (res != null) {
+                throw new IllegalArgumentException("Duplicate sensor ID");
             }
-            sensorMap.put(config.getSensorName(), createSensor(config));
         }
     }
 
@@ -92,7 +98,7 @@ public class SensorModule implements ISimulationChild {
             case "WindSensor":
                 return new WindSensor(config, this.simulation);
             default:
-                throw new IllegalStateException("No sensor implementation available for value: " + config.getClassName());
+                throw new IllegalArgumentException("No sensor implementation available for value: " + config.getClassName());
         }
     }
 

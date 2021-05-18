@@ -8,7 +8,6 @@ package de.thi.dronesim.persistence.entity;
 public class SensorConfig {
 
     private String className;
-    private String sensorName;
     private int sensorId;
 
     private double measurementAccuracy;
@@ -47,6 +46,7 @@ public class SensorConfig {
 
         SensorConfig config = (SensorConfig) o;
 
+        if (sensorId != config.sensorId) return false;
         if (Double.compare(config.measurementAccuracy, measurementAccuracy) != 0) return false;
         if (Double.compare(config.directionX, directionX) != 0) return false;
         if (Double.compare(config.directionY, directionY) != 0) return false;
@@ -65,9 +65,7 @@ public class SensorConfig {
         if (Double.compare(config.nintyDegreeDirectionZ, nintyDegreeDirectionZ) != 0) return false;
         if (Float.compare(config.rangeIncreaseVelocity, rangeIncreaseVelocity) != 0) return false;
         if (callTimerForSensorValues != config.callTimerForSensorValues) return false;
-        if (className != null ? !className.equals(config.className) : config.className != null) return false;
-        if (sensorId != config.sensorId) return false;
-        return sensorName != null ? sensorName.equals(config.sensorName) : config.sensorName == null;
+        return className != null ? className.equals(config.className) : config.className == null;
     }
 
     @Override
@@ -75,7 +73,6 @@ public class SensorConfig {
         int result;
         long temp;
         result = className != null ? className.hashCode() : 0;
-        result = 31 * result + (sensorName != null ? sensorName.hashCode() : 0);
         result = 31 * result + sensorId;
         temp = Double.doubleToLongBits(measurementAccuracy);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
@@ -255,14 +252,6 @@ public class SensorConfig {
         this.nintyDegreeDirectionZ = nintyDegreeDirectionZ;
     }
 
-    public String getSensorName() {
-        return sensorName;
-    }
-
-    public void setSensorName(String sensorName) {
-        this.sensorName = sensorName;
-    }
-    
     public int getSensorId() {
     	return sensorId;
     }

@@ -56,7 +56,7 @@ public class WindSensor implements ISensor {
 	 */
 	public WindSensor(SensorConfig config, Simulation simulation) {
 		this.simulation = simulation;
-		this.name = config.getSensorName();
+		this.name = "Windsensor";
 		this.id = config.getSensorId();
 		this.relativeDirection = new Vector3d(config.getDirectionX(), config.getDirectionY(), config.getDirectionZ());
 		
@@ -411,7 +411,6 @@ public class WindSensor implements ISensor {
 	public SensorConfig saveToConfig() {
 		SensorConfig config = new SensorConfig();
 		config.setClassName(this.getType());
-		config.setSensorName(this.getName());
 		config.setSensorId(this.getId());
 		config.setDirectionX(this.relativeDirection.getX());
 		config.setDirectionY(this.relativeDirection.getY());

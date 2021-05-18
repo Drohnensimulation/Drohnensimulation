@@ -40,7 +40,7 @@ public class GpsSensor implements ISensor {
 	 * Creates a new GPS Sensor
 	 */
 	public GpsSensor(SensorConfig config, Simulation simulation) {
-		this.name = config.getSensorName();
+		this.name = "Gpssensor";
 		this.id = config.getSensorId();
 		this.simulation = simulation;
 		this.measurements = new List<>();
@@ -66,7 +66,6 @@ public class GpsSensor implements ISensor {
 	@Override
 	public SensorConfig saveToConfig() {
 		SensorConfig config = new SensorConfig();
-		config.setSensorName(this.getName());
 		config.setSensorId(this.getId());
 		config.setClassName(this.getType());
 		return config;
