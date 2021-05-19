@@ -1,6 +1,7 @@
 package de.thi.dronesim.wind;
 
 import javax.vecmath.Vector3d;
+import java.util.Random;
 
 public class WindLayer {
 
@@ -17,6 +18,7 @@ public class WindLayer {
 
     private double nextGustStart = 0.0;                 // start time of the next gust          [s]
     private double nextGustSpeed = 0.0;                // speed of the next gust               [m/s]
+    private double nextGustDuration = GUST_RISE_TIME * 2;   // Duration of next must                [s]
 
     /**
      * Constructor for wind layer
@@ -121,7 +123,7 @@ public class WindLayer {
                 calcNextGust(time);
             } else if (time >= nextGustStart && gustSpeed > windSpeed) {
                 // Apply gust
-                windSpeed = gustInterpolation(time, nextGustSpeed, nextGustStart, nextGustStart + 2 * GUST_RISE_TIME);
+                windSpeed = gustInterpolation(time, nextGustSpeed, nextGustStart, nextGustDuration);
             }
         }
         return windSpeed;
@@ -132,17 +134,18 @@ public class WindLayer {
      * @param time Time for which the gust should be calculated in s
      * @param gustSpeed Maximum speed of the gust in m/s
      * @param gustStart Time at which the gust starts in s
-     * @param gustEnd Time at which the gust ends in s
+     * @param gustDuration Time at which the gust ends in s
      * @return The resulting wind speed
      */
-    private double gustInterpolation(double time, double gustSpeed, double gustStart, double gustEnd) {
-        final double riseTime = (gustEnd - gustStart) / 2;
+    private double gustInterpolation(double time, double gustSpeed, double gustStart, double gustDuration) {
         double y;
-        if (time <= (gustStart + riseTime)) {
-            y = ((gustSpeed - windSpeed)/(gustEnd - gustStart) * 2) * (time - gustStart);
+        double slope = (gustSpeed - windSpeed) / GUST_RISE_TIME;
+        if (time <= (gustStart + GUST_RISE_TIME)) {
+            y = slope * (time - gustStart);
+        } else if (time < gustStart + gustDuration - GUST_RISE_TIME) {
+            y = gustSpeed;
         } else {
-           y = -1 * ((gustSpeed - windSpeed)/(gustEnd - gustStart) * 2) * (time - gustStart) + (gustSpeed - windSpeed)
-                   * riseTime;
+           y = -1 * slope * (time - (gustStart + gustDuration - GUST_RISE_TIME)) + (gustSpeed - windSpeed);
         }
         return windSpeed + y;
     }
@@ -152,10 +155,11 @@ public class WindLayer {
      * @param time current time         [s]
      */
     private void calcNextGust(double time) {
-        nextGustStart = Math.random() * MAX_CALM_TIME + time;
-        nextGustSpeed = Math.random() * (gustSpeed - windSpeed) + windSpeed;
+        Random random = new Random();
+        nextGustStart = random.nextDouble() * MAX_CALM_TIME + time;
+        nextGustSpeed = random.nextDouble() * (gustSpeed - windSpeed) + windSpeed;
+        nextGustDuration = Math.min(random.nextGaussian() * 4 + GUST_RISE_TIME * 2, GUST_RISE_TIME * 2);
     }
-
 
     protected double getWindSpeed() {
         return windSpeed;
@@ -199,6 +203,10 @@ public class WindLayer {
 
     protected void setNextGustSpeed(double nextGustSpeed) {
         this.nextGustSpeed = nextGustSpeed;
+    }
+
+    public void setNextGustDuration(double nextGustDuration) {
+        this.nextGustDuration = nextGustDuration;
     }
 
 }
