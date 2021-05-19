@@ -4,7 +4,6 @@ import de.thi.dronesim.ISimulationChild;
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.sensor.ASensor;
-import de.thi.dronesim.obstacle.UfoObjs;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,30 +11,36 @@ import java.util.TimerTask;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
 
-//import com.jme3.math.Vector3f;
+
 
 
 public class RotationSensor extends ASensor implements ISimulationChild {
 	/**
-	 * Man kan sich die Rotation wie die Bewegung wie die Bewegung eines Blaulichts vorstellen
+	 * Imagine the rotation like a police blue light. The sensor rotates around the Y-axis 
+	 * 
+	 * Because of the cast from double into float at the Math. function there is always an 
+	 * inaccuracy of 0.00000x at the x and z values of the newOrientation Vector. 
+	 * Because of this inaccuracy it can happen that the vector gets a huge x and z difference after a lot of spins.
+	 * Consequently the value types got changed into double
 	 * 
 	 * @author Moris Breitenborn
 	 */
 	
-	public float rotationVelocity; // Winkelgeschwindigkeit 2Pi/2s == Eine Umdrehung in 2s Sekunden
+	public int spinsPerSecond;
+	public float rotationVelocity; // 2Pi/s == one spin in one second as radiant
 	public int callTimerForSensorValues;
 	public Set<HitMark> values;
 	public Timer callTimerValues = new Timer( );
-	public Timer repositoinTimer = new Timer( );
 	public float startRotationTime;
 	public float endRotationTime;
 
 	//Main simulation
 	private Simulation simulation;
 
-	public RotationSensor(float rotationVelcity, int callTimerForSensorValues) {
-		this.rotationVelocity = rotationVelcity;
+	public RotationSensor(int spinsPerSecond, int callTimerForSensorValues) {
+		this.spinsPerSecond = spinsPerSecond;
 		this.callTimerForSensorValues = callTimerForSensorValues;
+		spinsToRotationVelocityConverter(spinsPerSecond);
 		startRotation();
 	}
 
@@ -50,37 +55,45 @@ public class RotationSensor extends ASensor implements ISimulationChild {
 		String name = "RotationSensor";
 		return name;
 	}
+	// converts spins per seconds into radiant. with this value it is possible to calculate the traveled distance
+	public void spinsToRotationVelocityConverter(int spinsPerSecond) {
+		this.rotationVelocity = (float) ((2*Math.PI)*this.spinsPerSecond);
+	}
 	
-	// To calculate the rotation we measure the past time. This method starts the timer. 
+	// To calculate the rotation we measure the past time in nanoseconds. This method starts the timer. 
 	public void startRotation() {
-		startRotationTime = System.currentTimeMillis();
+		this.startRotationTime = System.nanoTime();
 	}
 	
-	public void stopCallingSensorValues() {
-		callTimerValues.cancel();
-	}
+	
 	// Calculates the arcMeasure by multiply the traveledTime and the given rotationVelocity
-	public float getTraveledArcMeasure() {
-		//calculate traveled time
-		endRotationTime = System.currentTimeMillis();
-		float travaledTime = endRotationTime - startRotationTime;
+	public double getTraveledArcMeasure() {
+		//calculate traveled time in nanoseconds
+		endRotationTime = System.nanoTime();
+		// traveled time converted into seconds
+		float travaledTime = (endRotationTime - this.startRotationTime) / 1000000000;
 		//restart rotation
 		startRotation();
 		//return arc measure
 		return travaledTime*rotationVelocity;
 	}
 	
-	// Calculate new OrientationVector
-	public Vector3f newOrientation() {
+	// Calculate new OrientationVector with the getTraveledArcMeasure() return as parameter 
+	public Vector3f newOrientation(double traveledArc) {
 		
 		Vector3f orienataion = getOrientation();
-		// get the arc measure 
-		float traveledArc = getTraveledArcMeasure();
+		
+		//to reduce inaccuracy we convert the traveledArc <= 1 Rotation
+		double oneRotation = (2*Math.PI);
+		while (traveledArc > oneRotation) {
+			traveledArc = traveledArc - oneRotation;
+		}
+		
 		// Create a rotation Matrix to rotate around the y-axses 
-		float cosPhi= (float) Math.cos(traveledArc);
-		float sinPhi= (float) Math.sin(traveledArc);
-		float minSinPhi= (float) (Math.sin(traveledArc)*(-1));
-		Matrix3f transformMatrixY = new Matrix3f(cosPhi, 0, sinPhi, 0, 1, 0, minSinPhi, 0, cosPhi);
+		double cosPhi=  Math.cos(traveledArc);
+		double sinPhi= Math.sin(traveledArc);
+		double minSinPhi= (Math.sin(traveledArc)*(-1));
+		Matrix3f transformMatrixY = new Matrix3f((float)cosPhi, (float)0, (float)sinPhi, (float)0, (float)1, (float)0, (float)minSinPhi, (float)0, (float)cosPhi);
 		Vector3f newOrientation = transformMatrixY.mult(orienataion);
 		
 		return newOrientation;	
@@ -88,16 +101,20 @@ public class RotationSensor extends ASensor implements ISimulationChild {
 	
 	
 	// This Method returns the values from "checkSensorCone" in a given time "callTimerForSensorValues"
-	public void callSensorValues() {
+	public void startCallSensorValues() {
 		
 		callTimerValues.scheduleAtFixedRate(new TimerTask() {
 
 		    @Override
 		    public void run() {
-		    	setOrientation(newOrientation());
+		    	setOrientation(newOrientation(getTraveledArcMeasure()));
 				values =  getSensorHits(getOrigin(), getOrientation(), getConeHeight(), getVectorAngel());
 		    }
 		}, 0, callTimerForSensorValues);
+	}
+	
+	public void stopCallingSensorValues() {
+		callTimerValues.cancel();
 	}
 	
 	

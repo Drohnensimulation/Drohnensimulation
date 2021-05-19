@@ -1,5 +1,7 @@
 package de.thi.dronesim.wind;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import de.thi.dronesim.ISimulationChild;
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.drone.Location;
@@ -7,21 +9,23 @@ import de.thi.dronesim.persistence.ConfigReader;
 import de.thi.dronesim.persistence.entity.SimulationConfig;
 import de.thi.dronesim.persistence.entity.WindConfig;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.ListIterator;
+import javax.vecmath.Vector3d;
+import java.io.Reader;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 public class Wind implements ISimulationChild {
 
-    private static final double WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE = 5;        // range in m
-    private static final double WIND_LAYER_INTERPOLATION_TIME_RANGE = 5;            // range in s
+    protected static final double WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE = 5;        // range in m
+    protected static final double WIND_LAYER_INTERPOLATION_TIME_RANGE = 5;            // range in s
 
     //Main simulation
     private Simulation simulation;
     private boolean configLoaded = false;
-    private String configPath;
 
-    private List<WindLayer> windLayers;             // list of wind layers      [Windlayer]
+    private List<WindLayer> windLayers = new ArrayList<WindLayer>();             // list of wind layers      [Windlayer]
     private int latestLayerId = 0;
 
     public Wind() {
@@ -29,13 +33,13 @@ public class Wind implements ISimulationChild {
     }
 
     public Wind(String configPath) {
-        this.configPath = configPath;
-        load();
+        loadFromConfig(configPath);
     }
 
     public Wind(List<WindLayer> layers) {
         this.configLoaded = true;
         this.windLayers = layers;
+        load();
     }
 
     /**
@@ -59,15 +63,18 @@ public class Wind implements ISimulationChild {
                     Math.abs(ws));
         }
         // Wind correction angle
-        double wca = location.getHeading() - location.getTrack();
+        double wca = 180 - Math.abs(Math.abs(location.getHeading() - location.getTrack()) - 180);
+        if (Math.abs((location.getHeading() + wca) % 360 - location.getTrack()) > 0.001)  wca *= -1;
         // Calculate wind speed
-        double ws = gs * gs + tas * tas - 2 * gs * tas * Math.cos(Math.toRadians(Math.abs(wca)));
+        double ws = Math.sqrt(gs * gs + tas * tas - 2 * gs * tas * Math.cos(Math.toRadians(Math.abs(wca))));
         // Calculate wind angle
-        double wa = Math.toDegrees(Math.asin(Math.sin(Math.toRadians(wca)) / ws * gs));
+        double wa = Math.toDegrees(Math.asin(Math.sin(Math.toRadians(Math.abs(wca))) / ws * gs));
+        // Use vertex angle for obtuse triangle
+        if (Math.abs(wca) < 90 && gs > tas) wa = 180 - wa;
         // Calculate wind direction
-        double wd = (((location.getTrack() - wa * Math.signum(wca)) + 540) % 360) - 180;
+        double wd = (location.getHeading() - wa *  Math.signum(wca) + 360) % 360;
 
-        return new CurrentWind(wa, wd);
+        return new CurrentWind(wd, ws);
     }
 
     /**
@@ -77,9 +84,7 @@ public class Wind implements ISimulationChild {
      * </p>
      */
     private void load() {
-        // TODO check for overlapping and small gaps
-        loadFromConfig(this.configPath);
-        sortWindLayer(windLayers);
+        sortWindLayer();
         normalize();
         this.configLoaded = true;
     }
@@ -89,67 +94,70 @@ public class Wind implements ISimulationChild {
      * @param configPath path to the WindLayer configuration File
      */
     private void loadFromConfig(String configPath) {
-        SimulationConfig windSimulationConfig =  ConfigReader.readConfig(configPath);
-        List<WindConfig> windConfigList = windSimulationConfig.getWindConfigList();
-        for (WindConfig windConfig : windConfigList) {
-            WindLayer windLayer = new WindLayer(windConfig.getWindSpeed(),
-                    windConfig.getGustSpeed(), windConfig.getTimeStart(),
-                    windConfig.getTimeEnd(), windConfig.getAltitudeBottom(),
-                    windConfig.getAltitudeTop(), windConfig.getWindDirection());
-            windLayers.add(windLayer);
+        //SimulationConfig windSimulationConfig =  ConfigReader.readConfig(configPath);
+        List<WindConfig> windConfigList = null;
+        Gson gson = new Gson();
+        try {
+            Reader reader = Files.newBufferedReader(Paths.get(configPath));
+            Type list = new TypeToken<ArrayList<WindConfig>>(){}.getType();
+            windConfigList = gson.fromJson(reader, list);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+        for (int i = 0; i < (windConfigList.size()); i++) {
+            this.windLayers.add(new WindLayer(windConfigList.get(i).getWindSpeed(), windConfigList.get(i).getGustSpeed(),
+                    windConfigList.get(i).getTimeStart(), windConfigList.get(i).getTimeEnd(),
+                    windConfigList.get(i).getAltitudeBottom(), windConfigList.get(i).getAltitudeTop(),
+                    windConfigList.get(i).getWindDirection()));
+        }
+        load();
     }
 
     /**
      * This function sorts the given WindLayer by Time
-     * @param windLayers List of unsorted WindLayer
      */
-    private void sortWindLayer(List<WindLayer> windLayers) {
+    private void sortWindLayer() {
+        windLayers.sort(Comparator.comparing(WindLayer::getAltitudeBottom));
         windLayers.sort(Comparator.comparing(WindLayer::getTimeStart));
-        sortWindLayerAltitudeBased();
     }
 
     /**
-     * This function sorts the given WindLayer by Altitude
-     */
-    private void sortWindLayerAltitudeBased() {
-        for (int i =0; i < windLayers.size() - 1; i++) {
-            for (int x = 0; x < windLayers.size() - i - 1; x++) {
-                if (windLayers.get(x).getAltitudeBottom() > windLayers.get(x+1).getAltitudeBottom()
-                        && windLayers.get(x).getTimeEnd() >= windLayers.get(x + 1).getTimeStart()) {
-                    WindLayer tempLayer = windLayers.get(x);
-                    windLayers.set(x, windLayers.get(x + 1));
-                    windLayers.set(x + 1, tempLayer);
-                }
-            }
-        }
-    }
-
-    /**
+     *
      * This Method normalizes the WindLayer already sorted, as defined in function load
+     * The borders of the wind layers are rounded up to the doubled interpolation range
      */
     private void normalize() {
-        double altDistance = 2 * WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE;
-        double timeDistance = 2 * WIND_LAYER_INTERPOLATION_TIME_RANGE;
+        final double altDistance = 2 * WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE;
+        final double timeDistance = 2 * WIND_LAYER_INTERPOLATION_TIME_RANGE;
 
-        for (int i = 0; i < windLayers.size() - 1; i++) {
-            for (int x = i + 1; x < windLayers.size() - 1; x++) {
-                WindLayer oldLayer = windLayers.get(i);
-                WindLayer nextLayer = windLayers.get(x);
-                if (oldLayer.getAltitudeTop() < nextLayer.getAltitudeBottom() + altDistance
-                        && (oldLayer.getTimeEnd() > nextLayer.getTimeStart()
-                        || oldLayer.getTimeEnd() + timeDistance <= nextLayer.getTimeEnd()
-                        && nextLayer.getTimeStart()  - oldLayer.getTimeEnd() <= timeDistance)) {
-                    nextLayer.setAltitudeBottom(oldLayer.getAltitudeTop() + altDistance);
-                } else if (oldLayer.getTimeEnd() < nextLayer.getTimeStart() + timeDistance
-                        && (oldLayer.getAltitudeTop() > nextLayer.getAltitudeBottom()
-                        || oldLayer.getAltitudeTop() + altDistance <= nextLayer.getAltitudeTop()
-                        && nextLayer.getAltitudeBottom()  - oldLayer.getAltitudeTop() <= altDistance)) {
-                    nextLayer.setTimeStart(oldLayer.getTimeEnd() + timeDistance);
+        // Round time and altitude
+        windLayers.forEach(WindLayer::normalize);
+
+        Collection<WindLayer> removed = new ArrayList<>();
+        for (int i = 0; i < windLayers.size(); i++) {
+            WindLayer currentLayer = windLayers.get(i);
+            // Check layer length is valid
+            if (!currentLayer.isValid()) {
+                removed.add(currentLayer);
+                continue;
+            }
+            // Check if any following layer violates borders of current layers
+            for (int x = i + 1; x < windLayers.size(); x++) {
+                WindLayer followingLayer = windLayers.get(x);
+                // Check if two layers overlap
+                if (currentLayer.overlapsWith(followingLayer)) {
+                    // Remove layer from list
+                    removed.add(followingLayer);
+
+                    // TODO use logger here
+                    System.err.println("[Wind] Wind layer ("+x
+                            +") violates the border of another layer and is therefore removed!");
+                    System.out.println("[Wind] Borders of different wind layers must not overlap.");
                 }
             }
         }
-
+        windLayers.removeAll(removed);
     }
 
     public void reset() {
@@ -198,13 +206,13 @@ public class Wind implements ISimulationChild {
         updateLatestLayer(time - WIND_LAYER_INTERPOLATION_TIME_RANGE);
 
         // Find all 4 layers required. More layers can't have any effect by definition
-        WindLayer lowerPrevLayer = findWindLayer(location.getZ() - WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
+        WindLayer lowerPrevLayer = findWindLayer(location.getY() - WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
                 time - WIND_LAYER_INTERPOLATION_TIME_RANGE);
-        WindLayer upperPrevLayer = findWindLayer(location.getZ() + WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
+        WindLayer upperPrevLayer = findWindLayer(location.getY() + WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
                 time - WIND_LAYER_INTERPOLATION_TIME_RANGE);
-        WindLayer lowerNextLayer = findWindLayer(location.getZ() - WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
+        WindLayer lowerNextLayer = findWindLayer(location.getY() - WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
                 time + WIND_LAYER_INTERPOLATION_TIME_RANGE);
-        WindLayer upperNextLayer = findWindLayer(location.getZ() + WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
+        WindLayer upperNextLayer = findWindLayer(location.getY() + WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE,
                 time + WIND_LAYER_INTERPOLATION_TIME_RANGE);
 
         // In case no layer was found, no wind applies
@@ -215,6 +223,7 @@ public class Wind implements ISimulationChild {
             return;
         }
 
+        // Check if it is preferred to interpolate time first
         boolean timeInterpolationFirst = false;
         if (lowerPrevLayer != null && upperNextLayer != null) {
             timeInterpolationFirst = lowerPrevLayer.getTimeEnd() != upperNextLayer.getTimeStart();
@@ -225,92 +234,142 @@ public class Wind implements ISimulationChild {
             timeInterpolationFirst = true;
         }
 
-        WindChange windChange;
+        Vector3d windSpeedVector = new Vector3d();
         if (timeInterpolationFirst) {
-            WindChange upperChange = interpolateTimeLayers(lowerPrevLayer, lowerNextLayer, location);
-            WindChange lowerChange = interpolateTimeLayers(upperPrevLayer, upperNextLayer, location);
+            Vector3d lowerSpeed = interpolateTimeLayers(lowerPrevLayer, lowerNextLayer);
+            Vector3d upperSpeed = interpolateTimeLayers(upperPrevLayer, upperNextLayer);
 
-            // If both changes are zero, no further interpolation is needed
-            if (upperChange.gs == 0 && lowerChange.gs == 0) {
-                windChange = upperChange;
-            } else {
+            // If both changes are identical or zero, no further interpolation is needed
+            if (lowerSpeed.equals(upperSpeed)) {
+                windSpeedVector = lowerSpeed;
+            } else if (lowerSpeed.length() != 0 || upperSpeed.length() != 0) {
                 // Either lowerPrevLayer or lowerNextLayer has to be not null as timeInterpolationFirst is set to true
                 double ref = lowerPrevLayer != null ? lowerPrevLayer.getAltitudeTop() : lowerNextLayer.getAltitudeTop();
                 // Interpolate time
-                windChange = interpolate(upperChange, lowerChange,
+                windSpeedVector = interpolate(lowerSpeed, upperSpeed,
                         location.getY() - ref,
                         WIND_LAYER_INTERPOLATION_TIME_RANGE);
             }
         } else {
             // Interpolate altitude first
-            WindChange prevChange = interpolateAltitudeLayers(lowerPrevLayer, upperPrevLayer, location);
-            WindChange nextChange = interpolateAltitudeLayers(lowerNextLayer, upperNextLayer, location);
+            Vector3d prevSpeed = interpolateAltitudeLayers(lowerPrevLayer, upperPrevLayer, location.getY(),
+                    simulation.getTime());
+            Vector3d nextSpeed = interpolateAltitudeLayers(lowerNextLayer, upperNextLayer, location.getY(),
+                    simulation.getTime());
 
-            // If both changes are zero, no further interpolation is needed
-            if (prevChange.gs == 0 && nextChange.gs == 0) {
-                windChange = prevChange;
-            } else {
+            // If both changes are identical or zero, no further interpolation is needed
+            if (prevSpeed.equals(nextSpeed)) {
+                windSpeedVector = prevSpeed;
+            } else if (prevSpeed.length() != 0 || nextSpeed.length() != 0) {
                 // At least one layer has to be not null
                 double ref = lowerPrevLayer != null ? lowerPrevLayer.getTimeEnd() :
                         (lowerNextLayer != null ? lowerNextLayer.getTimeStart() :
                                 (upperPrevLayer != null ? upperPrevLayer.getTimeEnd() : upperNextLayer.getTimeStart()));
                 // Interpolate time
-                windChange = interpolate(prevChange, nextChange,
+                windSpeedVector = interpolate(prevSpeed, nextSpeed,
                         time - ref,
                         WIND_LAYER_INTERPOLATION_TIME_RANGE);
             }
         }
 
+        Vector3d speedVector = createSpeedVector(location.getHeading(), location.getAirspeed());
+        speedVector.add(windSpeedVector);
+
+
+        double track = calculateAngleOfVector(speedVector);
         // Apply changes
-        location.setTrack(windChange.track);
-        location.setGroundSpeed(windChange.gs);
+        location.setTrack(track);
+        location.setGroundSpeed(speedVector.length());
     }
 
-    private WindChange interpolateTimeLayers(WindLayer prevLayer, WindLayer nextLayer, Location location) {
+    /**
+     * 
+     * @param direction Speed direction in deg
+     * @param speed Speed in m/s
+     * @return A vector with x for east speed and z for north speed
+     */
+    public static Vector3d createSpeedVector(double direction, double speed) {
+        Vector3d vector = new Vector3d();
+        vector.x = speed * Math.cos(Math.toRadians(direction));
+        vector.y = 0;
+        vector.z = speed * Math.sin(Math.toRadians(direction));
+        return vector;
+    }
+
+    /**
+     * Calculates the angle relative to north of a given vector
+     * @param vector Vector to be converted
+     * @return The angle in ged with 0° <= angle < 360°
+     */
+    public static double calculateAngleOfVector(Vector3d vector) {
+        if (vector.x == 0)
+            return (vector.z > 0) ? 90 : (vector.z == 0) ? 0 : 270;
+        if (vector.z == 0)
+            return  (vector.x >= 0) ? 0 : 180;
+
+        double ang = Math.toDegrees(Math.atan(vector.z / vector.x));
+        if (vector.x < 0 && vector.z < 0) // quadrant Ⅲ
+            return 180 + ang;
+        if (vector.x < 0) // quadrant Ⅱ
+            return 180 + ang;
+        if (vector.z < 0) // quadrant Ⅳ
+            return 270 + (90 + ang);
+        return ang;
+    }
+
+    private Vector3d interpolateTimeLayers(WindLayer prevLayer, WindLayer nextLayer) {
         double time = simulation.getTime();
-        WindChange prevChange = WindLayer.applyOrZero(prevLayer, location, time);
-        WindChange nextChange = WindLayer.applyOrZero(nextLayer, location, time);
 
-        if (prevLayer != null || nextLayer != null) {
-            double ref = prevLayer != null ? prevLayer.getTimeEnd() : nextLayer.getTimeStart();
-            return interpolate(prevChange, nextChange,
-                    time - ref,
-                    WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE);
-        }
-        // No layer applies so no wind is set
-        return new WindChange(location.getHeading(), 0);
+        Vector3d prevSpeed = WindLayer.convertSpeedOrZero(prevLayer, time);
+        // Check if layers are identical in which case an interpolation would be unnecessary
+        if (prevLayer == nextLayer)
+            return prevSpeed;
+        Vector3d nextSpeed = WindLayer.convertSpeedOrZero(nextLayer, time);
+        // Interpolate between both vectors
+        double ref = prevLayer != null ? prevLayer.getTimeEnd() : nextLayer.getTimeStart();
+        return interpolate(prevSpeed, nextSpeed,
+                time - ref,
+                WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE);
     }
 
-    private WindChange interpolateAltitudeLayers(WindLayer lowerLayer, WindLayer upperLayer, Location location) {
-        WindChange lowerChange = WindLayer.applyOrZero(lowerLayer, location, simulation.getTime());
-        WindChange upperChange = WindLayer.applyOrZero(upperLayer, location, simulation.getTime());
-
-        if (lowerLayer != null || upperLayer != null) {
-            double alt = upperLayer != null ? upperLayer.getAltitudeBottom() : lowerLayer.getAltitudeTop();
-            return interpolate(lowerChange, upperChange,
-                    location.getZ() - alt,
-                    WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE);
-        }
-        // If both layers are null, each change is a zero change.
-        return lowerChange;
+    /**
+     * Interpolates between two layers based on their altitude
+     * @param lowerLayer Lower wind layer
+     * @param upperLayer Upper wind layer (above lower layer)
+     * @param altitude Altitude of reference point
+     * @return A vector with the interpolated wind speed
+     */
+    private Vector3d interpolateAltitudeLayers(WindLayer lowerLayer, WindLayer upperLayer, double altitude, double time) {
+        Vector3d prevSpeed = WindLayer.convertSpeedOrZero(lowerLayer, time);
+        // Check if layers are identical in which case an interpolation would be unnecessary
+        if (lowerLayer == upperLayer)
+            return prevSpeed;
+        Vector3d nextSpeed = WindLayer.convertSpeedOrZero(upperLayer, time);
+        // Interpolate between both vectors
+        double borderAlt = upperLayer != null ? upperLayer.getAltitudeBottom() : lowerLayer.getAltitudeTop();
+        return interpolate(prevSpeed, nextSpeed,
+                altitude - borderAlt,
+                WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE);
     }
 
-    private WindChange interpolate(WindChange first, WindChange second, double x, double range) {
-
-        // Calculate change in track
-        double trackDiff = (((second.track - first.track) + 540) % 360) - 180;
-
-        // Calculate change of track and ground speed
-        double dTrack = (trackDiff / (range * 2) * (x - range));
-        double dgs = (second.gs - first.gs)/(range * 2) * (x - range);
-
-        // Calculate new track and ground speed
-        double track = (second.track + dTrack + 360) % 360;
-        double gs = second.gs + dgs;
-        return new WindChange(track, gs);
+    /**
+     * Interpolates two speed vectors based on the position.
+     * @param first First speed vector
+     * @param second Second speed vector
+     * @param x Requested position for interpolation relative to the border
+     * @param range Interpolation range
+     * @return A vector with the result of the interpolation
+     */
+    private Vector3d interpolate(Vector3d first, Vector3d second, double x, double range) {
+        Vector3d result = new Vector3d();
+        first.scale(-0.5 / range * x + 0.5);
+        second.scale(0.5 / range * x + 0.5);
+        result.add(first);
+        result.add(second);
+        return result;
     }
 
-    protected List<WindLayer> getWindLayers() {
+    public List<WindLayer> getWindLayers() {
         return windLayers;
     }
 
@@ -324,23 +383,16 @@ public class Wind implements ISimulationChild {
         return this.simulation;
     }
 
-    protected static final class WindChange {
-
-        private final double track;
-        private final double gs;
-
-        protected WindChange(double track, double gs) {
-            this.track = track;
-            this.gs = gs;
-        }
-
-    }
-
     public static final class CurrentWind {
 
         private final double windDirection;
         private final double windSpeed;
 
+        /**
+         *
+         * @param windDirection Wind direction in deg
+         * @param windSpeed Wind speed in m/s
+         */
         public CurrentWind(double windDirection, double windSpeed) {
             this.windDirection = windDirection;
             this.windSpeed = windSpeed;

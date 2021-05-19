@@ -28,6 +28,10 @@ public class Location {
         this.movement = new Vector3f(0, 0, 0);
     }
 
+    public Location() {
+        this(0.0f, 0.0f, 0.0f);
+    }
+
     /**
      * Updates the position and movement vector based on the track, ground speed and vertical speed.
      * @param updateRate Updates per second.
@@ -139,7 +143,7 @@ public class Location {
      *
      * @return Position on x-axis in m
      */
-    public synchronized float getX() {
+    public float getX() {
         return position.x;
     }
 
@@ -147,7 +151,7 @@ public class Location {
      * Sets the position on x-axis.
      * @param x position in m
      */
-    public synchronized void setX(float x) {
+    public void setX(float x) {
         this.position.x = x;
     }
 
@@ -155,7 +159,7 @@ public class Location {
      *
      * @return Position on y-axis in m
      */
-    public synchronized float getY() {
+    public float getY() {
         return position.y;
     }
 
@@ -163,7 +167,7 @@ public class Location {
      * Sets the position on y-axis.
      * @param y position in m
      */
-    public synchronized void setY(float y) {
+    public void setY(float y) {
         this.position.y = y;
     }
 
@@ -171,7 +175,7 @@ public class Location {
      *
      * @return Position on z-axis in m
      */
-    public synchronized float getZ() {
+    public float getZ() {
         return position.z;
     }
 
@@ -179,7 +183,7 @@ public class Location {
      * Sets the position on z-axis.
      * @param z position in m
      */
-    public synchronized void setZ(float z) {
+    public void setZ(float z) {
         this.position.z = z;
     }
 
@@ -187,7 +191,7 @@ public class Location {
      *
      * @return The current direction of travel in m/s
      */
-    public synchronized Vector3f getMovement() {
+    public Vector3f getMovement() {
         return movement;
     }
 
@@ -195,7 +199,7 @@ public class Location {
      *
      * @return The actual travel direction in deg
      */
-    public synchronized double getTrack() {
+    public double getTrack() {
         return track;
     }
 
@@ -209,7 +213,7 @@ public class Location {
      *
      * @param track Track direction in deg
      */
-    public synchronized void setTrack(double track) {
+    public void setTrack(double track) {
         this.track = track;
     }
 
@@ -217,7 +221,7 @@ public class Location {
      *
      * @return Heading in deg
      */
-    public synchronized double getHeading() {
+    public double getHeading() {
         return hdg;
     }
 
@@ -225,7 +229,7 @@ public class Location {
      * Sets the heading and sets the corresponding delta to zero..
      * @param hdg Heading in deg.
      */
-    public synchronized void setHeading(double hdg) {
+    public void setHeading(double hdg) {
         this.hdg = hdg;
         this.deltaHdg = 0;
     }
@@ -234,7 +238,7 @@ public class Location {
      *
      * @return The true airspeed in m/s
      */
-    public synchronized double getAirspeed() {
+    public double getAirspeed() {
         return tas;
     }
 
@@ -242,7 +246,7 @@ public class Location {
      * Sets the airspeed and sets the corresponding delta to zero.
      * @param tas True airspeed in m/s. (0 <= tas)
      */
-    public synchronized void setAirspeed(double tas) {
+    public void setAirspeed(double tas) {
         this.tas = tas;
         this.deltaTas = 0;
     }
@@ -251,7 +255,7 @@ public class Location {
      *
      * @return The projected speed over ground in m/s
      */
-    public synchronized double getGroundSpeed() {
+    public double getGroundSpeed() {
         return gs;
     }
 
@@ -264,7 +268,7 @@ public class Location {
      * </p>
      * @param gs Ground speed in m/s
      */
-    public synchronized void setGroundSpeed(double gs) {
+    public void setGroundSpeed(double gs) {
         this.gs = gs;
     }
 
@@ -272,7 +276,7 @@ public class Location {
      *
      * @return The vertical speed in m/s
      */
-    public synchronized double getVerticalSpeed() {
+    public double getVerticalSpeed() {
         return vs;
     }
 
@@ -280,16 +284,24 @@ public class Location {
      * Sets the vertical speed and sets the corresponding delta to zero.
      * @param vs Vertical speed in m/s
      */
-    public synchronized void setVerticalSpeed(double vs) {
+    public void setVerticalSpeed(double vs) {
         this.vs = vs;
         this.deltaVs = 0;
     }
 
     /**
      *
+     * @return Returns the position with altitude as y axis, north on z axis and west on east on x axis
+     */
+    public Vector3f getPosition() {
+        return position;
+    }
+
+    /**
+     *
      * @return The inclination of the x-axis in deg
      */
-    public synchronized double getPitch() {
+    public double getPitch() {
         return pitch;
     }
 
@@ -297,7 +309,7 @@ public class Location {
      * Sets the pitch.
      * @param pitch Pitch in deg
      */
-    public synchronized void setPitch(double pitch) {
+    public void setPitch(double pitch) {
         this.pitch = pitch;
     }
 
@@ -309,7 +321,7 @@ public class Location {
      *
      * @return Requested, not applied change of heading in deg
      */
-    public synchronized double getDeltaHeading() {
+    public double getDeltaHeading() {
         return deltaHdg;
     }
 
@@ -318,7 +330,7 @@ public class Location {
      * A change will take affect over time.
      * @param delta Change in deg
      */
-    public synchronized void requestDeltaHeading(double delta) {
+    public void requestDeltaHeading(double delta) {
         this.deltaHdg += delta;
     }
 
@@ -326,7 +338,7 @@ public class Location {
      *
      * @return The requested but not applied change of airspeed in m/s
      */
-    public synchronized double getDeltaAirspeed() {
+    public double getDeltaAirspeed() {
         return deltaTas;
     }
 
@@ -334,7 +346,7 @@ public class Location {
      * Requests a change of airspeed. The change is summed up with all previous request changes.
      * @param delta Change in m/s
      */
-    public synchronized void requestDeltaAirspeed(double delta) {
+    public void requestDeltaAirspeed(double delta) {
         this.deltaTas += delta;
     }
 
@@ -342,7 +354,7 @@ public class Location {
      *
      * @return The requested but not applied change of vertical speed in m/s
      */
-    public synchronized double getDeltaVerticalSpeed() {
+    public double getDeltaVerticalSpeed() {
         return deltaVs;
     }
 
@@ -350,7 +362,7 @@ public class Location {
      * Requests a change of vertical speed. The change is summed up with all previous request changes.
      * @param delta Change in m/s
      */
-    public synchronized void requestDeltaVerticalSpeed(double delta) {
+    public void requestDeltaVerticalSpeed(double delta) {
         this.deltaVs += delta;
     }
 
