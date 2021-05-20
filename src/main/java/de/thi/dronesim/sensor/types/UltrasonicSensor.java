@@ -41,7 +41,7 @@ public class UltrasonicSensor extends DistanceSensor {
 	 *  This Method is resetting the startIncreaseTime to calculate the next measurement
 	 */
 	public void startIncrease() {
-		this.startIncreaseTime = simulation.getTime();
+		this.startIncreaseTime = (float) simulation.getTime();
 	}
 	
 	/**
@@ -50,7 +50,7 @@ public class UltrasonicSensor extends DistanceSensor {
 	 *  time is 0. The return value got converted to seconds.
 	 */
 	private float traveledTime() {
-		float endIncreaseTime = simulation.getTime();
+		float endIncreaseTime = (float) simulation.getTime();
 		float traveledTime;
 		if(this.startIncreaseTime<endIncreaseTime) {
 			traveledTime = (endIncreaseTime - this.startIncreaseTime) / 1000;

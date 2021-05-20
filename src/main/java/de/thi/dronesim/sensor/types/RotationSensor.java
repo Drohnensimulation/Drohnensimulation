@@ -60,7 +60,7 @@ public class RotationSensor extends DistanceSensor {
 	 *  This Method is resetting the startRotationTime to calculate the next measurement
 	 */
 	public void startRotation() {
-		this.startRotationTime = simulation.getTime();
+		this.startRotationTime = (float) simulation.getTime();
 	}
 	
 	/**
@@ -69,7 +69,7 @@ public class RotationSensor extends DistanceSensor {
 	 *  time is 0. The return value got converted to seconds.
 	 */
 	private float traveledTime() {
-		float endRotationTime = simulation.getTime();
+		float endRotationTime = (float) simulation.getTime();
 		float traveledTime;
 		if(this.startRotationTime< endRotationTime) {
 			traveledTime = (endRotationTime - this.startRotationTime) / 1000;

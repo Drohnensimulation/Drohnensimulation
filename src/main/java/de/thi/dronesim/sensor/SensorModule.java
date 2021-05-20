@@ -2,6 +2,7 @@ package de.thi.dronesim.sensor;
 
 import de.thi.dronesim.ISimulationChild;
 import de.thi.dronesim.Simulation;
+import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 import de.thi.dronesim.sensor.types.*;
@@ -32,7 +33,7 @@ public class SensorModule implements ISimulationChild {
     /**
      * Calculates the current values for all sensors.
      */
-    public void runAllMeasurements() {
+    public void runAllMeasurements(SimulationUpdateEvent event) {
         sensorMap.values().forEach(ISensor::runMeasurement);
     }
 
@@ -107,9 +108,10 @@ public class SensorModule implements ISimulationChild {
     // /////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public void setSimulation(Simulation simulation) {
+    public void initialize(Simulation simulation) {
         this.simulation = simulation;
         init();
+        simulation.registerUpdateListener(this::runAllMeasurements);
     }
 
     @Override

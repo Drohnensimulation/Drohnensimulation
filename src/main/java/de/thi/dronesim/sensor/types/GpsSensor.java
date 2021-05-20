@@ -22,9 +22,9 @@ public class GpsSensor implements ISensor {
 	private final int hSpeedObservationTimeInMS = this.horizontalNoise * 500;
 	private final int vSpeedObservationTimeInMS = this.verticalNoise * 500;
 	
-	private final List<Integer, Coordinates> measurements;
-	private final List<Integer, Float> lastHorizontalDistanceDeltas;
-	private final List<Integer, Float> lastVerticalDistanceDeltas;
+	private final List<Double, Coordinates> measurements;
+	private final List<Double, Float> lastHorizontalDistanceDeltas;
+	private final List<Double, Float> lastVerticalDistanceDeltas;
 	
 	private Coordinates posLastFrame = null;
 	
@@ -85,7 +85,7 @@ public class GpsSensor implements ISensor {
 		zCoord = this.addNoise(zCoord, this.horizontalNoise);
 		yCoord = this.addNoise(yCoord, this.verticalNoise);
 		
-		int currentTime = this.simulation.getTime();
+		double currentTime = this.simulation.getTime();
 		
 		//Adds the measurement to the queue
 		this.measurements.addBack(currentTime, new Coordinates(xCoord, yCoord, zCoord));
@@ -157,11 +157,11 @@ public class GpsSensor implements ISensor {
 	 * @param delay time in MS a measurement must be delayed
 	 * @return The coordinates of the measurements
 	 */
-	private Coordinates getDelayedMeasurementAndClearEntries(List<Integer, Coordinates> list, long currentTime, int delay) {
+	private Coordinates getDelayedMeasurementAndClearEntries(List<Double, Coordinates> list, double currentTime, int delay) {
 		Coordinates last = null;
 		boolean run = true;
 		while(run && !list.isEmpty()) {
-			Pair<Integer, Coordinates> pair = list.getFront();
+			Pair<Double, Coordinates> pair = list.getFront();
 			if((int)(currentTime - pair.first) >= delay) {
 				last = pair.second;
 				list.removeFront();
@@ -181,17 +181,17 @@ public class GpsSensor implements ISensor {
 	 * @param observationTime the time period
 	 * @return the aprox speed in meters per second
 	 */
-	private Float getApproxSpeedAndClearEntries(List<Integer, Float> posDeltas, int currentTime, int observationTime) {
+	private Float getApproxSpeedAndClearEntries(List<Double, Float> posDeltas, double currentTime, int observationTime) {
 		if(posDeltas.isEmpty() || (int)(currentTime - posDeltas.getFront().first) < observationTime) {
 			return null;
 		}
 		
 		float sumDistance = 0;
-		List<Integer, Float>.Iterator<Integer, Float> it = posDeltas.getIterator();
+		List<Double, Float>.Iterator<Double, Float> it = posDeltas.getIterator();
 		while(it.hasNext()) {
 			sumDistance+= it.getNext().second;
 		}
-		float timeDif = currentTime - posDeltas.getFront().first;
+		float timeDif = (float) currentTime - posDeltas.getFront().first.floatValue();
 		
 		boolean delete = true;
 		while(delete && !posDeltas.isEmpty()) {
