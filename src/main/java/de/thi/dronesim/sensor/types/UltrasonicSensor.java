@@ -18,16 +18,18 @@ public class UltrasonicSensor extends DistanceSensor {
 	
 	/**
 	 * Constructor:
-	 * 
+	 *
 	 * @param rangeIncreaseVelocity: defines how fast the sensor increase in one second
 	 * @param startIncreaseTime: defines the time when the Sensor starts to increase. if the value is 5 the increase starts
-	 * after the Simulation is running for 5 seconds. 
+	 * after the Simulation is running for 5 seconds.
 	 */
 	public UltrasonicSensor(float rangeIncreaseVelocity, int startIncreaseTime) {
 		this.rangeIncreaseVelocity =rangeIncreaseVelocity;
 		this.startIncreaseTime= startIncreaseTime;
 	}
-	
+
+	public UltrasonicSensor() {}
+
 	@Override
 	public String getType() {
 		String name = "UltrasonicSensor";
@@ -44,7 +46,7 @@ public class UltrasonicSensor extends DistanceSensor {
 	
 	/**
 	 *  This Method calculate the time between this.startIncreaseTime and endIncreaseTime.
-	 *  If this.startIncreaseTime is smaller than endIncreaseTime the increase did not start yet. There for the traveled 
+	 *  If this.startIncreaseTime is smaller than endIncreaseTime the increase did not start yet. There for the traveled
 	 *  time is 0. The return value got converted to seconds.
 	 */
 	private float traveledTime() {
@@ -62,7 +64,7 @@ public class UltrasonicSensor extends DistanceSensor {
 	/**
 	 * Calculate the current cone height with help the time difference and the rangeIncreaseVelocity. first calculate the current
 	 * range and add the getOriginToPositionLength()
-	 * 
+	 *
 	 * @param traveledTime
 	 */
 	public float getCurrentConeHeight(float traveledTime) {
@@ -79,7 +81,7 @@ public class UltrasonicSensor extends DistanceSensor {
 	
 	/**
 	 * Calculate the current cone height with help the time difference and the rangeIncreaseVelocity an passes these parameters to
-	 * getSensorResult(); The result get saved into this.sensorResultDtovalues 
+	 * getSensorResult(); The result get saved into this.sensorResultDtovalues
 	 *
 	 */
 	@Override

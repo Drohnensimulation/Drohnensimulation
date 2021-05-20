@@ -1,5 +1,7 @@
 package de.thi.dronesim.wind;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import de.thi.dronesim.ISimulationChild;
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.drone.Location;
@@ -8,6 +10,10 @@ import de.thi.dronesim.persistence.entity.SimulationConfig;
 import de.thi.dronesim.persistence.entity.WindConfig;
 
 import javax.vecmath.Vector3d;
+import java.io.Reader;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Wind implements ISimulationChild {
@@ -19,8 +25,12 @@ public class Wind implements ISimulationChild {
     private Simulation simulation;
     private boolean configLoaded = false;
 
-    private List<WindLayer> windLayers;             // list of wind layers      [Windlayer]
+    private List<WindLayer> windLayers = new ArrayList<WindLayer>();             // list of wind layers      [Windlayer]
     private int latestLayerId = 0;
+
+    public Wind() {
+
+    }
 
     public Wind(String configPath) {
         loadFromConfig(configPath);
@@ -84,14 +94,22 @@ public class Wind implements ISimulationChild {
      * @param configPath path to the WindLayer configuration File
      */
     private void loadFromConfig(String configPath) {
-        SimulationConfig windSimulationConfig =  ConfigReader.readConfig(configPath);
-        List<WindConfig> windConfigList = windSimulationConfig.getWindConfigList();
-        for (WindConfig windConfig : windConfigList) {
-            WindLayer windLayer = new WindLayer(windConfig.getWindSpeed(),
-                    windConfig.getGustSpeed(), windConfig.getTimeStart(),
-                    windConfig.getTimeEnd(), windConfig.getAltitudeBottom(),
-                    windConfig.getAltitudeTop(), windConfig.getWindDirection());
-            windLayers.add(windLayer);
+        //SimulationConfig windSimulationConfig =  ConfigReader.readConfig(configPath);
+        List<WindConfig> windConfigList = null;
+        Gson gson = new Gson();
+        try {
+            Reader reader = Files.newBufferedReader(Paths.get(configPath));
+            Type list = new TypeToken<ArrayList<WindConfig>>(){}.getType();
+            windConfigList = gson.fromJson(reader, list);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i < (windConfigList.size()); i++) {
+            this.windLayers.add(new WindLayer(windConfigList.get(i).getWindSpeed(), windConfigList.get(i).getGustSpeed(),
+                    windConfigList.get(i).getTimeStart(), windConfigList.get(i).getTimeEnd(),
+                    windConfigList.get(i).getAltitudeBottom(), windConfigList.get(i).getAltitudeTop(),
+                    windConfigList.get(i).getWindDirection()));
         }
         load();
     }
@@ -182,7 +200,7 @@ public class Wind implements ISimulationChild {
      * @param location Location of the drone
      */
     public void applyWind(Location location) {
-        int time = simulation.getTime();
+        double time = simulation.getTime();
 
         // Update oldest layer to set start point of search algorithm
         updateLatestLayer(time - WIND_LAYER_INTERPOLATION_TIME_RANGE);
@@ -300,7 +318,7 @@ public class Wind implements ISimulationChild {
     }
 
     private Vector3d interpolateTimeLayers(WindLayer prevLayer, WindLayer nextLayer) {
-        int time = simulation.getTime();
+        double time = simulation.getTime();
 
         Vector3d prevSpeed = WindLayer.convertSpeedOrZero(prevLayer, time);
         // Check if layers are identical in which case an interpolation would be unnecessary
@@ -321,7 +339,7 @@ public class Wind implements ISimulationChild {
      * @param altitude Altitude of reference point
      * @return A vector with the interpolated wind speed
      */
-    private Vector3d interpolateAltitudeLayers(WindLayer lowerLayer, WindLayer upperLayer, double altitude, int time) {
+    private Vector3d interpolateAltitudeLayers(WindLayer lowerLayer, WindLayer upperLayer, double altitude, double time) {
         Vector3d prevSpeed = WindLayer.convertSpeedOrZero(lowerLayer, time);
         // Check if layers are identical in which case an interpolation would be unnecessary
         if (lowerLayer == upperLayer)
@@ -351,12 +369,12 @@ public class Wind implements ISimulationChild {
         return result;
     }
 
-    protected List<WindLayer> getWindLayers() {
+    public List<WindLayer> getWindLayers() {
         return windLayers;
     }
 
     @Override
-    public void setSimulation(Simulation simulation) {
+    public void initialize(Simulation simulation) {
         this.simulation = simulation;
     }
 

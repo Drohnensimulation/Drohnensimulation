@@ -6,35 +6,14 @@ public class Drone {
     /**
      * A Drone has a sort of Location State
      */
-    private Location location;
-    private float heading;
-    private float movementDirection;
-    private float verticalSpeed; //how to set apart going up and going down? 
-    private float horizontalSpeed;
+    private final Location location;
 
-    private static Drone instance;      // singleton instance
-
-    public Drone(){
-
+    public Drone() {
+        location = new Location(0, 0, 0);
     }
-    
+
     public Location getLocation() {
-    	return this.location;
+        return location;
     }
-    
-    public float getHeading() {
-		return heading;
-	}
 
-	public float getMovementDirection() {
-		return movementDirection;
-	}
-
-	public float getVerticalSpeed() {
-		return verticalSpeed;
-	}
-
-	public float getHorizontalSpeed() {
-		return horizontalSpeed;
-	}
 }
