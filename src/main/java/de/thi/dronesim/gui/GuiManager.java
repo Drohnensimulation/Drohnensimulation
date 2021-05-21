@@ -7,6 +7,8 @@ import de.thi.dronesim.Simulation;
 import de.thi.dronesim.gui.drenderer.*;
 import de.thi.dronesim.gui.dview.DView;
 import de.thi.dronesim.gui.mview.MView;
+import de.thi.dronesim.obstacle.UfoObjs;
+import de.thi.dronesim.obstacle.entity.Obstacle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +25,7 @@ public class GuiManager implements ISimulationChild {
     private boolean isDView;
 
     @Override
-    public void setSimulation(Simulation simulation) {
+    public void initialize(Simulation simulation) {
         this.simulation = simulation;
     }
 
@@ -41,8 +43,8 @@ public class GuiManager implements ISimulationChild {
      * Opens a {@link de.thi.dronesim.gui.mview.MView} gui
      */
     public void openMViewGui() {
-        if(!existsGui()) {
-            instrumentView = new MView();
+        if (!existsGui()) {
+            instrumentView = new MView(this);
             isDView = false;
         }
     }
@@ -51,9 +53,9 @@ public class GuiManager implements ISimulationChild {
      * Opens a {@link DRenderer} gui
      */
     public void openDViewGui() {
-        if(!existsGui()) {
-            DRenderer dView = initDView();
-            instrumentView = new DView(dView);
+        if (!existsGui()) {
+            DRenderer dRenderer = initDRenderer();
+            instrumentView = new DView(this, dRenderer);
             isDView = true;
         }
     }
@@ -72,21 +74,30 @@ public class GuiManager implements ISimulationChild {
         return isDView;
     }
 
-    private DRenderer initDView() {
+    private DRenderer initDRenderer() {
         // Create DView
         DRenderer dView = new DRenderer();
 
         // Add map objects
         List<RenderableObject> mapObjects = new ArrayList<>();
-        mapObjects.add(new RenderableCuboid(new Vector3f(0, .5f, 0)));
-        mapObjects.add(new RenderableCuboid(new Vector3f(1, .5f, 0)));
-        mapObjects.add(new RenderableCuboid(new Vector3f(0, .5f, -1)));
-        mapObjects.add(new RenderableCuboid(new Vector3f(0, 1.5f, -1)));
-        mapObjects.add(new RenderableCuboid(new Vector3f(1, .5f, 0)));
-        mapObjects.add(new RenderableSphere(new Vector3f(0, .5f, 2)));
-        mapObjects.add(new RenderableSphere(new Vector3f(0, 1.5f, 2)));
-        mapObjects.add(new RenderableSphere(new Vector3f(-1, .5f, -2)));
-        mapObjects.add(new RenderableMarker(new Vector3f(0, 1, 0)));
+        for (Obstacle obstacle : simulation.getChild(UfoObjs.class).getObstacles()) {
+            Vector3f center = new Vector3f(obstacle.getPosition()[0], obstacle.getPosition()[1], obstacle.getPosition()[2]);
+            Vector3f scale = new Vector3f(obstacle.getScale()[0], obstacle.getScale()[1], obstacle.getScale()[2]);
+            Vector3f rotation = new Vector3f(obstacle.getRotation()[0], obstacle.getRotation()[1], obstacle.getRotation()[2]);
+            switch(obstacle.getModelName()) {
+                case "red_cube":
+                    mapObjects.add(new RenderableCuboid(center, scale, rotation));
+                    break;
+                case "red_sphere":
+                    mapObjects.add(new RenderableSphere(center, scale, rotation));
+                    break;
+                case "marker":
+                    mapObjects.add(new RenderableMarker(center));
+                    break;
+                default:
+                    // TODO: Read path and load from local object file
+            }
+        }
         dView.addRenderableObjects(mapObjects);
 
         // Add drone

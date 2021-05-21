@@ -5,6 +5,7 @@ import com.jme3.math.Vector3f;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.TimeUnit;
 
@@ -32,14 +33,14 @@ public class RotationSensorTest {
     	// set on one spin per second
     	rotSen.spinsToRotationVelocityConverter(spinsPerSeconds);
     	// let 4 seconds pass
-    	 
+
     	double ArcMessuretest = rotSen.getTraveledArcMeasure(passingTime);
     	
     	double low = (float) ((2*Math.PI)*spinsPerSeconds*passingTime);
     	double high = low + 0.3;
     	
-    	 assertTrue(low  <= ArcMessuretest);
-    	 assertTrue(high >= ArcMessuretest);
+    	 assertTrue(low  <= ArcMessuretest, "Error,  ArcMessure is too low");
+    	 assertTrue(high >= ArcMessuretest, "Error,  ArcMessure is too high");
     }
     
     @Test
@@ -57,8 +58,8 @@ public class RotationSensorTest {
     	double low = (float) ((2*Math.PI)*spinsPerSeconds*passingTime);
     	double high = low + 0.3;
     	
-    	 assertTrue(low  <= ArcMessuretest);
-    	 assertTrue(high >= ArcMessuretest);
+    	 assertTrue(low  <= ArcMessuretest, "Error,  ArcMessure is too low");
+    	 assertTrue(high >= ArcMessuretest, "Error,  ArcMessure is too high");
     }
     
     /**

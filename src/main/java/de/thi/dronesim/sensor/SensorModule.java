@@ -2,6 +2,7 @@ package de.thi.dronesim.sensor;
 
 import de.thi.dronesim.ISimulationChild;
 import de.thi.dronesim.Simulation;
+import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 import de.thi.dronesim.sensor.types.*;
@@ -23,7 +24,7 @@ public class SensorModule implements ISimulationChild {
     // /////////////////////////////////////////////////////////////////////////////
 
     private Simulation simulation;
-    private final Map<String, ISensor> sensorMap = new HashMap<>();
+    private final Map<Integer, ISensor> sensorMap = new HashMap<>();
 
     // /////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -32,18 +33,18 @@ public class SensorModule implements ISimulationChild {
     /**
      * Calculates the current values for all sensors.
      */
-    public void runAllMeasurements() {
+    public void runAllMeasurements(SimulationUpdateEvent event) {
         sensorMap.values().forEach(ISensor::runMeasurement);
     }
 
     /**
      * Gets the result from the last calculation of a sensor.
      *
-     * @param sensorName the name of the Sensor
+     * @param sensorId the ID of the Sensor
      * @return the {@link SensorResultDto} of the last calculation
      */
-    public SensorResultDto getResultFromSensor(String sensorName) {
-        ISensor sensor = sensorMap.get(sensorName);
+    public SensorResultDto getResultFromSensor(Integer sensorId) {
+        ISensor sensor = sensorMap.get(sensorId);
         return sensor == null ? null : sensor.getLastMeasurement();
     }
 
@@ -53,7 +54,9 @@ public class SensorModule implements ISimulationChild {
      * @return a List of all results
      */
     public List<SensorResultDto> getResultsFromAllSensors() {
-        return sensorMap.values().stream().map(ISensor::getLastMeasurement).collect(Collectors.toList());
+        return sensorMap.values().stream()
+                .map(ISensor::getLastMeasurement)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -61,14 +64,18 @@ public class SensorModule implements ISimulationChild {
      */
     private void init() {
         sensorMap.clear();
-        for (SensorConfig config : simulation.getConfig().getSensorConfigList()) {
+        List<SensorConfig> sensorConfigList = simulation.getConfig().getSensorConfigList();
+        if (sensorConfigList == null) {
+            return;
+        }
+        for (SensorConfig config : sensorConfigList) {
             if (config.getClassName() == null) {
-                throw new IllegalStateException("Missing className");
+                throw new IllegalArgumentException("Missing className");
             }
-            if (config.getSensorName() == null) {
-                throw new IllegalStateException("Missing sensorName");
+            ISensor res = sensorMap.put(config.getSensorId(), createSensor(config));
+            if (res != null) {
+                throw new IllegalArgumentException("Duplicate sensor ID");
             }
-            sensorMap.put(config.getSensorName(), createSensor(config));
         }
     }
 
@@ -81,7 +88,7 @@ public class SensorModule implements ISimulationChild {
     private ISensor createSensor(SensorConfig config) {
         switch (config.getClassName()) {
             case "GpsSensor":
-                return new GpsSensor(config.getSensorName());
+                return new GpsSensor(config, this.simulation);
             case "InfraredSensor":
                 return new InfraredSensor();
             case "RotationSensor":
@@ -90,12 +97,9 @@ public class SensorModule implements ISimulationChild {
                 return new UltrasonicSensor(config.getRangeIncreaseVelocity(),
                         config.getCallTimerForSensorValues());
             case "WindSensor":
-                return new WindSensor(config.getSensorName(),
-                        new Vector3d(config.getDirectionX(), config.getDirectionY(), config.getDirectionZ()),
-                        new Vector3d(config.getZeroDegreeDirectionX(), config.getZeroDegreeDirectionY(), config.getZeroDegreeDirectionZ()),
-                        new Vector3d(config.getNintyDegreeDirectionX(), config.getNintyDegreeDirectionY(), config.getNintyDegreeDirectionZ()));
+                return new WindSensor(config, this.simulation);
             default:
-                throw new IllegalStateException("No sensor implementation available for value: " + config.getClassName());
+                throw new IllegalArgumentException("No sensor implementation available for value: " + config.getClassName());
         }
     }
 
@@ -104,9 +108,10 @@ public class SensorModule implements ISimulationChild {
     // /////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public void setSimulation(Simulation simulation) {
+    public void initialize(Simulation simulation) {
         this.simulation = simulation;
         init();
+        simulation.registerUpdateListener(this::runAllMeasurements);
     }
 
     @Override

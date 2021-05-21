@@ -1,5 +1,8 @@
 package de.thi.dronesim.sensor.types;
 
+import java.util.ArrayList;
+
+import de.thi.dronesim.Simulation;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.ISensor;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
@@ -7,6 +10,8 @@ import de.thi.dronesim.sensor.dto.SensorResultDto;
 public class GpsSensor implements ISensor {
 
 	private String name;
+	private int id;
+	
 	//How long the measured values should be delayed until they are displayed
 	private final int measurementDelayInMS = 100;
 	
@@ -17,9 +22,9 @@ public class GpsSensor implements ISensor {
 	private final int hSpeedObservationTimeInMS = this.horizontalNoise * 500;
 	private final int vSpeedObservationTimeInMS = this.verticalNoise * 500;
 	
-	private final List<Long, Coordinates> measurements;
-	private final List<Long, Float> lastHorizontalDistanceDeltas;
-	private final List<Long, Float> lastVerticalDistanceDeltas;
+	private final List<Double, Coordinates> measurements;
+	private final List<Double, Float> lastHorizontalDistanceDeltas;
+	private final List<Double, Float> lastVerticalDistanceDeltas;
 	
 	private Coordinates posLastFrame = null;
 	
@@ -27,13 +32,17 @@ public class GpsSensor implements ISensor {
 	private Float hSpeed = null;
 	private Float vSpeed = null;
 	
-	private String lastResult;
+	private Simulation simulation;
+	
+	private SensorResultDto lastResult;
 
 	/**
 	 * Creates a new GPS Sensor
 	 */
-	public GpsSensor(String name) {
-		this.name = name;
+	public GpsSensor(SensorConfig config, Simulation simulation) {
+		this.name = "Gpssensor";
+		this.id = config.getSensorId();
+		this.simulation = simulation;
 		this.measurements = new List<>();
 		this.lastHorizontalDistanceDeltas = new List<>();
 		this.lastVerticalDistanceDeltas = new List<>();
@@ -48,29 +57,35 @@ public class GpsSensor implements ISensor {
 	public String getName() {
 		return name;
 	}
+	
+	@Override
+	public int getId() {
+		return this.id;
+	}
 
 	@Override
 	public SensorConfig saveToConfig() {
-		// TODO
-		return null;
+		SensorConfig config = new SensorConfig();
+		config.setSensorId(this.getId());
+		config.setClassName(this.getType());
+		return config;
 	}
 
 	/**
 	 * Runs the measurement for gps coordinates and approximates the drone's speed.
 	 * Must be called every frame 
 	 */
+	@Override
 	public void runMeasurement() {
-		float xCoord = 0;
-		float yCoord = 0;
-		float zCoord = 0;
-		//TODO: get Coordinates from Drone
-	
+		float xCoord = this.simulation.getDrone().getLocation().getX();
+		float yCoord = this.simulation.getDrone().getLocation().getY();
+		float zCoord = this.simulation.getDrone().getLocation().getZ();
+
 		xCoord = this.addNoise(xCoord, this.horizontalNoise);
 		zCoord = this.addNoise(zCoord, this.horizontalNoise);
 		yCoord = this.addNoise(yCoord, this.verticalNoise);
 		
-		//TODO: replace system time with global simulation time
-		long currentTime = System.currentTimeMillis();
+		double currentTime = this.simulation.getTime();
 		
 		//Adds the measurement to the queue
 		this.measurements.addBack(currentTime, new Coordinates(xCoord, yCoord, zCoord));
@@ -78,20 +93,22 @@ public class GpsSensor implements ISensor {
 		//Get the measurement from the queue that was delayed long enough
 		Coordinates vals = this.getDelayedMeasurementAndClearEntries(this.measurements, currentTime, this.measurementDelayInMS);
 		
-		//Build the result string
-		StringBuilder resultString = new StringBuilder();
-		resultString.append("\"pos\": {");
+		//Build the result object
+		java.util.List<Float> resultList = new ArrayList<>(5);
+		
 		if(vals == null && this.posLastFrame == null) {
 			//Valid coordinates never existed
-			resultString.append("\"x\": \"NaN\", \"y\": \"NaN\", \"z\": \"NaN\"");
+			for(int i = 0; i < 3; i++) {
+				resultList.add(Float.NaN);
+			}
 		} else {
 			if(vals == null && this.posLastFrame != null) {
 				//last valid coordinates should be shown
 				vals = this.posLastFrame;
 			}
-			resultString.append("\"x\": ").append(vals.x)
-			.append(", \"y: \"").append(vals.y)
-			.append(", \"z: \"").append(vals.z);
+			resultList.add((float) vals.x);
+			resultList.add((float) vals.y);
+			resultList.add((float) vals.z);
 			
 			//calculate the position deltas relative to the positions last frame
 			if(this.posLastFrame != null) {
@@ -101,7 +118,6 @@ public class GpsSensor implements ISensor {
 			}
 			this.posLastFrame = vals;
 		}
-		resultString.append("}, \"speed\": {");
 		
 		//approx the speed
 		Float newHorizontalSpeed = this.getApproxSpeedAndClearEntries(lastHorizontalDistanceDeltas, 
@@ -116,23 +132,20 @@ public class GpsSensor implements ISensor {
 			this.vSpeed = newVerticalSpeed;
 		}
 		
-		//append speed to result string
-		resultString.append("\"approxHorizontalSpeed\": ").append("\"" + (this.hSpeed != null ? this.hSpeed : "NaN") + " m/s\"")
-			.append(", \"approxVerticalSpeed\": ").append("\"" + (this.vSpeed != null ? this.vSpeed : "NaN") + " m/s\"");
+		//add speed to result
+		resultList.add(this.hSpeed != null ? (float) this.hSpeed : Float.NaN);
+		resultList.add(this.vSpeed != null ? (float) this.vSpeed : Float.NaN);
 		
-		this.lastResult = resultString.toString();
-	}
-
-	@Override
-	public SensorResultDto getLastMeasurement() {
-		return null;
+		this.lastResult = new SensorResultDto();
+		this.lastResult.setValues(resultList);
 	}
 
 	/**
 	 * Gets the result from the last measurement
 	 * @return
 	 */
-	public String getLastResult() {
+	@Override
+	public SensorResultDto getLastMeasurement() {
 		return this.lastResult;
 	}
 	
@@ -144,11 +157,11 @@ public class GpsSensor implements ISensor {
 	 * @param delay time in MS a measurement must be delayed
 	 * @return The coordinates of the measurements
 	 */
-	private Coordinates getDelayedMeasurementAndClearEntries(List<Long, Coordinates> list, long currentTime, int delay) {
+	private Coordinates getDelayedMeasurementAndClearEntries(List<Double, Coordinates> list, double currentTime, int delay) {
 		Coordinates last = null;
 		boolean run = true;
 		while(run && !list.isEmpty()) {
-			Pair<Long, Coordinates> pair = list.getFront();
+			Pair<Double, Coordinates> pair = list.getFront();
 			if((int)(currentTime - pair.first) >= delay) {
 				last = pair.second;
 				list.removeFront();
@@ -168,17 +181,17 @@ public class GpsSensor implements ISensor {
 	 * @param observationTime the time period
 	 * @return the aprox speed in meters per second
 	 */
-	private Float getApproxSpeedAndClearEntries(List<Long, Float> posDeltas, long currentTime, int observationTime) {
+	private Float getApproxSpeedAndClearEntries(List<Double, Float> posDeltas, double currentTime, int observationTime) {
 		if(posDeltas.isEmpty() || (int)(currentTime - posDeltas.getFront().first) < observationTime) {
 			return null;
 		}
 		
 		float sumDistance = 0;
-		List<Long, Float>.Iterator<Long, Float> it = posDeltas.getIterator();
+		List<Double, Float>.Iterator<Double, Float> it = posDeltas.getIterator();
 		while(it.hasNext()) {
 			sumDistance+= it.getNext().second;
 		}
-		float timeDif = currentTime - posDeltas.getFront().first;
+		float timeDif = (float) currentTime - posDeltas.getFront().first.floatValue();
 		
 		boolean delete = true;
 		while(delete && !posDeltas.isEmpty()) {

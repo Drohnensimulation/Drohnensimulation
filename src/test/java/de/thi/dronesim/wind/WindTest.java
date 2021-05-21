@@ -340,7 +340,7 @@ class WindTest {
 
     private void setupWind() {
         wind = new Wind(windLayers);
-        wind.setSimulation(simulation);
+        wind.initialize(simulation);
     }
 
     @Test

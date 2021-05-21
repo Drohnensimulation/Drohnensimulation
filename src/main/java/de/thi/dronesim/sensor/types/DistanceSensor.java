@@ -461,6 +461,12 @@ public abstract class DistanceSensor implements ISensor {
         return name;
     }
 
+    @Override
+    public int getId() {
+        // TODO
+        return 0;
+    }
+
     /**
      * Relative direction of the sensor to the drone
      *

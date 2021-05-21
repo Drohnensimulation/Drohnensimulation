@@ -14,6 +14,8 @@ public interface ISensor {
 
 	String getName();
 
+	int getId();
+
 	SensorConfig saveToConfig();
 
 	void runMeasurement();

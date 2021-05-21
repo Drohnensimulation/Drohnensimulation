@@ -1,9 +1,15 @@
 package de.thi.dronesim.sensor.types;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import de.thi.dronesim.Simulation;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.ISensor;
 import de.thi.dronesim.sensor.Vector3d;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
+import de.thi.dronesim.wind.Wind;
+import de.thi.dronesim.wind.Wind.CurrentWind;
 
 /**
  * The wind sensor can measure the wind direction and strength for a two dimensional plain.
@@ -14,7 +20,10 @@ import de.thi.dronesim.sensor.dto.SensorResultDto;
 public class WindSensor implements ISensor {
 
 	private String name;
-
+	private int id;
+	
+	private SensorResultDto lastMeasurement;
+	
 	private final Vector3d defaultDroneHeading = new Vector3d(1, 0, 0);
 	
 	//Sensor direction when drone is looking to defaultDroneHeading
@@ -26,6 +35,8 @@ public class WindSensor implements ISensor {
 	
 	//If the measured wind blows in this direction, the measurement will return an angle of 90 degrees
 	protected Vector3d nintyDegreeDirection;
+	
+	private Simulation simulation;
 	
 	/**
 	 * Configures the Wind Sensor. 
@@ -43,9 +54,11 @@ public class WindSensor implements ISensor {
 	 * @param zeroDegreeDirection
 	 * @param nintyDegreeDirection
 	 */
-	public WindSensor(String name, Vector3d sensorDirection, Vector3d zeroDegreeDirection, Vector3d nintyDegreeDirection) {
-		this.name = name;
-		this.relativeDirection = sensorDirection.copy();
+	public WindSensor(SensorConfig config, Simulation simulation) {
+		this.simulation = simulation;
+		this.name = "Windsensor";
+		this.id = config.getSensorId();
+		this.relativeDirection = new Vector3d(config.getDirectionX(), config.getDirectionY(), config.getDirectionZ());
 		
 		if(Double.compare(this.relativeDirection.getX(), 0) == 0 &&
 		   Double.compare(this.relativeDirection.getY(), 0) == 0 &&
@@ -54,8 +67,8 @@ public class WindSensor implements ISensor {
 			throw new IllegalArgumentException("sensorDirection must not be (0,0,0)!");
 		}
 		
-		this.zeroDegreeDirection = zeroDegreeDirection.copy();
-		this.nintyDegreeDirection = nintyDegreeDirection.copy();
+		this.zeroDegreeDirection = new Vector3d(config.getZeroDegreeDirectionX(), config.getZeroDegreeDirectionY(), config.getZeroDegreeDirectionZ());
+		this.nintyDegreeDirection = new Vector3d(config.getNintyDegreeDirectionX(), config.getNintyDegreeDirectionY(), config.getNintyDegreeDirectionZ());
 		
 		if(Double.compare(this.scalarProduct(this.relativeDirection, this.zeroDegreeDirection), 0) != 0 ||
 		   Double.compare(this.scalarProduct(this.relativeDirection, this.nintyDegreeDirection), 0) != 0 ||
@@ -88,66 +101,71 @@ public class WindSensor implements ISensor {
 	public Vector3d getRelativeNintyDegreeDirection() {
 		return this.nintyDegreeDirection;
 	}
-	
+
 	/**
 	 * Gets the sensor measurement
 	 * @return
 	 */
-	public String getMeasurement() {
+	@Override
+	public void runMeasurement() {
 		//Dummy values for compiling.
-		double droneHeadingDeg = 225;
-		double droneMovementDeg = 225;
-		double windDirectionDeg = 135; //Direction in which the wind blows
-		double windSpeed = 200;
-		double droneHorizontalSpeed = 50;
-		double droneVerticalSpeed = 0; //Speed >0 means drone goes upwards, <0 drone goes downwards => -20 means drone goes down with 20 m/s 
-		//TODO: which direction is 0 deg?
-		
-		//TODO: Get values from Drone / Wind interface
-		
+
+		// TODO: FIXME drone does not have these values anymore
+//		double droneHeadingDeg = this.simulation.getDrone().getHeading();
+//		double droneMovementDeg = this.simulation.getDrone().getMovementDirection();
+//		double droneHorizontalSpeed = this.simulation.getDrone().getHorizontalSpeed();
+//		double droneVerticalSpeed = this.simulation.getDrone().getVerticalSpeed(); //TODO: Speed >0 means drone goes upwards, <0 drone goes downwards => -20 means drone goes down with 20 m/s
+		double droneHeadingDeg = 1.0;
+		double droneMovementDeg = 1.0;
+		double droneHorizontalSpeed = 1.0;
+		double droneVerticalSpeed = 1.0;
+		CurrentWind cw = Wind.getWindAt(this.simulation.getDrone().getLocation());
+		double windDirectionDeg = cw.getWindDirection(); //Direction in which the wind blows
+		double windSpeed = cw.getWindSpeed();
+
 		Vector3d droneHeadingVec;
 		Vector3d droneMovementVec;
 		Vector3d windDirection;
 		Vector3d absSensorDirection;
-		
+
 		//Transform to a vector
 		droneHeadingVec = this.degToVector(droneHeadingDeg);
-		
+
 		//transform to vector and scale the it. The vector length should represent the drone speed
 		droneMovementVec = this.scaleVector(this.degToVector(droneMovementDeg), droneHorizontalSpeed);
-		
+
 		//transform to vector and scale the it. The vector length should represent the drone speed.
 		//The direction in which the wind blows, not from where the wind comes
 		windDirection = this.scaleVector(this.degToVector(windDirectionDeg), windSpeed);
-		
+
 		//Add the vertical drone speed to the vector
 		droneMovementVec = this.add(droneMovementVec, new Vector3d(0, droneVerticalSpeed, 0));
-		
+
 		//compute the absolute sensor direction
 		absSensorDirection = this.mimicTransformation(this.defaultDroneHeading, droneHeadingVec, this.relativeDirection);
-		
+
 		//compute the wind strength and direction thats experienced by the drone.
-		//It depends on the wind and the drone movement. 
+		//It depends on the wind and the drone movement.
 		//If the drone moves in the same direction as the wind blows and moves in the same speed, no
 		//wind is experienced.
 		Vector3d trueWindVec = this.sub(windDirection, droneMovementVec);
-		
+
 		//Define the sensor plane:
 		//To define the measured wind vector, we need to describe the plain with two orthogonal vectors
 		//which are part of the plain. The absSensorDirection is the plain's normal vector and must be orthogonal
 		//to the to plain vectors
 		Vector3d[] plane = new Vector3d[2];
-		if(Double.compare(absSensorDirection.getX(), 0.0) == 0 && 
+		if(Double.compare(absSensorDirection.getX(), 0.0) == 0 &&
 				Double.compare(absSensorDirection.getY(), 0.0) == 0) {
 			//for (0,0,z), this will always be a orthogonal vector.
-			//We have to handle this special case because the else-case would give us (0,0,0) which is not 
+			//We have to handle this special case because the else-case would give us (0,0,0) which is not
 			//a valid plain vector
 			plane[0] = new Vector3d(1, 0, 0);
 		} else {
 			//for all (x,y,z) with !(x==0 && y==0), the vector (y,-x,0) is a valid orthogonal plain vector
 			plane[0] = this.scaleVector(new Vector3d(absSensorDirection.getY(), -absSensorDirection.getX(), 0), 1);
 		}
-		
+
 		//The second plain vector can be computed with the cross product
 		plane[1] = new Vector3d(
 					absSensorDirection.getY() * plane[0].getZ() - absSensorDirection.getZ() * plane[0].getY(),
@@ -155,59 +173,64 @@ public class WindSensor implements ISensor {
 					absSensorDirection.getX() * plane[0].getY() - absSensorDirection.getY() * plane[0].getX()
 				);
 		plane[1] = this.scaleVector(plane[1], 1);
-		
+
 		//Now the trueWindVec can be projected onto our plain
 		Vector3d measuredWindVec = this.add(
 				this.multiply(plane[0], this.scalarProduct(trueWindVec, plane[0])),
 				this.multiply(plane[1], this.scalarProduct(trueWindVec, plane[1]))
 				);
-		
-		
+
+
 		//The Sensor can't just return the absolute direction, so it must be transformed to degrees starting
 		//from the default direction
 		//The absolute default direction at first be computed from the relative firections
 		Vector3d absZeroDegreeVec = this.mimicTransformation(this.defaultDroneHeading, droneHeadingVec, this.zeroDegreeDirection);
 		Vector3d absNintyDegreeVec = this.mimicTransformation(this.defaultDroneHeading, droneHeadingVec, this.nintyDegreeDirection);
-		
+
+		List<Float> list = new ArrayList<>(2);
+		this.lastMeasurement = new SensorResultDto();
 		if(Double.compare(this.getLength(measuredWindVec), 0) == 0) {
 			//If no wind is measured, we return a default value
-			return "{\"direction\": -1, \"strength\": 0}";
+			list.add(-1f);
+			list.add(0f);
 		} else {
 			double measuredWindAngle;
-			
-			//We compute the angle between the measured wind direction and the default direction. 
+
+			//We compute the angle between the measured wind direction and the default direction.
 			//This will always give us an angle <180 degrees
-			double smallAngle = Math.acos( 
-					this.scalarProduct(measuredWindVec, absZeroDegreeVec) / 
+			double smallAngle = Math.acos(
+					this.scalarProduct(measuredWindVec, absZeroDegreeVec) /
 					(this.getLength(measuredWindVec) * this.getLength(absZeroDegreeVec))
 					);
-			
+
 			//But the true angle could be >180. In that case, our 90-degree-vector and the wind vector must have
 			//an angle of more than 90 degrees
-			double angleToNintyDegreeDirection = Math.acos( 
-					this.scalarProduct(measuredWindVec, absNintyDegreeVec) / 
+			double angleToNintyDegreeDirection = Math.acos(
+					this.scalarProduct(measuredWindVec, absNintyDegreeVec) /
 					(this.getLength(measuredWindVec) * this.getLength(absNintyDegreeVec))
 					);
-			
+
 			if(Double.compare(angleToNintyDegreeDirection, 0.5 * Math.PI) > 0) {
 				measuredWindAngle = 360 - Math.toDegrees(smallAngle);
 			} else {
 				measuredWindAngle = Math.toDegrees(smallAngle);
 			}
-			
-			return "{\"direction\": " + Double.toString(measuredWindAngle) + ", \"strength\": " + Double.toString(this.getLength(measuredWindVec)) + "}";
+
+			list.add((float) measuredWindAngle);
+			list.add((float) this.getLength(measuredWindVec));
 		}
+		this.lastMeasurement.setValues(list);
 	}
-	
+
 	/**
-	 * When v0AfterTransformation is a vector that can be optained when v0BeforeTransmission is rotated 
+	 * When v0AfterTransformation is a vector that can be optained when v0BeforeTransmission is rotated
 	 * around y-axis and afterwards around x-Axis, these transformations are computed and executed on the
-	 * v1 vector. The v1 after these transformations are returned. So the relative position of v1 and 
+	 * v1 vector. The v1 after these transformations are returned. So the relative position of v1 and
 	 * v0BeforeTransformation is equivalent to v0AfterTransmission and the returned vector.
 	 * More formally:
 	 * 		Transformation(v0BeforeTransformation) -> v0AfterTransformation
 	 * 		Transformation(v1) -> result of this method
-	 * 
+	 *
 	 * @param v0BeforeTransformation
 	 * @param v0AfterTransformation
 	 * @param v1
@@ -216,10 +239,10 @@ public class WindSensor implements ISensor {
 	private Vector3d mimicTransformation(Vector3d v0BeforeTransformation, Vector3d v0AfterTransformation, Vector3d v1) {
 		//The vector v0BeforeTransformation rotated around the y-Axis, then the x-Axis to be transformed into
 		//v0AfterTransformation. We need to compute the angle between v0AfterTransformation and the xy-plain,
-		//rotate it back into xy-plain (so we get the vector v') and compute the angle between 
-		//v' and v0BeforeTransformation. With this to angles, we can transform v1 in the same way 
+		//rotate it back into xy-plain (so we get the vector v') and compute the angle between
+		//v' and v0BeforeTransformation. With this to angles, we can transform v1 in the same way
 		//v0AfterTransformation was transformed.
-		
+
 		//At first we compute the angle between v0AfterTransformation and the xy-plain
 		Vector3d normalVecXZPlane = new Vector3d(0, 1, 0);
 		double rotationBackToXZPlane = Math.abs(
@@ -227,55 +250,60 @@ public class WindSensor implements ISensor {
 				this.scalarProduct(v0AfterTransformation, normalVecXZPlane) / this.getLength(v0AfterTransformation)
 			)
 		);
-			
+
 		//If exactly one of x and y is negative, we take the negativ angle. This will be important regarding
 		//to the rotation matrix.
 		if(v0AfterTransformation.getY() * v0AfterTransformation.getX() > 0) {
 			rotationBackToXZPlane*= -1;
 		}
-		
+
 		//So we take the v0AfterTransformation and rotate it around the x-Axis with our computed angle.
-		//(We don't have the complete rotation matrix, but the computation you get if you'd multiply 
+		//(We don't have the complete rotation matrix, but the computation you get if you'd multiply
 		//the vector and the matrix)
 		Vector3d vecInXYPlane = new Vector3d(
-			v0AfterTransformation.getX(), 
-			0, 
+			v0AfterTransformation.getX(),
+			0,
 			-v0AfterTransformation.getY()*Math.sin(rotationBackToXZPlane) + v0AfterTransformation.getZ()*Math.cos(rotationBackToXZPlane)
 		);
-		
+
 		//We now compute the angle between the vector in xy-plain and v0BeforeTransformation
 		double rotationBackToDefault = Math.abs(
 			Math.acos(
 				this.scalarProduct(vecInXYPlane, v0BeforeTransformation) / this.getLength(vecInXYPlane)
 			)
 		);
-		
+
 		//Now we have to take the negativ angle if z is negative regardiing to the rotation matrix.
 		if(vecInXYPlane.getZ() < 0) {
 			rotationBackToDefault*= -1;
 		}
-		
+
 		//So now we have both angles we need.
-		
+
 		//Now we have to invert the angles. The convertion into degrees is because of the better modulo.
 		double rotationYAxis = Math.toRadians((360-Math.toDegrees(rotationBackToDefault)) % 360);
 		double rotationXAxis = Math.toRadians((360-Math.toDegrees(rotationBackToXZPlane)) % 360);
-		
+
 		//Rotate the v1 around the y-Axis
 		Vector3d vecSensorYRotation = new Vector3d(
-			v1.getX()*Math.cos(rotationYAxis) + v1.getZ()*Math.sin(rotationYAxis), 
+			v1.getX()*Math.cos(rotationYAxis) + v1.getZ()*Math.sin(rotationYAxis),
 			v1.getY(),
 			-v1.getX()*Math.sin(rotationYAxis) + v1.getZ()*Math.cos(rotationYAxis)
 		);
-		
+
 		//Rotate the v1 around x-Axis
 		Vector3d absSensorDirection = new Vector3d(
 			vecSensorYRotation.getX(),
 			vecSensorYRotation.getY()*Math.cos(rotationXAxis) + vecSensorYRotation.getZ()*Math.sin(rotationXAxis),
 			-vecSensorYRotation.getY()*Math.sin(rotationXAxis) + vecSensorYRotation.getZ()*Math.cos(rotationXAxis)
 		);
-		
+
 		return absSensorDirection;
+	}
+
+	@Override
+	public SensorResultDto getLastMeasurement() {
+		return this.lastMeasurement;
 	}
 	
 	/**
@@ -284,10 +312,9 @@ public class WindSensor implements ISensor {
 	 * @return a 3d vector
 	 */
 	private Vector3d degToVector(double deg) {
-		//TODO: which direction is 0 deg?
-		return new Vector3d(Math.cos(Math.toRadians(deg)),
-				   			0,
-				   			-Math.sin(Math.toRadians(deg)));
+		return new Vector3d(Math.sin(Math.toRadians(deg)),
+				0,
+				Math.cos(Math.toRadians(deg)));
 	}
 	
 	/**
@@ -378,23 +405,28 @@ public class WindSensor implements ISensor {
 
 	@Override
 	public String getName() {
-		return name;
+		return this.name;
+	}
+	
+	@Override
+	public int getId() {
+		return this.id;
 	}
 
 	@Override
 	public SensorConfig saveToConfig() {
-		// TODO
-		return null;
-	}
-
-	@Override
-	public void runMeasurement() {
-	// TODO
-	}
-
-	@Override
-	public SensorResultDto getLastMeasurement() {
-		// TODO
-		return null;
+		SensorConfig config = new SensorConfig();
+		config.setClassName(this.getType());
+		config.setSensorId(this.getId());
+		config.setDirectionX(this.relativeDirection.getX());
+		config.setDirectionY(this.relativeDirection.getY());
+		config.setDirectionZ(this.relativeDirection.getZ());
+		config.setZeroDegreeDirectionX(this.zeroDegreeDirection.getX());
+		config.setZeroDegreeDirectionY(this.zeroDegreeDirection.getY());
+		config.setZeroDegreeDirectionZ(this.zeroDegreeDirection.getZ());
+		config.setNintyDegreeDirectionX(this.nintyDegreeDirection.getX());
+		config.setNintyDegreeDirectionY(this.nintyDegreeDirection.getY());
+		config.setNintyDegreeDirectionZ(this.nintyDegreeDirection.getZ());
+		return config;
 	}
 }

@@ -231,7 +231,7 @@ public class TestUfoObjs {
         SimulationConfig config = simulation.getConfig();
         config.setObstacleConfigList(configList);
 
-        instance.setSimulation(simulation);
+        instance.initialize(simulation);
 
         // Add all obstacles
         Set<ObstacleDTO> obstacleSet = obstacleConfig.obstacles;
