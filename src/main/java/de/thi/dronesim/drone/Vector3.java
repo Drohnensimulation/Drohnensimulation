@@ -119,5 +119,11 @@ public class Vector3 {
         double distZ = this.z - other.z;
         return distX * distX + distY * distY + distZ * distZ;
     }
+    
+    public double scalarProduct(Vector3 other) {
+		return this.x * other.x + 
+			   this.y * other.y + 
+			   this.z * other.z;
+	}
 
 }
