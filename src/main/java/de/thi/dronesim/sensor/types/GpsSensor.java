@@ -44,6 +44,8 @@ public class GpsSensor implements ISensor {
 		this.measurements = new List<>();
 		this.lastHorizontalDistanceDeltas = new List<>();
 		this.lastVerticalDistanceDeltas = new List<>();
+		this.lastResult = new SensorResultDto();
+		this.lastResult.setSensor(this);
 	}
 	
 	@Override
@@ -134,8 +136,6 @@ public class GpsSensor implements ISensor {
 		resultList.add(this.hSpeed != null ? (float) this.hSpeed : Float.NaN);
 		resultList.add(this.vSpeed != null ? (float) this.vSpeed : Float.NaN);
 		
-		this.lastResult = new SensorResultDto();
-		this.lastResult.setSensor(this);
 		this.lastResult.setValues(resultList);
 	}
 
