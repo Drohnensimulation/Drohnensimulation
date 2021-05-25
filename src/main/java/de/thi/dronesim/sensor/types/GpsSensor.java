@@ -33,17 +33,17 @@ public class GpsSensor implements ISensor {
 	private Float hSpeed = null;
 	private Float vSpeed = null;
 	
-	private Simulation simulation;
+	//private Simulation simulation;
 	
 	private SensorResultDto lastResult;
 
 	/**
 	 * Creates a new GPS Sensor
 	 */
-	public GpsSensor(SensorConfig config, Simulation simulation) {
+	public GpsSensor(SensorConfig config) {
 		this.name = "Gpssensor";
 		this.id = config.getSensorId();
-		this.simulation = simulation;
+		//this.simulation = simulation;
 		this.measurements = new List<>();
 		this.lastHorizontalDistanceDeltas = new List<>();
 		this.lastVerticalDistanceDeltas = new List<>();
