@@ -3,6 +3,7 @@ package de.thi.dronesim.sensor.types;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
 import de.thi.dronesim.Simulation;
+import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 
 
@@ -119,7 +120,7 @@ public class RotationSensor extends DistanceSensor {
 	 * 
 	 */
 	@Override
-	public void runMeasurement() {
+	public void runMeasurement(SimulationUpdateEvent event) {
 		setDirection(newOrientation(getTraveledArcMeasure(traveledTime())));
 		sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), calcConeHeight(), calcSurfaceVector());
 	}
