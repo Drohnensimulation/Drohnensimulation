@@ -1,6 +1,7 @@
 package de.thi.dronesim.sensor.types;
 
 import de.thi.dronesim.Simulation;
+import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 
 public class UltrasonicSensor extends DistanceSensor {
@@ -85,7 +86,7 @@ public class UltrasonicSensor extends DistanceSensor {
 	 *
 	 */
 	@Override
-	public void runMeasurement() {
+	public void runMeasurement(SimulationUpdateEvent event) {
 		float traveledTime =  traveledTime();
 		this.sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), getCurrentConeHeight(traveledTime), calcSurfaceVector()); // getCurrentConeHeight()
 	}
