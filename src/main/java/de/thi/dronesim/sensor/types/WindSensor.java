@@ -37,7 +37,7 @@ public class WindSensor implements ISensor {
 	//If the measured wind blows in this direction, the measurement will return an angle of 90 degrees
 	protected Vector3d nintyDegreeDirection;
 	
-	private Simulation simulation;
+	//private Simulation simulation;
 	
 	/**
 	 * Configures the Wind Sensor. 
@@ -55,8 +55,8 @@ public class WindSensor implements ISensor {
 	 * @param zeroDegreeDirection
 	 * @param nintyDegreeDirection
 	 */
-	public WindSensor(SensorConfig config, Simulation simulation) {
-		this.simulation = simulation;
+	public WindSensor(SensorConfig config) {
+		//this.simulation = simulation;
 		this.name = "Windsensor";
 		this.id = config.getSensorId();
 		this.relativeDirection = new Vector3d(config.getDirectionX(), config.getDirectionY(), config.getDirectionZ());
