@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.thi.dronesim.Simulation;
+import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.ISensor;
 import de.thi.dronesim.sensor.Vector3d;
@@ -107,7 +108,7 @@ public class WindSensor implements ISensor {
 	 * @return
 	 */
 	@Override
-	public void runMeasurement() {
+	public void runMeasurement(SimulationUpdateEvent event) {
 		//Dummy values for compiling.
 
 		// TODO: FIXME drone does not have these values anymore
