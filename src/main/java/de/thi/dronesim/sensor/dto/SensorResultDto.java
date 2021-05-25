@@ -15,7 +15,7 @@ public class SensorResultDto {
         return sensor;
     }
 
-    public void setSensor(DistanceSensor sensor) {
+    public void setSensor(ISensor sensor) {
         this.sensor = sensor;
     }
 

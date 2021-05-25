@@ -34,7 +34,7 @@ public class SensorModule implements ISimulationChild {
      * Calculates the current values for all sensors.
      */
     public void runAllMeasurements(SimulationUpdateEvent event) {
-        sensorMap.values().forEach(ISensor::runMeasurement);
+        sensorMap.values().forEach(sensor -> sensor.runMeasurement(event));
     }
 
     /**
@@ -88,7 +88,7 @@ public class SensorModule implements ISimulationChild {
     private ISensor createSensor(SensorConfig config) {
         switch (config.getClassName()) {
             case "GpsSensor":
-                return new GpsSensor(config, this.simulation);
+                return new GpsSensor(config);
             case "InfraredSensor":
                 return new InfraredSensor();
             case "RotationSensor":
@@ -97,7 +97,7 @@ public class SensorModule implements ISimulationChild {
                 return new UltrasonicSensor(config.getRangeIncreaseVelocity(),
                         config.getCallTimerForSensorValues());
             case "WindSensor":
-                return new WindSensor(config, this.simulation);
+                return new WindSensor(config);
             default:
                 throw new IllegalArgumentException("No sensor implementation available for value: " + config.getClassName());
         }

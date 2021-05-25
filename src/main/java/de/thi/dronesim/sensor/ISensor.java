@@ -1,5 +1,6 @@
 package de.thi.dronesim.sensor;
 
+import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 
@@ -18,7 +19,7 @@ public interface ISensor {
 
 	SensorConfig saveToConfig();
 
-	void runMeasurement();
+	void runMeasurement(SimulationUpdateEvent event);
 
 	SensorResultDto getLastMeasurement();
 }
