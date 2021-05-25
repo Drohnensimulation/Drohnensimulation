@@ -20,20 +20,18 @@ public class GpsSensor implements ISensor {
 	private final int verticalNoise = 10;
 	
 	//The approx horizontal and vertical speed is the avg measured speed over the following time
-	private final int hSpeedObservationTimeInMS = this.horizontalNoise * 500;
-	private final int vSpeedObservationTimeInMS = this.verticalNoise * 500;
+	private final int hSpeedObservationTimeInMS = this.horizontalNoise * 1000;
+	private final int vSpeedObservationTimeInMS = this.verticalNoise * 1000;
 	
-	private final List<Double, Coordinates> measurements;
-	private final List<Double, Float> lastHorizontalDistanceDeltas;
-	private final List<Double, Float> lastVerticalDistanceDeltas;
+	private final List<Integer, Coordinates> measurements;
+	private final List<Integer, Float> lastHorizontalDistanceDeltas;
+	private final List<Integer, Float> lastVerticalDistanceDeltas;
 	
 	private Coordinates posLastFrame = null;
 	
 	//approx speed in meters per second
 	private Float hSpeed = null;
 	private Float vSpeed = null;
-	
-	//private Simulation simulation;
 	
 	private SensorResultDto lastResult;
 
@@ -43,7 +41,6 @@ public class GpsSensor implements ISensor {
 	public GpsSensor(SensorConfig config) {
 		this.name = "Gpssensor";
 		this.id = config.getSensorId();
-		//this.simulation = simulation;
 		this.measurements = new List<>();
 		this.lastHorizontalDistanceDeltas = new List<>();
 		this.lastVerticalDistanceDeltas = new List<>();
@@ -78,15 +75,15 @@ public class GpsSensor implements ISensor {
 	 */
 	@Override
 	public void runMeasurement(SimulationUpdateEvent event) {
-		float xCoord = this.simulation.getDrone().getLocation().getX();
-		float yCoord = this.simulation.getDrone().getLocation().getY();
-		float zCoord = this.simulation.getDrone().getLocation().getZ();
+		float xCoord = event.getDrone().getLocation().getX();
+		float yCoord = event.getDrone().getLocation().getY();
+		float zCoord = event.getDrone().getLocation().getZ();
 
 		xCoord = this.addNoise(xCoord, this.horizontalNoise);
 		zCoord = this.addNoise(zCoord, this.horizontalNoise);
 		yCoord = this.addNoise(yCoord, this.verticalNoise);
 		
-		double currentTime = this.simulation.getTime();
+		int currentTime = (int)(event.getTime()*1000);
 		
 		//Adds the measurement to the queue
 		this.measurements.addBack(currentTime, new Coordinates(xCoord, yCoord, zCoord));
@@ -138,6 +135,7 @@ public class GpsSensor implements ISensor {
 		resultList.add(this.vSpeed != null ? (float) this.vSpeed : Float.NaN);
 		
 		this.lastResult = new SensorResultDto();
+		this.lastResult.setSensor(this);
 		this.lastResult.setValues(resultList);
 	}
 
@@ -158,12 +156,12 @@ public class GpsSensor implements ISensor {
 	 * @param delay time in MS a measurement must be delayed
 	 * @return The coordinates of the measurements
 	 */
-	private Coordinates getDelayedMeasurementAndClearEntries(List<Double, Coordinates> list, double currentTime, int delay) {
+	private Coordinates getDelayedMeasurementAndClearEntries(List<Integer, Coordinates> list, double currentTime, int delay) {
 		Coordinates last = null;
 		boolean run = true;
 		while(run && !list.isEmpty()) {
-			Pair<Double, Coordinates> pair = list.getFront();
-			if((int)(currentTime - pair.first) >= delay) {
+			Pair<Integer, Coordinates> pair = list.getFront();
+			if(currentTime - pair.first >= delay) {
 				last = pair.second;
 				list.removeFront();
 			} else {
@@ -182,28 +180,28 @@ public class GpsSensor implements ISensor {
 	 * @param observationTime the time period
 	 * @return the aprox speed in meters per second
 	 */
-	private Float getApproxSpeedAndClearEntries(List<Double, Float> posDeltas, double currentTime, int observationTime) {
-		if(posDeltas.isEmpty() || (int)(currentTime - posDeltas.getFront().first) < observationTime) {
+	private Float getApproxSpeedAndClearEntries(List<Integer, Float> posDeltas, int currentTime, int observationTime) {
+		if(posDeltas.isEmpty() || currentTime - posDeltas.getFront().first < observationTime) {
 			return null;
 		}
 		
 		float sumDistance = 0;
-		List<Double, Float>.Iterator<Double, Float> it = posDeltas.getIterator();
+		List<Integer, Float>.Iterator<Integer, Float> it = posDeltas.getIterator();
 		while(it.hasNext()) {
 			sumDistance+= it.getNext().second;
 		}
-		float timeDif = (float) currentTime - posDeltas.getFront().first.floatValue();
+		int timeDif = currentTime - posDeltas.getFront().first;
 		
 		boolean delete = true;
 		while(delete && !posDeltas.isEmpty()) {
-			if((int)(currentTime - posDeltas.getFront().first) > observationTime) {
+			if(currentTime - posDeltas.getFront().first > observationTime) {
 				posDeltas.removeFront();
 			} else {
 				delete = false;
 			}
 		}
 		
-		return sumDistance / timeDif * 1000;
+		return (float)((int)(sumDistance / (double)timeDif * 1000 + 0.5));
 	}
 	
 	/**
