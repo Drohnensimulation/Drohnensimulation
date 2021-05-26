@@ -23,6 +23,8 @@ import de.thi.dronesim.wind.Wind.CurrentWind;
  */
 public class WindSensor implements ISensor {
 
+	//TODO: Replace Vector3 with Vector3f from the jme libary
+
 	private String name;
 	private int id;
 	
@@ -332,9 +334,9 @@ public class WindSensor implements ISensor {
 		SensorConfig config = new SensorConfig();
 		config.setClassName(this.getType());
 		config.setSensorId(this.getId());
-		config.setDirectionX(this.relativeDirection.x);
-		config.setDirectionY(this.relativeDirection.y);
-		config.setDirectionZ(this.relativeDirection.z);
+		config.setDirectionX((float) this.relativeDirection.x);
+		config.setDirectionY((float) this.relativeDirection.y);
+		config.setDirectionZ((float) this.relativeDirection.z);
 		config.setZeroDegreeDirectionX(this.zeroDegreeDirection.x);
 		config.setZeroDegreeDirectionY(this.zeroDegreeDirection.y);
 		config.setZeroDegreeDirectionZ(this.zeroDegreeDirection.z);
