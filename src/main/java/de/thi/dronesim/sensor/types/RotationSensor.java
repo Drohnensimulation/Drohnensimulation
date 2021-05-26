@@ -3,6 +3,7 @@ package de.thi.dronesim.sensor.types;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
 import de.thi.dronesim.Simulation;
+import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 
 
@@ -21,9 +22,6 @@ public class RotationSensor extends DistanceSensor {
 	private int spinsPerSecond;
 	private float rotationVelocity; // 2Pi/s == one spin in one second as radiant
 	private float startRotationTime;
-
-	//Main simulation
-	private Simulation simulation;
 
 	/**
 	 * Constructor:
@@ -59,21 +57,21 @@ public class RotationSensor extends DistanceSensor {
 	/**
 	 *  This Method is resetting the startRotationTime to calculate the next measurement
 	 */
-	public void startRotation() {
-		this.startRotationTime = (float) simulation.getTime();
+	public void startRotation(SimulationUpdateEvent event) {
+		this.startRotationTime = (float) event.getTime();
 	}
 	
 	/**
 	 *  This Method calculate the time between this.startRotationTime and endRotationTime.
 	 *  If this.startRotationTime is smaller than endRotationTime the rotation did not start yet. There for the traveled 
-	 *  time is 0. The return value got converted to seconds.
+	 *  time is 0. The return value are seconds.
 	 */
-	private float traveledTime() {
-		float endRotationTime = (float) simulation.getTime();
+	private float traveledTime(SimulationUpdateEvent event) {
+		float endRotationTime = (float) event.getTime();
 		float traveledTime;
 		if(this.startRotationTime< endRotationTime) {
-			traveledTime = (endRotationTime - this.startRotationTime) / 1000;
-			startRotation();
+			traveledTime = (endRotationTime - this.startRotationTime);
+			startRotation(event);
 		}else {
 			traveledTime = 0;
 		}
@@ -119,8 +117,8 @@ public class RotationSensor extends DistanceSensor {
 	 * 
 	 */
 	@Override
-	public void runMeasurement() {
-		setDirection(newOrientation(getTraveledArcMeasure(traveledTime())));
+	public void runMeasurement(SimulationUpdateEvent event) {
+		setDirection(newOrientation(getTraveledArcMeasure(traveledTime(event))));
 		sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), calcConeHeight(), calcSurfaceVector());
 	}
 
