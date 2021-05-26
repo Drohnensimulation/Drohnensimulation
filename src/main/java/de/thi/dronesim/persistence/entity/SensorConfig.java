@@ -22,6 +22,8 @@ public class SensorConfig {
     private double range;
     private double sensorAngle;
     private double sensorRadius;
+    private String sensorForm;
+    private String calcType;
 
     // WindSensor
     private double zeroDegreeDirectionX;
@@ -65,6 +67,8 @@ public class SensorConfig {
         if (Double.compare(config.nintyDegreeDirectionZ, nintyDegreeDirectionZ) != 0) return false;
         if (Float.compare(config.rangeIncreaseVelocity, rangeIncreaseVelocity) != 0) return false;
         if (callTimerForSensorValues != config.callTimerForSensorValues) return false;
+        if (!config.calcType.equals(calcType)) return false;
+        if (!config.sensorForm.equals(sensorForm)) return false;
         return className != null ? className.equals(config.className) : config.className == null;
     }
 
@@ -108,6 +112,10 @@ public class SensorConfig {
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (rangeIncreaseVelocity != +0.0f ? Float.floatToIntBits(rangeIncreaseVelocity) : 0);
         result = 31 * result + callTimerForSensorValues;
+        temp = Long.parseLong(Integer.toString(sensorForm.length()));
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Long.parseLong(Integer.toString(calcType.length()));
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
@@ -202,6 +210,22 @@ public class SensorConfig {
 
     public void setClassName(String className) {
         this.className = className;
+    }
+
+    public String getSensorForm() {
+        return sensorForm;
+    }
+
+    public void setSensorForm(String sensorForm) {
+        this.sensorForm = sensorForm;
+    }
+
+    public String getCalcType() {
+        return calcType;
+    }
+
+    public void setCalcType(String calcType) {
+        this.calcType = calcType;
     }
 
     public double getZeroDegreeDirectionX() {
