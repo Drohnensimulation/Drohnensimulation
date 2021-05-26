@@ -10,6 +10,8 @@ import de.thi.dronesim.sensor.ISensor;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 import de.thi.dronesim.sensor.enums.CalcType;
 import de.thi.dronesim.sensor.enums.SensorForm;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
@@ -22,6 +24,11 @@ import java.util.*;
  * @author Daniel Stolle
  */
 public abstract class DistanceSensor implements ISensor {
+
+    // /////////////////////////////////////////////////////////////////////////////
+    // Logger
+    // /////////////////////////////////////////////////////////////////////////////
+    private static final Logger logger = LogManager.getLogger();
 
     //TODO: -Beschreibung des Kegels
     //		-Vervollständigung der Methodenimplementierung
@@ -38,8 +45,8 @@ public abstract class DistanceSensor implements ISensor {
     private float measurementAccuracy;
     private Vector3f directionVector;
     private Vector3f positionVector;
-    private SensorForm sensorForm;
-    private CalcType calcType;
+    private final SensorForm sensorForm;
+    private final CalcType calcType;
     protected SensorResultDto sensorResultDtoValues;
 
     // /////////////////////////////////////////////////////////////////////////////
@@ -51,6 +58,44 @@ public abstract class DistanceSensor implements ISensor {
      */
     public DistanceSensor() {
         // TODO: create a constructor with the fields from the config and use only the setter
+        //Defaultcase for sensorForm and CalcType
+        this.sensorForm = SensorForm.CONE;
+        this.calcType = CalcType.AVG;
+    }
+
+
+    /**
+     * A constructor to initialize a Sensor from the Config
+     *
+     * @param config a SensorConfig-Object of the Big Config List
+     *
+     * @author Johannes Steierl
+     */
+    public DistanceSensor(SensorConfig config){
+        this.name = config.getClassName();
+        this.range = config.getRange();
+        this.sensorAngle = config.getSensorAngle();
+        this.sensorRadius = config.getSensorRadius();
+        this.measurementAccuracy = config.getMeasurementAccuracy();
+        this.directionVector = new Vector3f(config.getDirectionX(), config.getDirectionY(), config.getDirectionZ());
+        this.positionVector = new Vector3f(config.getPosX(), config.getPosY(), config.getPosZ());
+        SensorForm tempForm = SensorForm.CONE; //Default
+        try{
+            tempForm = SensorForm.valueOf(config.getSensorForm());
+        }catch(IllegalArgumentException e){
+            logger.error("SensorForm {} wird nicht unterstützt! Defaultwert ist CONE", config.getSensorForm());
+        }finally {
+            this.sensorForm = tempForm;
+        }
+        CalcType tempCalcType = CalcType.AVG;
+        try{
+            tempCalcType = CalcType.valueOf(config.getCalcType());
+        }catch(IllegalArgumentException e){
+            logger.error("CalcType {} wird nicht unterstützt! Defaultwert ist AVG", config.getCalcType());
+            tempCalcType = CalcType.AVG;
+        }finally {
+            this.calcType = tempCalcType;
+        }
     }
 
     // /////////////////////////////////////////////////////////////////////////////
@@ -604,15 +649,8 @@ public abstract class DistanceSensor implements ISensor {
         return sensorForm;
     }
 
-    protected void setSensorForm(SensorForm sensorForm) {
-        this.sensorForm = sensorForm;
-    }
-
     protected CalcType getCalcType() {
         return calcType;
     }
 
-    protected void setCalcType(CalcType calcType) {
-        this.calcType = calcType;
-    }
 }
