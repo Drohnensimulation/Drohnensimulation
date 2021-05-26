@@ -10,18 +10,18 @@ public class SensorConfig {
     private String className;
     private int sensorId;
 
-    private double measurementAccuracy;
-    private double directionX;
-    private double directionY;
-    private double directionZ;
-    private double posX;
-    private double posY;
-    private double posZ;
+    private float measurementAccuracy;
+    private float directionX;
+    private float directionY;
+    private float directionZ;
+    private float posX;
+    private float posY;
+    private float posZ;
 
     // DistanceSensor
-    private double range;
-    private double sensorAngle;
-    private double sensorRadius;
+    private float range;
+    private float sensorAngle;
+    private float sensorRadius;
     private String sensorForm;
     private String calcType;
 
@@ -124,83 +124,83 @@ public class SensorConfig {
     // Getter/Setter
     // /////////////////////////////////////////////////////////////////////////////
 
-    public double getRange() {
+    public float getRange() {
         return range;
     }
 
-    public void setRange(double range) {
+    public void setRange(float range) {
         this.range = range;
     }
 
-    public double getSensorAngle() {
+    public float getSensorAngle() {
         return sensorAngle;
     }
 
-    public void setSensorAngle(double sensorAngle) {
+    public void setSensorAngle(float sensorAngle) {
         this.sensorAngle = sensorAngle;
     }
 
-    public double getSensorRadius() {
+    public float getSensorRadius() {
         return sensorRadius;
     }
 
-    public void setSensorRadius(double sensorRadius) {
+    public void setSensorRadius(float sensorRadius) {
         this.sensorRadius = sensorRadius;
     }
 
-    public double getMeasurementAccuracy() {
+    public float getMeasurementAccuracy() {
         return measurementAccuracy;
     }
 
-    public void setMeasurementAccuracy(double measurementAccuracy) {
+    public void setMeasurementAccuracy(float measurementAccuracy) {
         this.measurementAccuracy = measurementAccuracy;
     }
 
-    public double getDirectionX() {
+    public float getDirectionX() {
         return directionX;
     }
 
-    public void setDirectionX(double directionX) {
+    public void setDirectionX(float directionX) {
         this.directionX = directionX;
     }
 
-    public double getDirectionY() {
+    public float getDirectionY() {
         return directionY;
     }
 
-    public void setDirectionY(double directionY) {
+    public void setDirectionY(float directionY) {
         this.directionY = directionY;
     }
 
-    public double getDirectionZ() {
+    public float getDirectionZ() {
         return directionZ;
     }
 
-    public void setDirectionZ(double directionZ) {
+    public void setDirectionZ(float directionZ) {
         this.directionZ = directionZ;
     }
 
-    public double getPosX() {
+    public float getPosX() {
         return posX;
     }
 
-    public void setPosX(double posX) {
+    public void setPosX(float posX) {
         this.posX = posX;
     }
 
-    public double getPosY() {
+    public float getPosY() {
         return posY;
     }
 
-    public void setPosY(double posY) {
+    public void setPosY(float posY) {
         this.posY = posY;
     }
 
-    public double getPosZ() {
+    public float getPosZ() {
         return posZ;
     }
 
-    public void setPosZ(double posZ) {
+    public void setPosZ(float posZ) {
         this.posZ = posZ;
     }
 
