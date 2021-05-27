@@ -2,6 +2,7 @@ package de.thi.dronesim.sensor.types;
 
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.SimulationUpdateEvent;
+import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 
 public class UltrasonicSensor extends DistanceSensor {
@@ -22,12 +23,13 @@ public class UltrasonicSensor extends DistanceSensor {
 	 * @param startIncreaseTime: defines the time when the Sensor starts to increase. if the value is 5 the increase starts
 	 * after the Simulation is running for 5 seconds.
 	 */
-	public UltrasonicSensor(float rangeIncreaseVelocity, int startIncreaseTime) {
-		this.rangeIncreaseVelocity =rangeIncreaseVelocity;
-		this.startIncreaseTime= startIncreaseTime;
+	public UltrasonicSensor(SensorConfig config) {
+		super(config);
+		this.rangeIncreaseVelocity = config.getRangeIncreaseVelocity();
+		this.startIncreaseTime= config.getStartIncreaseTime();
 	}
 
-	public UltrasonicSensor() {}
+	//public UltrasonicSensor() {}
 
 	@Override
 	public String getType() {

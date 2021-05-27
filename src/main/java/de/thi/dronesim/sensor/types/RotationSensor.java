@@ -4,6 +4,7 @@ import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.SimulationUpdateEvent;
+import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 
 
@@ -30,15 +31,16 @@ public class RotationSensor extends DistanceSensor {
 	 * @param startRotationTime: defines the time when the Sensor starts to spin. if the value is 5 the rotation starts
 	 * after the Simulation is running for 5 seconds. 
 	 */
-	public RotationSensor(int spinsPerSecond, float startRotationTime) {
-		this.spinsPerSecond = spinsPerSecond;
-		this.startRotationTime = startRotationTime;
+	public RotationSensor(SensorConfig config) {
+		super(config);
+		this.spinsPerSecond = config.getSpinsPerSecond();
+		this.startRotationTime = config.getStartRotationTime();
 		spinsToRotationVelocityConverter(spinsPerSecond);
 	}
 
 	// Why did some one put this Constructor here???????
-	public RotationSensor() {
-	}
+	//public RotationSensor() {
+	//}
 
 	@Override
 	

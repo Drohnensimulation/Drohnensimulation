@@ -35,7 +35,11 @@ public class SensorConfig {
 
     // UltrasonicSensor
     private float rangeIncreaseVelocity;
-    private int callTimerForSensorValues;
+    private float startIncreaseTime;
+    
+    // RotationSensor
+    private int spinsPerSecond;
+    private float startRotationTime;
 
     // /////////////////////////////////////////////////////////////////////////////
     // Object Methods
@@ -66,9 +70,11 @@ public class SensorConfig {
         if (Double.compare(config.nintyDegreeDirectionY, nintyDegreeDirectionY) != 0) return false;
         if (Double.compare(config.nintyDegreeDirectionZ, nintyDegreeDirectionZ) != 0) return false;
         if (Float.compare(config.rangeIncreaseVelocity, rangeIncreaseVelocity) != 0) return false;
-        if (callTimerForSensorValues != config.callTimerForSensorValues) return false;
+        if (startIncreaseTime != config.startIncreaseTime) return false;
         if (!config.calcType.equals(calcType)) return false;
         if (!config.sensorForm.equals(sensorForm)) return false;
+        if (spinsPerSecond != config.spinsPerSecond) return false;
+        if (startRotationTime != config.startRotationTime) return false;
         return className != null ? className.equals(config.className) : config.className == null;
     }
 
@@ -110,8 +116,13 @@ public class SensorConfig {
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(nintyDegreeDirectionZ);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
+        //UltrasonicSensor
         result = 31 * result + (rangeIncreaseVelocity != +0.0f ? Float.floatToIntBits(rangeIncreaseVelocity) : 0);
-        result = 31 * result + callTimerForSensorValues;
+        result = (31 * result + (int) startIncreaseTime);
+        //RotationSensor
+        result = 31 * result + (spinsPerSecond != +0.0f ? Float.floatToIntBits(spinsPerSecond) : 0);
+        result = (31 * result + (int) startRotationTime);
+        //Enums
         temp = Long.parseLong(Integer.toString(sensorForm.length()));
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Long.parseLong(Integer.toString(calcType.length()));
@@ -292,11 +303,27 @@ public class SensorConfig {
         this.rangeIncreaseVelocity = rangeIncreaseVelocity;
     }
 
-    public int getCallTimerForSensorValues() {
-        return callTimerForSensorValues;
+    public float getStartIncreaseTime() {
+        return startIncreaseTime;
     }
 
-    public void setCallTimerForSensorValues(int callTimerForSensorValues) {
-        this.callTimerForSensorValues = callTimerForSensorValues;
+    public void setStartIncreaseTime(float startIncreaseTime) {
+        this.startIncreaseTime = startIncreaseTime;
+    }
+    
+    public int getSpinsPerSecond() {
+        return spinsPerSecond;
+    }
+
+    public void setSpinsPerSecond(int spinsPerSecond) {
+        this.spinsPerSecond = spinsPerSecond;
+    }
+    
+    public float getStartRotationTime() {
+        return startRotationTime;
+    }
+
+    public void setStartRotationTime(float startRotationTime) {
+        this.startRotationTime = startRotationTime;
     }
 }

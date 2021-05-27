@@ -54,17 +54,6 @@ public abstract class DistanceSensor implements ISensor {
     // /////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Default constructor of a DistanceSensor
-     */
-    public DistanceSensor() {
-        // TODO: create a constructor with the fields from the config and use only the setter
-        //Defaultcase for sensorForm and CalcType
-        this.sensorForm = SensorForm.CONE;
-        this.calcType = CalcType.AVG;
-    }
-
-
-    /**
      * A constructor to initialize a Sensor from the Config
      *
      * @param config a SensorConfig-Object of the Big Config List

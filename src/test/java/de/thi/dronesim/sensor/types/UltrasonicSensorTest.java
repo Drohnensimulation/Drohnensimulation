@@ -2,7 +2,14 @@ package de.thi.dronesim.sensor.types;
 
 import org.junit.jupiter.api.Test;
 
+import de.thi.dronesim.persistence.entity.SensorConfig;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
 
 /**
 	 * Class to test UltrasonicSensors.
@@ -11,11 +18,39 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 	 */
 public class UltrasonicSensorTest {
 
+	//All values
+	SensorConfig sensorConfigA = new SensorConfig();
+    @BeforeEach
+    public void init() {
+    	//All
+    	List<SensorConfig> sensorConfigsA = new ArrayList<>();
+    	sensorConfigA.setRange(10);
+    	sensorConfigA.setSensorAngle(11);
+    	sensorConfigA.setSensorRadius(13);
+        sensorConfigA.setMeasurementAccuracy(14);
+        sensorConfigA.setDirectionX(15);
+        sensorConfigA.setDirectionY(16);
+        sensorConfigA.setDirectionZ(17);
+        sensorConfigA.setPosX(18);
+        sensorConfigA.setPosY(19);
+        sensorConfigA.setPosZ(20);
+        //UltrasonicSensor
+        sensorConfigA.setRangeIncreaseVelocity(4);
+        sensorConfigA.setStartIncreaseTime(4);
+        //RotationSensor
+        sensorConfigA.setSpinsPerSecond(1);
+        sensorConfigA.setStartRotationTime(4);
+        //Form
+        sensorConfigA.setSensorForm("CONE");
+        sensorConfigA.setCalcType("AVG");
+    }
+	
 	    // Velocity of 1 m/s
 	    @Test
 	    void getCurrentConeHeightTest1() {
-	    	
-	    	UltrasonicSensor sensor = new UltrasonicSensor(1,1);
+	    	sensorConfigA.setRangeIncreaseVelocity(1);
+	        sensorConfigA.setStartIncreaseTime(1);
+	    	UltrasonicSensor sensor = new UltrasonicSensor(sensorConfigA);
 
 	    	//setup to get  OriginToPositionLength = 1
 	    	sensor.setSensorAngle(45);
@@ -35,8 +70,9 @@ public class UltrasonicSensorTest {
 	 // Velocity of 2 m/s
 	    @Test
 	    void getCurrentConeHeightTest2() {
-	    	
-	    	UltrasonicSensor sensor = new UltrasonicSensor(2,1);
+	    	sensorConfigA.setRangeIncreaseVelocity(2);
+	        sensorConfigA.setStartIncreaseTime(1);
+	    	UltrasonicSensor sensor = new UltrasonicSensor(sensorConfigA);
 
 	    	//setup to get  OriginToPositionLength = 1
 			sensor.setSensorAngle(45);

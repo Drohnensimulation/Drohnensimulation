@@ -1,9 +1,17 @@
 package de.thi.dronesim.sensor.types;
 
 import com.jme3.math.Vector3f;
+
+import de.thi.dronesim.persistence.entity.SensorConfig;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Class to test Sensors.
@@ -12,6 +20,34 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class SensorTest {
 
+	//All values
+	SensorConfig sensorConfigA = new SensorConfig();
+    @BeforeEach
+    public void init() {
+    	//All
+    	List<SensorConfig> sensorConfigsA = new ArrayList<>();
+    	sensorConfigA.setRange(10);
+    	sensorConfigA.setSensorAngle(11);
+    	sensorConfigA.setSensorRadius(13);
+        sensorConfigA.setMeasurementAccuracy(14);
+        sensorConfigA.setDirectionX(15);
+        sensorConfigA.setDirectionY(16);
+        sensorConfigA.setDirectionZ(17);
+        sensorConfigA.setPosX(18);
+        sensorConfigA.setPosY(19);
+        sensorConfigA.setPosZ(20);
+        //UltrasonicSensor
+        sensorConfigA.setRangeIncreaseVelocity(4);
+        sensorConfigA.setStartIncreaseTime(4);
+        //RotationSensor
+        sensorConfigA.setSpinsPerSecond(1);
+        sensorConfigA.setStartRotationTime(4);
+        sensorConfigsA.add(sensorConfigA);
+        //Form
+        sensorConfigA.setSensorForm("CONE");
+        sensorConfigA.setCalcType("AVG");
+    }
+	
     /**
      * Sensor pointing in direction of x.
      * With a angle of 45 degrees and a size of 1 the origin should be at -1 for x.
@@ -20,7 +56,7 @@ class SensorTest {
     void testGetOrigin1() {
 
         // given
-        DistanceSensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(1, 0, 0);
         sensor.setPosition(0, 0, 0);
         sensor.setSensorAngle(45);
@@ -42,7 +78,7 @@ class SensorTest {
     void testGetOrigin2() {
 
         // given
-        DistanceSensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(1, 0, 0);
         sensor.setPosition(1, 0, 0);
         sensor.setSensorAngle(45);
@@ -64,7 +100,7 @@ class SensorTest {
     void testGetOrigin3() {
 
         // given
-        DistanceSensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(0, 1, 0);
         sensor.setPosition(0, 0, 0);
         sensor.setSensorAngle(45);
@@ -86,7 +122,7 @@ class SensorTest {
     void testGetOrigin4() {
 
         // given
-        DistanceSensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(0, 0, 1);
         sensor.setPosition(0, 0, 0);
         sensor.setSensorAngle(45);
@@ -108,7 +144,7 @@ class SensorTest {
     void testGetOrigin5() {
 
         // given
-        DistanceSensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(1, 1, 0);
         sensor.setPosition(0, 0, 0);
         sensor.setSensorAngle(45);
@@ -131,7 +167,7 @@ class SensorTest {
     void testGetOrigin6() {
 
         // given
-        DistanceSensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(1, 1, 1);
         sensor.setPosition(0, 0, 0);
         sensor.setSensorAngle(45);
@@ -153,7 +189,7 @@ class SensorTest {
     void testGetOrigin7() {
 
         // given
-        DistanceSensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(1, 0, 0);
         sensor.setPosition(0, 0, 0);
         sensor.setSensorAngle(45);
@@ -175,7 +211,7 @@ class SensorTest {
     void testGetOrigin8() {
 
         // given
-        DistanceSensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(1, 0, 0);
         sensor.setPosition(0, 0, 0);
         sensor.setSensorAngle(60F);
@@ -197,7 +233,7 @@ class SensorTest {
     void testGetOrigin9() {
 
         // given
-        DistanceSensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(1, 1, 1);
         sensor.setPosition(1, 2, 3);
         sensor.setSensorAngle(45);
