@@ -26,12 +26,12 @@ public class SensorConfig {
     private String calcType;
 
     // WindSensor
-    private double zeroDegreeDirectionX;
-    private double zeroDegreeDirectionY;
-    private double zeroDegreeDirectionZ;
-    private double nintyDegreeDirectionX;
-    private double nintyDegreeDirectionY;
-    private double nintyDegreeDirectionZ;
+    private float zeroDegreeDirectionX;
+    private float zeroDegreeDirectionY;
+    private float zeroDegreeDirectionZ;
+    private float nintyDegreeDirectionX;
+    private float nintyDegreeDirectionY;
+    private float nintyDegreeDirectionZ;
 
     // UltrasonicSensor
     private float rangeIncreaseVelocity;
@@ -228,51 +228,51 @@ public class SensorConfig {
         this.calcType = calcType;
     }
 
-    public double getZeroDegreeDirectionX() {
+    public float getZeroDegreeDirectionX() {
         return zeroDegreeDirectionX;
     }
 
-    public void setZeroDegreeDirectionX(double zeroDegreeDirectionX) {
+    public void setZeroDegreeDirectionX(float zeroDegreeDirectionX) {
         this.zeroDegreeDirectionX = zeroDegreeDirectionX;
     }
 
-    public double getZeroDegreeDirectionY() {
+    public float getZeroDegreeDirectionY() {
         return zeroDegreeDirectionY;
     }
 
-    public void setZeroDegreeDirectionY(double zeroDegreeDirectionY) {
+    public void setZeroDegreeDirectionY(float zeroDegreeDirectionY) {
         this.zeroDegreeDirectionY = zeroDegreeDirectionY;
     }
 
-    public double getZeroDegreeDirectionZ() {
+    public float getZeroDegreeDirectionZ() {
         return zeroDegreeDirectionZ;
     }
 
-    public void setZeroDegreeDirectionZ(double zeroDegreeDirectionZ) {
+    public void setZeroDegreeDirectionZ(float zeroDegreeDirectionZ) {
         this.zeroDegreeDirectionZ = zeroDegreeDirectionZ;
     }
 
-    public double getNintyDegreeDirectionX() {
+    public float getNintyDegreeDirectionX() {
         return nintyDegreeDirectionX;
     }
 
-    public void setNintyDegreeDirectionX(double nintyDegreeDirectionX) {
+    public void setNintyDegreeDirectionX(float nintyDegreeDirectionX) {
         this.nintyDegreeDirectionX = nintyDegreeDirectionX;
     }
 
-    public double getNintyDegreeDirectionY() {
+    public float getNintyDegreeDirectionY() {
         return nintyDegreeDirectionY;
     }
 
-    public void setNintyDegreeDirectionY(double nintyDegreeDirectionY) {
+    public void setNintyDegreeDirectionY(float nintyDegreeDirectionY) {
         this.nintyDegreeDirectionY = nintyDegreeDirectionY;
     }
 
-    public double getNintyDegreeDirectionZ() {
+    public float getNintyDegreeDirectionZ() {
         return nintyDegreeDirectionZ;
     }
 
-    public void setNintyDegreeDirectionZ(double nintyDegreeDirectionZ) {
+    public void setNintyDegreeDirectionZ(float nintyDegreeDirectionZ) {
         this.nintyDegreeDirectionZ = nintyDegreeDirectionZ;
     }
 
