@@ -22,4 +22,6 @@ public interface ISensor {
 	void runMeasurement(SimulationUpdateEvent event);
 
 	SensorResultDto getLastMeasurement();
+
+	boolean equals(ISensor sensor);
 }

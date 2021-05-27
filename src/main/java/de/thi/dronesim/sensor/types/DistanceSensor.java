@@ -642,4 +642,8 @@ public abstract class DistanceSensor implements ISensor {
         return calcType;
     }
 
+    public boolean equals(ISensor sensor){
+	    return this.getId() == sensor.getId();
+    }
+
 }
