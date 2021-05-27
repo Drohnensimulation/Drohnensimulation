@@ -319,4 +319,8 @@ public class GpsSensor implements ISensor {
 			}
 		}
 	}
+
+	public boolean equals(ISensor sensor){
+		return this.getId() == sensor.getId();
+	}
 }

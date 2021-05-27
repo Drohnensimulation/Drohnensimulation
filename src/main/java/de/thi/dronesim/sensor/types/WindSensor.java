@@ -339,4 +339,8 @@ public class WindSensor implements ISensor {
 		config.setNintyDegreeDirectionZ(this.nintyDegreeDirection.z);
 		return config;
 	}
+
+	public boolean equals(ISensor sensor){
+		return this.getId() == sensor.getId();
+	}
 }
