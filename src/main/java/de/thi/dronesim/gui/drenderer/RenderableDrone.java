@@ -44,6 +44,13 @@ public class RenderableDrone extends RenderableObject {
     }
 
     /**
+     * Instantiates a new renderable drone at 0/0/0
+     */
+    public RenderableDrone() {
+        super(new Vector3f(0, 0, 0), null);
+    }
+
+    /**
      * Create the spatial object (called by rendering thread)
      *
      * @param assetManager Asset manager

@@ -4,6 +4,9 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import com.jme3.math.Vector3f;
 import de.thi.dronesim.ISimulationChild;
 import de.thi.dronesim.Simulation;
+import de.thi.dronesim.SimulationUpdateEvent;
+import de.thi.dronesim.SimulationUpdateListener;
+import de.thi.dronesim.drone.Location;
 import de.thi.dronesim.gui.drenderer.*;
 import de.thi.dronesim.gui.dview.DView;
 import de.thi.dronesim.gui.mview.MView;
@@ -18,20 +21,32 @@ import java.util.List;
  *
  * @author Michael Weichenrieder
  */
-public class GuiManager implements ISimulationChild {
+public class GuiManager implements ISimulationChild, SimulationUpdateListener {
 
     private Simulation simulation;
     private IGuiView instrumentView;
-    private boolean isDView;
+    private DRenderer dRenderer;
 
     @Override
     public void initialize(Simulation simulation) {
         this.simulation = simulation;
+        simulation.registerUpdateListener(this, 0);
     }
 
     @Override
     public Simulation getSimulation() {
         return simulation;
+    }
+
+    @Override
+    public void onUpdate(SimulationUpdateEvent event) {
+        if (instrumentView != null) {
+            instrumentView.updateDroneStatus(event);
+        }
+        if (dRenderer != null) {
+            RenderableDrone drone = dRenderer.getDrone();
+            updateDroneLocation(drone, event.getDrone().getLocation());
+        }
     }
 
     public GuiManager() {
@@ -45,7 +60,6 @@ public class GuiManager implements ISimulationChild {
     public void openMViewGui() {
         if (!existsGui()) {
             instrumentView = new MView(this);
-            isDView = false;
         }
     }
 
@@ -54,9 +68,8 @@ public class GuiManager implements ISimulationChild {
      */
     public void openDViewGui() {
         if (!existsGui()) {
-            DRenderer dRenderer = initDRenderer();
+            dRenderer = initDRenderer();
             instrumentView = new DView(this, dRenderer);
-            isDView = true;
         }
     }
 
@@ -71,7 +84,16 @@ public class GuiManager implements ISimulationChild {
      * @return True if the opened gui is a {@link DRenderer}
      */
     public boolean isDView() {
-        return isDView;
+        return dRenderer != null;
+    }
+
+    private void updateDroneLocation(RenderableDrone drone, Location location) {
+        if (drone != null) {
+            drone.setPosition(location.getPosition());
+            float rotation = (float) (location.getHeading() * (Math.PI / 180.0));
+            drone.setRotation(new Vector3f(0, -rotation, 0));
+            drone.setRotateRotors(location.getAirspeed() > 0);
+        }
     }
 
     private DRenderer initDRenderer() {
@@ -84,7 +106,7 @@ public class GuiManager implements ISimulationChild {
             Vector3f center = new Vector3f(obstacle.getPosition()[0], obstacle.getPosition()[1], obstacle.getPosition()[2]);
             Vector3f scale = new Vector3f(obstacle.getScale()[0], obstacle.getScale()[1], obstacle.getScale()[2]);
             Vector3f rotation = new Vector3f(obstacle.getRotation()[0], obstacle.getRotation()[1], obstacle.getRotation()[2]);
-            switch(obstacle.getModelName()) {
+            switch (obstacle.getModelName()) {
                 case "red_cube":
                     mapObjects.add(new RenderableCuboid(center, scale, rotation));
                     break;
@@ -101,16 +123,8 @@ public class GuiManager implements ISimulationChild {
         dView.addRenderableObjects(mapObjects);
 
         // Add drone
-        RenderableDrone drone = new RenderableDrone(new Vector3f(0, 1, 0));
-        drone.setTilt(new Vector3f((float) Math.PI * .05f, 0, (float) Math.PI * .05f));
-        drone.setRotation(new Vector3f(0, (float) Math.PI * 1.5f, 0));
-        drone.moveRelativeToWorld(new Vector3f(0, .2f, 0));
-        drone.setRotateRotors(true);
-        Runnable droneUpdater = () -> {
-            drone.addRotation(new Vector3f(0, -.0005f, 0));
-            drone.moveRelativeToDrone(new Vector3f(0, 0, .0006f));
-        };
-        dView.addFrameUpdateListener(droneUpdater);
+        RenderableDrone drone = new RenderableDrone();
+        updateDroneLocation(drone, simulation.getDrone().getLocation());
         dView.addRenderableObject(drone);
 
         // Return DView

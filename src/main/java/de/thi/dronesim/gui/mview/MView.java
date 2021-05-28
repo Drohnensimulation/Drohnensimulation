@@ -1,5 +1,6 @@
 package de.thi.dronesim.gui.mview;
 
+import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.drone.Location;
 import de.thi.dronesim.gui.GuiManager;
 import de.thi.dronesim.gui.IGuiView;
@@ -403,7 +404,9 @@ public class MView extends JFrame implements IGuiView {
     }
 
     @Override
-    public void updateDroneStatus(Location location) {
+    public void updateDroneStatus(SimulationUpdateEvent simulationUpdateEvent) {
+        Location location = simulationUpdateEvent.getDrone().getLocation(); // TODO: Use whole SimulationUpdateEvent if needed
+
         // Update Position
         coordXValue.setText(String.valueOf(location.getX()));
         coordYValue.setText(String.valueOf(location.getY()));
@@ -498,7 +501,7 @@ public class MView extends JFrame implements IGuiView {
                         runtimeValue.setText(hh + ":" + mm + ":" + ss);
 
 
-                        updateDroneStatus(l);
+                        //updateDroneStatus(l); // TODO: Fix for new parameter type
 
                     } // while
                 });
