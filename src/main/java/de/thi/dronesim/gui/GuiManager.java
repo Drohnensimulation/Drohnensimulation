@@ -92,7 +92,7 @@ public class GuiManager implements ISimulationChild, SimulationUpdateListener {
             drone.setPosition(location.getPosition());
             float rotation = (float) (location.getHeading() * (Math.PI / 180.0));
             drone.setRotation(new Vector3f(0, -rotation, 0));
-            drone.setRotateRotors(location.getAirspeed() > 0);
+            drone.setRotateRotors(location.getAirspeed() > 0 || location.getVerticalSpeed() > 0);
         }
     }
 
