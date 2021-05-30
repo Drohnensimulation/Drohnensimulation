@@ -1,20 +1,21 @@
 package de.thi.dronesim.gui.mview;
 
 import de.thi.dronesim.SimulationUpdateEvent;
+import de.thi.dronesim.drone.Drone;
 import de.thi.dronesim.drone.Location;
 import de.thi.dronesim.gui.GuiManager;
 import de.thi.dronesim.gui.IGuiView;
-import de.thi.dronesim.obstacle.entity.Obstacle;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Set;
 
 /**
  * Alternative GUI for text-only display.
  *
  * @author Daniel Dunger
  */
+
+@SuppressWarnings("FieldCanBeLocal")
 public class MView extends JFrame implements IGuiView {
 
     // These values are currently set to fit the current information
@@ -33,18 +34,19 @@ public class MView extends JFrame implements IGuiView {
     private final JLabel statusValue;
     private final JLabel runtime;
     private final JLabel runtimeValue;
+    private int seconds, minutes, hours;
 
     // Coordinates/Position
     private final JPanel panelCoordsOuter;
     private final JLabel coords;
 
     private final JPanel panelCoordsInner;
-    private final JLabel coordX;
-    private final JLabel coordXValue;
-    private final JLabel coordY;
-    private final JLabel coordYValue;
-    private final JLabel coordZ;
-    private final JLabel coordZValue;
+    private final JLabel coordinateX;
+    private final JLabel coordinateXValue;
+    private final JLabel coordinateY;
+    private final JLabel coordinateYValue;
+    private final JLabel coordinateZ;
+    private final JLabel coordinateZValue;
 
     // Velocity Panel
     private final JPanel panelVelocityOuter;
@@ -86,19 +88,8 @@ public class MView extends JFrame implements IGuiView {
     private final JButton startButton;
     private final JButton loadButton;
 
-    // TODO: Should be moved into simulation class to be able to inform all classes.
-    private enum SIM_STATUS {
-        NOT_RUNNING,    // Default
-        RUNNING,        //
-        PAUSED,         // Paused by the user/program
-        STOPPED,        // When the simulation is completed.
-        CRASHED,        // As in the drone against an obstacle, not the program.
-    }
-
-    private SIM_STATUS currentStatus = SIM_STATUS.NOT_RUNNING;
-
     public MView(GuiManager guiManager) {
-        super("Drone Simulatione (No GFX)");
+        super("Drone Simulation (No GFX)");
 
         // Holding a ref to the manager, so we can access the simulation, so our buttons can start/pause it.
         this.guiManager = guiManager;
@@ -127,7 +118,6 @@ public class MView extends JFrame implements IGuiView {
         loadButton = new JButton("Load Scenario");
 
         // Button Actions
-        // TODO: Add the correct methods once they are added (Simulation class). These are just for testing at the moment.
         startButton.addActionListener(e -> runSimulation());
 
         loadButton.addActionListener(e -> {
@@ -288,7 +278,7 @@ public class MView extends JFrame implements IGuiView {
         runtime.setHorizontalAlignment(SwingConstants.CENTER);
         panelTop.add(runtime);
 
-        runtimeValue = new JLabel("00:00:00:00");
+        runtimeValue = new JLabel("00:00:00");
         runtimeValue.setHorizontalAlignment(SwingConstants.CENTER);
         panelTop.add(runtimeValue);
 
@@ -363,29 +353,29 @@ public class MView extends JFrame implements IGuiView {
         panelCoordsOuter.add(panelCoordsInner, gbc_panelCoordsInner);
         panelCoordsInner.setLayout(new GridLayout(3, 2, 0, 0));
 
-        coordX = new JLabel("X:");
-        coordX.setHorizontalAlignment(SwingConstants.CENTER);
-        panelCoordsInner.add(coordX);
+        coordinateX = new JLabel("X:");
+        coordinateX.setHorizontalAlignment(SwingConstants.CENTER);
+        panelCoordsInner.add(coordinateX);
 
-        coordXValue = new JLabel(String.valueOf(Integer.MIN_VALUE));
-        coordXValue.setHorizontalAlignment(SwingConstants.CENTER);
-        panelCoordsInner.add(coordXValue);
+        coordinateXValue = new JLabel(String.valueOf(Integer.MIN_VALUE));
+        coordinateXValue.setHorizontalAlignment(SwingConstants.CENTER);
+        panelCoordsInner.add(coordinateXValue);
 
-        coordY = new JLabel("Y:");
-        coordY.setHorizontalAlignment(SwingConstants.CENTER);
-        panelCoordsInner.add(coordY);
+        coordinateY = new JLabel("Y:");
+        coordinateY.setHorizontalAlignment(SwingConstants.CENTER);
+        panelCoordsInner.add(coordinateY);
 
-        coordYValue = new JLabel(String.valueOf(Integer.MIN_VALUE));
-        coordYValue.setHorizontalAlignment(SwingConstants.CENTER);
-        panelCoordsInner.add(coordYValue);
+        coordinateYValue = new JLabel(String.valueOf(Integer.MIN_VALUE));
+        coordinateYValue.setHorizontalAlignment(SwingConstants.CENTER);
+        panelCoordsInner.add(coordinateYValue);
 
-        coordZ = new JLabel("Z:");
-        coordZ.setHorizontalAlignment(SwingConstants.CENTER);
-        panelCoordsInner.add(coordZ);
+        coordinateZ = new JLabel("Z:");
+        coordinateZ.setHorizontalAlignment(SwingConstants.CENTER);
+        panelCoordsInner.add(coordinateZ);
 
-        coordZValue = new JLabel(String.valueOf(Integer.MIN_VALUE));
-        coordZValue.setHorizontalAlignment(SwingConstants.CENTER);
-        panelCoordsInner.add(coordZValue);
+        coordinateZValue = new JLabel(String.valueOf(Integer.MIN_VALUE));
+        coordinateZValue.setHorizontalAlignment(SwingConstants.CENTER);
+        panelCoordsInner.add(coordinateZValue);
         contentPane.setLayout(gl_contentPane);
 
         // Just so everything is a bit more visible, black borders:
@@ -405,14 +395,49 @@ public class MView extends JFrame implements IGuiView {
 
     @Override
     public void updateDroneStatus(SimulationUpdateEvent simulationUpdateEvent) {
-        Location location = simulationUpdateEvent.getDrone().getLocation(); // TODO: Use whole SimulationUpdateEvent if needed
+        Drone d = simulationUpdateEvent.getDrone();
+        Location location = d.getLocation();
+
+        // Update runtime
+        double t = simulationUpdateEvent.getTime() / 1000;
+
+        seconds = (int) t % 1000 - 60 * (minutes + 60 * hours);
+
+        if (seconds >= 60) {
+            seconds = 0;
+            minutes++;
+
+            if (minutes >= 60) {
+                minutes = 0;
+                hours++;
+            }
+        }
+
+        // Just for a better visual...
+        StringBuilder time = new StringBuilder();
+        if (hours < 10)
+            time.append(String.format("0%d", hours));
+        else
+            time.append(String.format("%d", hours));
+
+        if (minutes < 10)
+            time.append(String.format(":0%d", minutes));
+        else
+            time.append(String.format(":%d", minutes));
+
+        if (seconds < 10)
+            time.append(String.format(":0%d", seconds));
+        else
+            time.append(String.format(":%d", seconds));
+
+        runtimeValue.setText(time.toString());
 
         // Update Position
-        coordXValue.setText(String.valueOf(location.getX()));
-        coordYValue.setText(String.valueOf(location.getY()));
-        coordZValue.setText(String.valueOf(location.getZ()));
+        coordinateXValue.setText(String.valueOf(location.getX()));
+        coordinateYValue.setText(String.valueOf(location.getY()));
+        coordinateZValue.setText(String.valueOf(location.getZ()));
 
-        // Update Heading and Tilts (TODO: Check this: 0/360 - East, 90 North, 180 West, 270 South ?)
+        // Update Heading and Tilts
         double hdg = location.getHeading() % 360.00;
         String dir = "???";
         if (hdg < 22.5 && hdg >= 0.0)
@@ -420,7 +445,7 @@ public class MView extends JFrame implements IGuiView {
         else if (hdg < 72.5 && hdg >= 22.5)
             dir = "NE";
         else if (hdg < 112.5 && hdg >= 72.5)
-            dir = "No";
+            dir = "N";
         else if (hdg < 157.5 && hdg >= 112.5)
             dir = "NW";
         else if (hdg < 202.5 && hdg >= 157.5)
@@ -436,82 +461,28 @@ public class MView extends JFrame implements IGuiView {
 
         headingValue.setText(dir.concat(" @ " + hdg + " Degree"));
         pitchValue.setText(String.valueOf(location.getPitch()));
+
         // These values do not exist currently TODO: Discuss if they will ever be added, else remove this (+labels), will screw the layout so adjust accordingly
         //rollValue.setText(String.valueOf(location.getRoll()));
         //yawValue.setText(String.valueOf(location.getYaw()));
 
         // Velocities
-        airSpeedValue.setText(String.valueOf(l.getAirspeed()));
-        verticalVelocityValue.setText(String.valueOf(l.getVerticalSpeed()));
-        groundSpeedValue.setText(String.valueOf(l.getGroundSpeed()));
+        airSpeedValue.setText(String.valueOf(location.getAirspeed()));
+        verticalVelocityValue.setText(String.valueOf(location.getVerticalSpeed()));
+        groundSpeedValue.setText(String.valueOf(location.getGroundSpeed()));
+
+        // TODO: Figure out how to access sensors now to update the obstacle/wind stuff...
+
     }
-
-    private void updateObstacles(Set<Obstacle> obstacles) {
-        // TODO: Check how obstacles are passed and parse them.
-    }
-
-    /**
-     * Everything from here on forward can be deleted, as it is just for testing and should be moved to the main class.
-     */
-
-    // TODO: Testing only, removable.
-    private Thread runningThread;
-    private Location l;
 
     private void runSimulation() {
-        System.out.println("runSimulation: " + currentStatus.name());
-        switch (currentStatus) {
-            case NOT_RUNNING:
-            case STOPPED:
-                startSimulation();
-                break;
-            case RUNNING:
-            case PAUSED:
-                //togglePauseSimulation(); // Removed because of ownership errors.
-                break;
-            case CRASHED:
-                break;
+        if (guiManager.getSimulation().isRunning()) {
+            guiManager.getSimulation().stop();
+        } else {
+            guiManager.getSimulation().start();
+            startButton.setText("Stop Simulation");
+            statusValue.setText("Running...");
         }
     }
 
-    private synchronized void startSimulation() {
-        // TODO: Replace this with actual starter
-        // Currently, this thread just updates a pseudo location and its runtime, nothing else.
-        runningThread = new Thread(
-                () -> {
-                    int hh = 0, mm = 0, ss = 0;
-
-                    while (true) {
-                        try {
-                            Thread.sleep(1000); // Busy-Waiting is bad, I know. This is just testing though
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                        if (ss++ >= 60) {
-                            ss = 0;
-                            if (mm++ >= 60) {
-                                hh++;
-                                mm = 0;
-                            }
-                        }
-
-                        l.updateDelta(1);
-                        l.updatePosition(1);
-                        runtimeValue.setText(hh + ":" + mm + ":" + ss);
-
-
-                        //updateDroneStatus(l); // TODO: Fix for new parameter type
-
-                    } // while
-                });
-
-        l = new Location(0, 0, 0);
-        l.requestDeltaAirspeed(10);
-        l.requestDeltaHeading(90);
-
-        currentStatus = SIM_STATUS.RUNNING;
-        statusValue.setText("Running...");
-        runningThread.start();
-    }
 }
