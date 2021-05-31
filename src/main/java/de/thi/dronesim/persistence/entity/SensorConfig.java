@@ -53,83 +53,59 @@ public class SensorConfig {
         SensorConfig config = (SensorConfig) o;
 
         if (sensorId != config.sensorId) return false;
-        if (Double.compare(config.measurementAccuracy, measurementAccuracy) != 0) return false;
-        if (Double.compare(config.directionX, directionX) != 0) return false;
-        if (Double.compare(config.directionY, directionY) != 0) return false;
-        if (Double.compare(config.directionZ, directionZ) != 0) return false;
-        if (Double.compare(config.posX, posX) != 0) return false;
-        if (Double.compare(config.posY, posY) != 0) return false;
-        if (Double.compare(config.posZ, posZ) != 0) return false;
-        if (Double.compare(config.range, range) != 0) return false;
-        if (Double.compare(config.sensorAngle, sensorAngle) != 0) return false;
-        if (Double.compare(config.sensorRadius, sensorRadius) != 0) return false;
-        if (Double.compare(config.zeroDegreeDirectionX, zeroDegreeDirectionX) != 0) return false;
-        if (Double.compare(config.zeroDegreeDirectionY, zeroDegreeDirectionY) != 0) return false;
-        if (Double.compare(config.zeroDegreeDirectionZ, zeroDegreeDirectionZ) != 0) return false;
-        if (Double.compare(config.nintyDegreeDirectionX, nintyDegreeDirectionX) != 0) return false;
-        if (Double.compare(config.nintyDegreeDirectionY, nintyDegreeDirectionY) != 0) return false;
-        if (Double.compare(config.nintyDegreeDirectionZ, nintyDegreeDirectionZ) != 0) return false;
+        if (Float.compare(config.measurementAccuracy, measurementAccuracy) != 0) return false;
+        if (Float.compare(config.directionX, directionX) != 0) return false;
+        if (Float.compare(config.directionY, directionY) != 0) return false;
+        if (Float.compare(config.directionZ, directionZ) != 0) return false;
+        if (Float.compare(config.posX, posX) != 0) return false;
+        if (Float.compare(config.posY, posY) != 0) return false;
+        if (Float.compare(config.posZ, posZ) != 0) return false;
+        if (Float.compare(config.range, range) != 0) return false;
+        if (Float.compare(config.sensorAngle, sensorAngle) != 0) return false;
+        if (Float.compare(config.sensorRadius, sensorRadius) != 0) return false;
+        if (Float.compare(config.zeroDegreeDirectionX, zeroDegreeDirectionX) != 0) return false;
+        if (Float.compare(config.zeroDegreeDirectionY, zeroDegreeDirectionY) != 0) return false;
+        if (Float.compare(config.zeroDegreeDirectionZ, zeroDegreeDirectionZ) != 0) return false;
+        if (Float.compare(config.nintyDegreeDirectionX, nintyDegreeDirectionX) != 0) return false;
+        if (Float.compare(config.nintyDegreeDirectionY, nintyDegreeDirectionY) != 0) return false;
+        if (Float.compare(config.nintyDegreeDirectionZ, nintyDegreeDirectionZ) != 0) return false;
         if (Float.compare(config.rangeIncreaseVelocity, rangeIncreaseVelocity) != 0) return false;
-        if (startIncreaseTime != config.startIncreaseTime) return false;
-        if (!config.calcType.equals(calcType)) return false;
-        if (!config.sensorForm.equals(sensorForm)) return false;
+        if (Float.compare(config.startIncreaseTime, startIncreaseTime) != 0) return false;
         if (spinsPerSecond != config.spinsPerSecond) return false;
-        if (startRotationTime != config.startRotationTime) return false;
-        return className != null ? className.equals(config.className) : config.className == null;
+        if (Float.compare(config.startRotationTime, startRotationTime) != 0) return false;
+        if (className != null ? !className.equals(config.className) : config.className != null) return false;
+        if (sensorForm != null ? !sensorForm.equals(config.sensorForm) : config.sensorForm != null) return false;
+        return calcType != null ? calcType.equals(config.calcType) : config.calcType == null;
     }
 
     @Override
     public int hashCode() {
-        int result;
-        long temp;
-        result = className != null ? className.hashCode() : 0;
+        int result = className != null ? className.hashCode() : 0;
         result = 31 * result + sensorId;
-        temp = Double.doubleToLongBits(measurementAccuracy);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(directionX);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(directionY);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(directionZ);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(posX);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(posY);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(posZ);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(range);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(sensorAngle);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(sensorRadius);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(zeroDegreeDirectionX);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(zeroDegreeDirectionY);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(zeroDegreeDirectionZ);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(nintyDegreeDirectionX);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(nintyDegreeDirectionY);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(nintyDegreeDirectionZ);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        //UltrasonicSensor
+        result = 31 * result + (measurementAccuracy != +0.0f ? Float.floatToIntBits(measurementAccuracy) : 0);
+        result = 31 * result + (directionX != +0.0f ? Float.floatToIntBits(directionX) : 0);
+        result = 31 * result + (directionY != +0.0f ? Float.floatToIntBits(directionY) : 0);
+        result = 31 * result + (directionZ != +0.0f ? Float.floatToIntBits(directionZ) : 0);
+        result = 31 * result + (posX != +0.0f ? Float.floatToIntBits(posX) : 0);
+        result = 31 * result + (posY != +0.0f ? Float.floatToIntBits(posY) : 0);
+        result = 31 * result + (posZ != +0.0f ? Float.floatToIntBits(posZ) : 0);
+        result = 31 * result + (range != +0.0f ? Float.floatToIntBits(range) : 0);
+        result = 31 * result + (sensorAngle != +0.0f ? Float.floatToIntBits(sensorAngle) : 0);
+        result = 31 * result + (sensorRadius != +0.0f ? Float.floatToIntBits(sensorRadius) : 0);
+        result = 31 * result + (sensorForm != null ? sensorForm.hashCode() : 0);
+        result = 31 * result + (calcType != null ? calcType.hashCode() : 0);
+        result = 31 * result + (zeroDegreeDirectionX != +0.0f ? Float.floatToIntBits(zeroDegreeDirectionX) : 0);
+        result = 31 * result + (zeroDegreeDirectionY != +0.0f ? Float.floatToIntBits(zeroDegreeDirectionY) : 0);
+        result = 31 * result + (zeroDegreeDirectionZ != +0.0f ? Float.floatToIntBits(zeroDegreeDirectionZ) : 0);
+        result = 31 * result + (nintyDegreeDirectionX != +0.0f ? Float.floatToIntBits(nintyDegreeDirectionX) : 0);
+        result = 31 * result + (nintyDegreeDirectionY != +0.0f ? Float.floatToIntBits(nintyDegreeDirectionY) : 0);
+        result = 31 * result + (nintyDegreeDirectionZ != +0.0f ? Float.floatToIntBits(nintyDegreeDirectionZ) : 0);
         result = 31 * result + (rangeIncreaseVelocity != +0.0f ? Float.floatToIntBits(rangeIncreaseVelocity) : 0);
-        result = (31 * result + (int) startIncreaseTime);
-        //RotationSensor
-        result = 31 * result + (spinsPerSecond != +0.0f ? Float.floatToIntBits(spinsPerSecond) : 0);
-        result = (31 * result + (int) startRotationTime);
-        //Enums
-        temp = Long.parseLong(Integer.toString(sensorForm.length()));
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Long.parseLong(Integer.toString(calcType.length()));
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (startIncreaseTime != +0.0f ? Float.floatToIntBits(startIncreaseTime) : 0);
+        result = 31 * result + spinsPerSecond;
+        result = 31 * result + (startRotationTime != +0.0f ? Float.floatToIntBits(startRotationTime) : 0);
         return result;
     }
-
 
     // /////////////////////////////////////////////////////////////////////////////
     // Getter/Setter
