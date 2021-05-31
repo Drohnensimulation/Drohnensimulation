@@ -1,12 +1,11 @@
 package de.thi.dronesim.sensor.types;
 
-import java.util.ArrayList;
-
-import de.thi.dronesim.Simulation;
 import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.ISensor;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
+
+import java.util.ArrayList;
 
 public class GpsSensor implements ISensor {
 
@@ -318,5 +317,9 @@ public class GpsSensor implements ISensor {
 				return new Pair<>(this.current.u, this.current.v);
 			}
 		}
+	}
+
+	public boolean equals(ISensor sensor){
+		return this.getId() == sensor.getId();
 	}
 }

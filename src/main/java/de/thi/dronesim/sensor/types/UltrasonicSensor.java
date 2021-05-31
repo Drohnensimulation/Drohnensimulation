@@ -1,7 +1,7 @@
 package de.thi.dronesim.sensor.types;
 
-import de.thi.dronesim.Simulation;
 import de.thi.dronesim.SimulationUpdateEvent;
+import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 
 public class UltrasonicSensor extends DistanceSensor {
@@ -14,8 +14,6 @@ public class UltrasonicSensor extends DistanceSensor {
 
 	private float rangeIncreaseVelocity; // meters per second
 	private float startIncreaseTime;
-	//Main simulation
-	private Simulation simulation;
 	
 	/**
 	 * Constructor:
@@ -24,12 +22,13 @@ public class UltrasonicSensor extends DistanceSensor {
 	 * @param startIncreaseTime: defines the time when the Sensor starts to increase. if the value is 5 the increase starts
 	 * after the Simulation is running for 5 seconds.
 	 */
-	public UltrasonicSensor(float rangeIncreaseVelocity, int startIncreaseTime) {
-		this.rangeIncreaseVelocity =rangeIncreaseVelocity;
-		this.startIncreaseTime= startIncreaseTime;
+	public UltrasonicSensor(SensorConfig config) {
+		super(config);
+		this.rangeIncreaseVelocity = config.getRangeIncreaseVelocity();
+		this.startIncreaseTime= config.getStartIncreaseTime();
 	}
 
-	public UltrasonicSensor() {}
+	//public UltrasonicSensor() {}
 
 	@Override
 	public String getType() {
@@ -41,8 +40,8 @@ public class UltrasonicSensor extends DistanceSensor {
 	/**
 	 *  This Method is resetting the startIncreaseTime to calculate the next measurement
 	 */
-	public void startIncrease() {
-		this.startIncreaseTime = (float) simulation.getTime();
+	public void startIncrease(SimulationUpdateEvent event) {
+		this.startIncreaseTime = (float) event.getTime();
 	}
 	
 	/**
@@ -50,12 +49,12 @@ public class UltrasonicSensor extends DistanceSensor {
 	 *  If this.startIncreaseTime is smaller than endIncreaseTime the increase did not start yet. There for the traveled
 	 *  time is 0. The return value got converted to seconds.
 	 */
-	private float traveledTime() {
-		float endIncreaseTime = (float) simulation.getTime();
+	private float traveledTime(SimulationUpdateEvent event) {
+		float endIncreaseTime = (float) event.getTime();
 		float traveledTime;
 		if(this.startIncreaseTime<endIncreaseTime) {
-			traveledTime = (endIncreaseTime - this.startIncreaseTime) / 1000;
-			startIncrease();
+			traveledTime = (endIncreaseTime - this.startIncreaseTime);
+			startIncrease(event);
 		}else {
 			traveledTime = 0;
 		}
@@ -87,7 +86,7 @@ public class UltrasonicSensor extends DistanceSensor {
 	 */
 	@Override
 	public void runMeasurement(SimulationUpdateEvent event) {
-		float traveledTime =  traveledTime();
+		float traveledTime =  traveledTime(event);
 		this.sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), getCurrentConeHeight(traveledTime), calcSurfaceVector()); // getCurrentConeHeight()
 	}
 

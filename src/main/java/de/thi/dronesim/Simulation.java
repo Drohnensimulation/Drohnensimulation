@@ -2,6 +2,7 @@ package de.thi.dronesim;
 
 import de.thi.dronesim.drone.Drone;
 import de.thi.dronesim.persistence.ConfigReader;
+import de.thi.dronesim.persistence.entity.LocationConfig;
 import de.thi.dronesim.persistence.entity.SimulationConfig;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -51,7 +52,8 @@ public class Simulation {
         Simulation.scanForChildren();
         this.config = ConfigReader.readConfig(configPath);
         this.children = new HashMap<>();
-        this.drone = new Drone();
+        LocationConfig locationConfig = config.getLocationConfig();
+        this.drone = new Drone(locationConfig.getX(), locationConfig.getY(), locationConfig.getZ());
     }
 
     /**
