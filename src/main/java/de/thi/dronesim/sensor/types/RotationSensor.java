@@ -2,7 +2,6 @@ package de.thi.dronesim.sensor.types;
 
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
-import de.thi.dronesim.Simulation;
 import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
@@ -38,12 +37,7 @@ public class RotationSensor extends DistanceSensor {
 		spinsToRotationVelocityConverter(spinsPerSecond);
 	}
 
-	// Why did some one put this Constructor here???????
-	//public RotationSensor() {
-	//}
-
 	@Override
-	
 	public String getType() {
 		// TODO Auto-generated method stub
 		String name = "RotationSensor";

@@ -1,6 +1,5 @@
 package de.thi.dronesim.sensor.types;
 
-import de.thi.dronesim.Simulation;
 import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
