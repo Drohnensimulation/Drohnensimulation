@@ -125,5 +125,28 @@ public class Vector3 {
 			   this.y * other.y + 
 			   this.z * other.z;
 	}
+    
+    public String toString() {
+    	StringBuilder sb = new StringBuilder();
+    	return sb.append('[')
+    			 .append(this.x)
+    			 .append(", ")
+    			 .append(this.y)
+    			 .append(", ")
+    			 .append(this.z)
+    			 .append(']')
+    			 .toString();
+    }
+    
+    public boolean equals(Object other) {
+    	if(other instanceof Vector3) {
+    		Vector3 otherVec = (Vector3) other;
+    		return Double.compare(this.x, otherVec.x) == 0 &&
+    				Double.compare(this.y, otherVec.y) == 0 &&
+    				Double.compare(this.z, otherVec.z) == 0;
+    	}
+    	
+    	return false;
+    }
 
 }
