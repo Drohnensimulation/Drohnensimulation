@@ -39,6 +39,11 @@ public class WindSensor implements ISensor {
 	//If the measured wind blows in this direction, the measurement will return an angle of 90 degrees
 	protected Vector3f nintyDegreeDirection;
 	
+	//Data for testing
+	private Vector3f absoluteSensorPosTesting;
+	private Vector3f[] planeTesting = new Vector3f[2];
+	
+	
 	/**
 	 * Configures the Wind Sensor. 
 	 * First, the relativ direction of the sensor has to be set when the drone 
@@ -125,9 +130,13 @@ public class WindSensor implements ISensor {
 		//Transform to a vector
 		droneHeadingVec = this.degToVector(droneHeadingDeg);
 
-		//get Drone-Movement vector. The length must be equal to the speed in m/s
+		//get Drone-Movement vector. The length must be equal to the speed in m/s.
+		//Unfortunately the horizontal and vertical speed are two different values
 		droneMovementVec = this.toVector3(event.getDrone().getLocation().getMovement());
-
+		droneMovementVec.y = 0; //delete vertical movement, we have to add the vertical speed later
+		droneMovementVec = droneMovementVec.normalize().mult((float)(event.getDrone().getLocation().getGroundSpeed())); //the length is no equal to the horizontal speed
+		droneMovementVec.y = (float) event.getDrone().getLocation().getVerticalSpeed(); //now add vertical speed again
+		
 		//transform to vector and scale the it. The vector length must represent the wind speed in m/s.
 		//The direction in which the wind blows, not from where the wind comes
 		windDirection = this.degToVector(windDirectionDeg);
@@ -173,6 +182,8 @@ public class WindSensor implements ISensor {
 				);
 		plane[1].normalize();
 
+		
+		
 		//Now the trueWindVec can be projected onto our plain
 		
 		Vector3f p0 = new Vector3f(plane[0]);
@@ -229,6 +240,11 @@ public class WindSensor implements ISensor {
 			list.add((float) measuredWindVec.length());
 		}
 		this.lastMeasurement.setValues(list);
+		
+		//Collect data for testing
+		this.absoluteSensorPosTesting = absSensorDirection;
+		this.planeTesting[0] = plane[0];
+		this.planeTesting[1] = plane[1];
 	}
 
 	/**
@@ -300,9 +316,9 @@ public class WindSensor implements ISensor {
 	 * @return a 3d vector
 	 */
 	private Vector3f degToVector(double deg) {
-		return new Vector3f((float) Math.sin(Math.toRadians(deg)),
+		return new Vector3f((float) Math.sin(Math.toRadians(360-deg)),
 				0,
-				(float) Math.cos(Math.toRadians(deg)));
+				(float) Math.cos(Math.toRadians(360-deg)));
 	}
 	
 	private Vector3f toVector3(Vector3f v) {
@@ -343,5 +359,15 @@ public class WindSensor implements ISensor {
 
 	public boolean equals(ISensor sensor){
 		return this.getId() == sensor.getId();
+	}
+	
+	
+	//Methods for testing
+	Vector3f getLastAbsSensorDirection() {
+		return this.absoluteSensorPosTesting;
+	}
+	
+	Vector3f[] getLastPlane() {
+		return this.planeTesting;
 	}
 }
