@@ -114,7 +114,7 @@ public class WindSensor implements ISensor {
 //		Should be already done by the location
 //		double droneVerticalSpeed = event.getDrone().getLocation().getVerticalSpeed(); //TODO: Speed >0 means drone goes upwards, <0 drone goes downwards => -20 means drone goes down with 20 m/s
 		CurrentWind cw = Wind.getWindAt(event.getDrone().getLocation());
-		float windDirectionDeg = (float) cw.getWindDirection(); //Direction in which the wind blows
+		float windDirectionDeg = (float) cw.getWindDirection(); //Direction from where the wind comes
 		float windSpeed = (float) cw.getWindSpeed();
 
 		Vector3f droneHeadingVec;
@@ -131,6 +131,7 @@ public class WindSensor implements ISensor {
 		//transform to vector and scale the it. The vector length must represent the wind speed in m/s.
 		//The direction in which the wind blows, not from where the wind comes
 		windDirection = this.degToVector(windDirectionDeg);
+		windDirection.multLocal(-1f); //Now it's the direction in which the wind blows
 		windDirection.normalize();
 		windDirection.multLocal(windSpeed);
 
