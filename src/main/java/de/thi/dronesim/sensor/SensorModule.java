@@ -85,17 +85,16 @@ public class SensorModule implements ISimulationChild {
      * @param config config for the sensor
      * @return the created sensor
      */
-    private ISensor createSensor(SensorConfig config) {
+    ISensor createSensor(SensorConfig config) {
         switch (config.getClassName()) {
             case "GpsSensor":
                 return new GpsSensor(config);
             case "InfraredSensor":
-                return new InfraredSensor();
+                return new InfraredSensor(config);
             case "RotationSensor":
-                return new RotationSensor();
+                return new RotationSensor(config);
             case "UltrasonicSensor":
-                return new UltrasonicSensor(config.getRangeIncreaseVelocity(),
-                        config.getCallTimerForSensorValues());
+                return new UltrasonicSensor(config);
             case "WindSensor":
                 return new WindSensor(config);
             default:

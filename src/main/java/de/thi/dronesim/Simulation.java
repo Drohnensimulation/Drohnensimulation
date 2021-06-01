@@ -4,6 +4,7 @@ import de.thi.dronesim.drone.Drone;
 import de.thi.dronesim.obstacle.UfoObjs;
 import de.thi.dronesim.obstacle.dto.ObstacleDTO;
 import de.thi.dronesim.persistence.ConfigReader;
+import de.thi.dronesim.persistence.entity.LocationConfig;
 import de.thi.dronesim.persistence.entity.SimulationConfig;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -53,13 +54,8 @@ public class Simulation {
         Simulation.scanForChildren();
         this.config = ConfigReader.readConfig(configPath);
         this.children = new HashMap<>();
-
-        if(config.getLocationConfig() != null) {
-            this.drone = new Drone((float) config.getLocationConfig().getX(), (float) config.getLocationConfig().getY(), (float) config.getLocationConfig().getZ());
-        }
-        else {
-            this.drone = new Drone();
-        }
+        LocationConfig locationConfig = config.getLocationConfig();
+        this.drone = new Drone(locationConfig.getX(), locationConfig.getY(), locationConfig.getZ());
     }
 
     /**
