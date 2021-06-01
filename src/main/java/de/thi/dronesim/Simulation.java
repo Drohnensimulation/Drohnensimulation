@@ -1,6 +1,8 @@
 package de.thi.dronesim;
 
 import de.thi.dronesim.drone.Drone;
+import de.thi.dronesim.obstacle.UfoObjs;
+import de.thi.dronesim.obstacle.dto.ObstacleDTO;
 import de.thi.dronesim.persistence.ConfigReader;
 import de.thi.dronesim.persistence.entity.SimulationConfig;
 import org.apache.logging.log4j.Level;
@@ -51,7 +53,13 @@ public class Simulation {
         Simulation.scanForChildren();
         this.config = ConfigReader.readConfig(configPath);
         this.children = new HashMap<>();
-        this.drone = new Drone();
+
+        if(config.getLocationConfig() != null) {
+            this.drone = new Drone((float) config.getLocationConfig().getX(), (float) config.getLocationConfig().getY(), (float) config.getLocationConfig().getZ());
+        }
+        else {
+            this.drone = new Drone();
+        }
     }
 
     /**
@@ -110,6 +118,13 @@ public class Simulation {
         this.registerUpdateListener(event -> drone.getLocation().updatePosition(event.getTps()), 800);
 
         this.instantiateChildren();
+
+        //Load obstacles from obstacle config into obstacle class
+        if (config.getObstacleConfigList() != null) {
+            for (ObstacleDTO obstacleDTO : getConfig().getObstacleConfigList().get(0).obstacles)
+                getChild(UfoObjs.class).addObstacle(obstacleDTO);
+        }
+
     }
 
     /**
