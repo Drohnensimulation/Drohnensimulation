@@ -1,0 +1,205 @@
+{
+
+  "locationConfig": {
+    "x": "1",
+    "y": "0",
+    "z": "1"
+  },
+
+
+
+  "obstacleConfigList":
+    [{
+      "obstacles": [{
+        "modelName": "red_cube",
+        "modelPath": "",
+        "id": 1,
+        "hitboxes": [{
+          "position": [0.0, 0.5, 0.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "dimension": [1.0, 1.0, 1.0]
+        }],
+        "position": [0.0, 0.5, 0.0],
+        "rotation": [0.0, 0.0, 0.0],
+        "scale": [1.0, 1.0, 1.0]
+      },{
+        "modelName": "red_cube",
+        "modelPath": "",
+        "id": 2,
+        "hitboxes": [{
+          "position": [1.0, 0.5, 0.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "dimension": [1.0, 1.0, 1.0]
+        }],
+        "position": [1.0, 0.5, 0.0],
+        "rotation": [0.0, 0.0, 0.0],
+        "scale": [1.0, 1.0, 1.0]
+      },{
+        "modelName": "red_cube",
+        "modelPath": "",
+        "id": 3,
+        "hitboxes": [{
+          "position": [0.25, 0.5, -1.25],
+          "rotation": [0.0, 0.0, 0.0],
+          "dimension": [1.0, 1.0, 1.0]
+        }],
+        "position": [0.25, 0.5, -1.25],
+        "rotation": [0.0, 0.0, 0.0],
+        "scale": [1.0, 1.0, 1.0]
+      },{
+        "modelName": "red_cube",
+        "modelPath": "",
+        "id": 4,
+        "hitboxes": [{
+          "position": [0.25, 1.5, -1.25],
+          "rotation": [0.0, 0.0, 0.0],
+          "dimension": [1.0, 1.0, 1.0]
+        }],
+        "position": [0.25, 1.5, -1.25],
+        "rotation": [0.0, 0.0, 0.0],
+        "scale": [1.0, 2.0, 1.0]
+      },{
+        "modelName": "red_cube",
+        "modelPath": "",
+        "id": 5,
+        "hitboxes": [{
+          "position": [1.0, 0.5, 0.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "dimension": [1.0, 1.0, 1.0]
+        }],
+        "position": [1.0, 0.5, 0.0],
+        "rotation": [0.0, 0.0, 0.0],
+        "scale": [1.0, 1.0, 1.0]
+      },{
+        "modelName": "red_sphere",
+        "modelPath": "",
+        "id": 6,
+        "hitboxes": [{
+          "position": [0.0, 0.5, 2.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "dimension": [1.0, 1.0, 1.0]
+        }],
+        "position": [0.0, 0.5, 2.0],
+        "rotation": [0.0, 0.0, 0.0],
+        "scale": [1.0, 1.0, 1.0]
+      },{
+        "modelName": "red_sphere",
+        "modelPath": "",
+        "id": 7,
+        "hitboxes": [{
+          "position": [0.0, 1.5, 2.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "dimension": [1.0, 1.0, 1.0]
+        }],
+        "position": [0.0, 1.5, 2.0],
+        "rotation": [0.0, 0.0, 0.0],
+        "scale": [1.0, 1.0, 1.0]
+      },{
+        "modelName": "red_sphere",
+        "modelPath": "",
+        "id": 8,
+        "hitboxes": [{
+          "position": [-1.0, 0.5, -2.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "dimension": [1.0, 1.0, 1.0]
+        }],
+        "position": [-1.0, 0.5, -2.0],
+        "rotation": [0.0, 0.0, 0.0],
+        "scale": [1.0, 1.0, 1.0]
+      },{
+        "modelName": "marker",
+        "modelPath": "",
+        "id": 9,
+        "hitboxes": [],
+        "position": [0.0, 1.0, 0.0],
+        "rotation": [0.0, 0.0, 0.0],
+        "scale": [1.0, 1.0, 1.0]
+      },{
+        "modelName": "marker",
+        "modelPath": "",
+        "id": 10,
+        "hitboxes": [],
+        "position": [1.0, 0.0, 1.0],
+        "rotation": [0.0, 0.0, 0.0],
+        "scale": [1.0, 1.0, 1.0]
+      }],
+      "config": {
+        "rayDensity": 100
+      }
+    }]
+  ,
+
+
+
+  "sensorConfigList": [
+      {
+      "className": "WindSensor",
+      "sensorId": 0,
+      "measurementAccuracy": 14.0,
+      "directionX": 15.0,
+      "directionY": 16.0,
+      "directionZ": 17.0,
+      "posX": 18.0,
+      "posY": 19.0,
+      "posZ": 20.0,
+      "range": 10.0,
+      "sensorAngle": 11.0,
+      "sensorRadius": 13.0,
+      "zeroDegreeDirectionX": 0.0,
+      "zeroDegreeDirectionY": 0.0,
+      "zeroDegreeDirectionZ": 0.0,
+      "nintyDegreeDirectionX": 0.0,
+      "nintyDegreeDirectionY": 0.0,
+      "nintyDegreeDirectionZ": 0.0,
+      "rangeIncreaseVelocity": 0.0,
+      "callTimerForSensorValues": 0
+    }
+  ],
+
+
+
+
+  "windConfigList": [
+
+    {
+      "windSpeed": 100,
+      "gustSpeed": 20,
+      "timeStart": 4,
+      "timeEnd": 15,
+      "altitudeBottom": 5,
+      "altitudeTop": 15,
+      "windDirection": 100
+    },
+
+    {
+      "windSpeed": 1,
+      "gustSpeed": 2,
+      "timeStart": 5,
+      "timeEnd": 8,
+      "altitudeBottom": 3,
+      "altitudeTop": 9,
+      "windDirection": 180
+
+    },
+    {
+      "windSpeed": 4,
+      "gustSpeed": 7,
+      "timeStart": 7,
+      "timeEnd": 17,
+      "altitudeBottom": 7,
+      "altitudeTop": 17,
+      "windDirection": 70
+
+    },
+    {
+      "windSpeed": 5,
+      "gustSpeed": 2,
+      "timeStart": 1,
+      "timeEnd": 8,
+      "altitudeBottom": 1,
+      "altitudeTop": 30,
+      "windDirection": 10
+    }
+
+  ]
+}

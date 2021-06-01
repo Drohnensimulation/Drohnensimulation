@@ -113,7 +113,7 @@ public class GpsSensor implements ISensor {
 			if(this.posLastFrame != null) {
 				this.lastHorizontalDistanceDeltas.addBack(currentTime, 
 						(float)Math.sqrt(Math.pow(vals.x-posLastFrame.x, 2) + Math.pow(vals.z-posLastFrame.z, 2)));
-					this.lastVerticalDistanceDeltas.addBack(currentTime, Math.abs(vals.y-this.posLastFrame.y));
+				this.lastVerticalDistanceDeltas.addBack(currentTime, Math.abs(vals.y-this.posLastFrame.y));
 			}
 			this.posLastFrame = vals;
 		}
@@ -210,7 +210,27 @@ public class GpsSensor implements ISensor {
 	 * @return
 	 */
 	private float addNoise(float val, int maxNoise) {
-		return (int)(val / maxNoise + 0.5) * (float)maxNoise;
+		return (int)(val / maxNoise + (val > 0 ? 0.5 : -0.5)) * (float)maxNoise;
+	}
+	
+	int getHorizontalNoise() {
+		return this.horizontalNoise;
+	}
+	
+	int getVerticalNoise() {
+		return this.verticalNoise;
+	}
+	
+	int getHSpeedObservedTime() {
+		return this.hSpeedObservationTimeInMS;
+	}
+	
+	int getVSpeedObservedTime() {
+		return this.vSpeedObservationTimeInMS;
+	}
+	
+	int getDelay() {
+		return this.measurementDelayInMS;
 	}
 	
 	private class Coordinates {
