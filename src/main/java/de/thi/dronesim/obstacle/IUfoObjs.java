@@ -89,6 +89,14 @@ public interface IUfoObjs {
      * @return Referenz zu einem Getroffenen Objekt
      */
     Set<HitMark> checkSensorCylinder(Vector3f origin, Vector3f orientation, Vector3f dimension);
+    
+    /**
+     * Prüft auf Kollisionen mit dem Drohnen-Hitbox
+     * @param origin Drohnen-Mittelpunkt
+     * @param radius Größe des kugelförmigen Hitboxes
+     * @return true wenn die Drohne mit einem fremden Objekt kollidiert
+     */
+    boolean checkDroneCollision(Vector3f origin, float radius);
 
     /**
      * Extracts the current state into the ConfigDTO

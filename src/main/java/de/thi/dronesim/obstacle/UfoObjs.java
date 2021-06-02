@@ -394,6 +394,34 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         return hits;
     }
 
+	@Override
+	public boolean checkDroneCollision(Vector3f origin, float radius) {
+    	float goldenRatio = (1f + (float) Math.sqrt(5)) / 2;
+        float angle = 2 * (float) Math.PI * goldenRatio;
+        
+        Vector3f ray = new Vector3f();
+        
+        int rayCount = 300;
+        float inclination;
+        float azimuth;
+        float sin;
+        
+        for (int l = 0; l < rayCount; l++) {
+        	inclination = (float) Math.acos(1 - 2 * l / (float) rayCount);
+        	azimuth = angle * l;
+        	sin = (float) Math.sin(inclination);
+
+            ray.set(sin * (float) Math.cos(azimuth),
+            		sin * (float) Math.sin(azimuth),
+            		(float) Math.cos(inclination)).normalizeLocal();
+            
+            //check for collision
+            if(this.rayTest(origin, ray, radius) != null)
+            	return true;
+        }
+        return false;
+	}
+	
     @Override
     public ObstacleJsonDTO save() {
         Set <Obstacle> obstacles = this.getObstacles();
