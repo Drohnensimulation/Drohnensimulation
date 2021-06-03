@@ -173,6 +173,50 @@ public class TestUfoObjs {
     }
 
     /**
+     * Test method for {@link UfoObjs#checkDroneCollision(Vector3f, float)}
+     */
+    @Test
+    public void checkDroneCollision() {
+        Vector3f origin;
+
+        // drone in front of a obstacle. obstacle position = (2.5, 1.0, 3.5)
+        origin = Jme3MathHelper.of(2,1, 2);
+        assertTrue(instance.checkDroneCollision(origin,2.0f));
+        origin = Jme3MathHelper.of(2, 1, 1);
+        assertFalse(instance.checkDroneCollision(origin,2.0f));
+
+        // Test drone to the right of a obstacle. obstacle position = (2.5, 1.0, 3.5)
+        origin = Jme3MathHelper.of(4, 1, 3);
+        assertTrue(instance.checkDroneCollision(origin, 2.0f));
+        origin = Jme3MathHelper.of(5, 1, 3);
+        assertFalse(instance.checkDroneCollision(origin, 2.0f));
+
+        // Test drone to the left of a obstacle. obstacle position = (-0.5, 1.0, 3.5)
+        origin = Jme3MathHelper.of(-2,1,3);
+        assertTrue(instance.checkDroneCollision(origin,2.0f));
+        origin = Jme3MathHelper.of(-3,1,3);
+        assertFalse(instance.checkDroneCollision(origin,2.0f));
+
+        // Test drone behind the obstacle. obstacle position = (1.0, 1.0, 5.0)
+        origin = Jme3MathHelper.of(1,1,6);
+        assertTrue(instance.checkDroneCollision(origin,2.0f));
+        origin = Jme3MathHelper.of(1,1,8);
+        assertFalse(instance.checkDroneCollision(origin,2.0f));
+
+        // Test drone over the obstacle. obstacle position = (1.0, 1.0, 5.0)
+        origin = Jme3MathHelper.of(1,2,5);
+        assertTrue(instance.checkDroneCollision(origin,2.0f));
+        origin = Jme3MathHelper.of(1, 4, 5);
+        assertFalse(instance.checkDroneCollision(origin,2.0f));
+
+        // Test drone under the obstacle. obstacle position = (4.0, 10.0, 1.0)
+        origin = Jme3MathHelper.of(4, 9,1);
+        assertTrue(instance.checkDroneCollision(origin,2.0f));
+        origin = Jme3MathHelper.of(4,7,1);
+        assertFalse(instance.checkDroneCollision(origin,2.0f));
+    }
+
+    /**
      * Test method for {@link UfoObjs#save()}
      */
     @Test
