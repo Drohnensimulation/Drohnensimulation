@@ -21,6 +21,9 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
+/**
+ * @author Christian Schmied
+ */
 public class JBulletContext {
     private static final Vector3f GRAVITY = null;//new Vector3f(0, -9.81f, 0);
     private final DynamicsWorld dynamicsWorld;
@@ -66,13 +69,12 @@ public class JBulletContext {
 
     public JBulletHitMark rayTest(com.jme3.math.Vector3f from, com.jme3.math.Vector3f direction, float range){
         //Parameters
-        float maxDistance = 10;
         Vector3f from_clone = VecMathHelper.of(from);
         Vector3f direction_clone = VecMathHelper.of(direction);
 
         //Calculate EndPoint
         direction_clone.normalize();
-        direction_clone.scale(maxDistance);
+        direction_clone.scale(range);
         Vector3f to = new Vector3f(from_clone);
         to.add(direction_clone);
 
