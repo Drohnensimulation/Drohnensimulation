@@ -411,26 +411,27 @@ public class MView extends JFrame implements IGuiView {
                 minutes = 0;
                 hours++;
             }
+
+            // Only update if we have a change, small save I guess
+            // Just for a better visual representation, if times are single digit, we add a 0 in front
+            StringBuilder time = new StringBuilder();
+            if (hours < 10)
+                time.append(String.format("0%d", hours));
+            else
+                time.append(String.format("%d", hours));
+
+            if (minutes < 10)
+                time.append(String.format(":0%d", minutes));
+            else
+                time.append(String.format(":%d", minutes));
+
+            if (seconds < 10)
+                time.append(String.format(":0%d", seconds));
+            else
+                time.append(String.format(":%d", seconds));
+
+            runtimeValue.setText(time.toString());
         }
-
-        // Just for a better visual...
-        StringBuilder time = new StringBuilder();
-        if (hours < 10)
-            time.append(String.format("0%d", hours));
-        else
-            time.append(String.format("%d", hours));
-
-        if (minutes < 10)
-            time.append(String.format(":0%d", minutes));
-        else
-            time.append(String.format(":%d", minutes));
-
-        if (seconds < 10)
-            time.append(String.format(":0%d", seconds));
-        else
-            time.append(String.format(":%d", seconds));
-
-        runtimeValue.setText(time.toString());
 
         // Update Position
         coordinateXValue.setText(String.valueOf(location.getX()));
