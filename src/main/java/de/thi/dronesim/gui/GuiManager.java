@@ -123,7 +123,7 @@ public class GuiManager implements ISimulationChild, SimulationUpdateListener {
         dView.addRenderableObjects(mapObjects);
 
         // Add drone
-        RenderableDrone drone = new RenderableDrone();
+        RenderableDrone drone = new RenderableDrone(simulation.getDrone().getRadius());
         updateDroneLocation(drone, simulation.getDrone().getLocation());
         dView.addRenderableObject(drone);
 
