@@ -4,6 +4,7 @@ import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
 import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.persistence.entity.SensorConfig;
+import de.thi.dronesim.sensor.SensorModule;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 
 
@@ -113,13 +114,22 @@ public class RotationSensor extends DistanceSensor {
 	 * 
 	 */
 	@Override
-	public void runMeasurement(SimulationUpdateEvent event) {
+	public void runMeasurement(SimulationUpdateEvent event, SensorModule sensorModule) {
 		setDirection(newOrientation(getTraveledArcMeasure(traveledTime(event))));
-		sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), calcConeHeight(), calcSurfaceVector());
+		sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), calcConeHeight(), calcSurfaceVector(), sensorModule);
 	}
 
 	@Override
 	public SensorResultDto getLastMeasurement() {
 		return sensorResultDtoValues;
+	}
+
+	@Override
+	public SensorConfig saveToConfig() {
+		SensorConfig config = super.saveToConfig();
+		config.setClassName(this.getClass().getSimpleName());
+		config.setSpinsPerSecond(spinsPerSecond);
+		config.setStartRotationTime(startRotationTime);
+		return config;
 	}
 }

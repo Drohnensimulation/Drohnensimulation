@@ -34,7 +34,7 @@ public class SensorModule implements ISimulationChild {
      * Calculates the current values for all sensors.
      */
     public void runAllMeasurements(SimulationUpdateEvent event) {
-        sensorMap.values().forEach(sensor -> sensor.runMeasurement(event));
+        sensorMap.values().forEach(sensor -> sensor.runMeasurement(event, this));
     }
 
     /**
@@ -62,9 +62,8 @@ public class SensorModule implements ISimulationChild {
     /**
      * Initialize the sensor map with the config from the simulation
      */
-    private void init() {
+    public void loadConfig(List<SensorConfig> sensorConfigList) {
         sensorMap.clear();
-        List<SensorConfig> sensorConfigList = simulation.getConfig().getSensorConfigList();
         if (sensorConfigList == null) {
             return;
         }
@@ -109,7 +108,6 @@ public class SensorModule implements ISimulationChild {
     @Override
     public void initialize(Simulation simulation) {
         this.simulation = simulation;
-        init();
         simulation.registerUpdateListener(this::runAllMeasurements);
     }
 

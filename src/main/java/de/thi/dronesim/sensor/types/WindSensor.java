@@ -8,6 +8,7 @@ import com.jme3.math.Vector3f;
 import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.ISensor;
+import de.thi.dronesim.sensor.SensorModule;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 import de.thi.dronesim.wind.Wind;
 import de.thi.dronesim.wind.Wind.CurrentWind;
@@ -112,7 +113,7 @@ public class WindSensor implements ISensor {
 	 * @return
 	 */
 	@Override
-	public void runMeasurement(SimulationUpdateEvent event) {
+	public void runMeasurement(SimulationUpdateEvent event, SensorModule sensorModule) {
 		double droneHeadingDeg = event.getDrone().getLocation().getHeading();
 //		double droneMovementDeg = event.getDrone().getLocation().getTrack();		
 		
@@ -208,6 +209,7 @@ public class WindSensor implements ISensor {
 
 		List<Float> list = new ArrayList<>(2);
 		this.lastMeasurement = new SensorResultDto();
+		this.lastMeasurement.setSensor(this);
 		if(Double.compare(measuredWindVec.length(), 0) == 0) {
 			//If no wind is measured, we return a default value
 			list.add(Float.NaN);
