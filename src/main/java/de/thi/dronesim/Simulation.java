@@ -123,9 +123,7 @@ public class Simulation {
         }
 
         //Load sensors from sensor config into sensor class
-        if (config.getSensorConfigList() != null) {
-            getChild(SensorModule.class).loadConfig(config.getSensorConfigList());
-        }
+        getChild(SensorModule.class).loadConfig(config.getSensorConfigList());
 
     }
 

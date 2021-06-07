@@ -1,7 +1,6 @@
 package de.thi.dronesim.persistence.entity;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Object that holds all configurations for the Simulation.

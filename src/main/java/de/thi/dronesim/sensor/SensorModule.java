@@ -34,7 +34,7 @@ public class SensorModule implements ISimulationChild {
      * Calculates the current values for all sensors.
      */
     public void runAllMeasurements(SimulationUpdateEvent event) {
-        sensorMap.values().forEach(sensor -> sensor.runMeasurement(event));
+        sensorMap.values().forEach(sensor -> sensor.runMeasurement(event, this));
     }
 
     /**
