@@ -6,7 +6,7 @@
     "z": "1"
   },
 
-
+  "droneRadius": 1.0,
 
   "obstacleConfigList":
     [{

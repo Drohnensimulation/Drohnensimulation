@@ -53,6 +53,7 @@ public class ConfigExample {
         simulationConfig.setWindConfigList(windConfigs);
         simulationConfig.setObstacleConfigList(obstacleConfigs);
         simulationConfig.setLocationConfig(locationConfig);
+        simulationConfig.setDroneRadius(1);
 
         if (args.length == 1 && args[0] != null) {
             ConfigWriter.writeConfig(simulationConfig, args[0]);
