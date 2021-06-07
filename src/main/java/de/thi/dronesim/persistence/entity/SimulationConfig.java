@@ -11,6 +11,7 @@ import java.util.Objects;
 public class SimulationConfig {
 
     private LocationConfig locationConfig;
+    private float droneRadius;
 
     private List<ObstacleConfig> obstacleConfigList;
     private List<SensorConfig> sensorConfigList;
@@ -22,30 +23,25 @@ public class SimulationConfig {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         SimulationConfig that = (SimulationConfig) o;
 
-        if (!Objects.equals(locationConfig, that.locationConfig)) {
+        if (Float.compare(that.droneRadius, droneRadius) != 0) return false;
+        if (locationConfig != null ? !locationConfig.equals(that.locationConfig) : that.locationConfig != null)
             return false;
-        }
-        if (!Objects.equals(obstacleConfigList, that.obstacleConfigList)) {
+        if (obstacleConfigList != null ? !obstacleConfigList.equals(that.obstacleConfigList) : that.obstacleConfigList != null)
             return false;
-        }
-        if (!Objects.equals(sensorConfigList, that.sensorConfigList)) {
+        if (sensorConfigList != null ? !sensorConfigList.equals(that.sensorConfigList) : that.sensorConfigList != null)
             return false;
-        }
-        return Objects.equals(windConfigList, that.windConfigList);
+        return windConfigList != null ? windConfigList.equals(that.windConfigList) : that.windConfigList == null;
     }
 
     @Override
     public int hashCode() {
         int result = locationConfig != null ? locationConfig.hashCode() : 0;
+        result = 31 * result + (droneRadius != +0.0f ? Float.floatToIntBits(droneRadius) : 0);
         result = 31 * result + (obstacleConfigList != null ? obstacleConfigList.hashCode() : 0);
         result = 31 * result + (sensorConfigList != null ? sensorConfigList.hashCode() : 0);
         result = 31 * result + (windConfigList != null ? windConfigList.hashCode() : 0);
@@ -86,5 +82,13 @@ public class SimulationConfig {
 
     public void setWindConfigList(List<WindConfig> windConfigList) {
         this.windConfigList = windConfigList;
+    }
+
+    public float getDroneRadius() {
+        return droneRadius;
+    }
+
+    public void setDroneRadius(float droneRadius) {
+        this.droneRadius = droneRadius;
     }
 }

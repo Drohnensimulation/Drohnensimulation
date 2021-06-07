@@ -4,7 +4,10 @@ import com.google.gson.Gson;
 import com.jme3.math.Vector3f;
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.helpers.Jme3MathHelper;
+import de.thi.dronesim.obstacle.dto.HitBoxDTO;
+import de.thi.dronesim.obstacle.dto.ObstacleConfigurationDTO;
 import de.thi.dronesim.obstacle.dto.ObstacleDTO;
+import de.thi.dronesim.obstacle.dto.ObstacleJsonDTO;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 import de.thi.dronesim.obstacle.util.HitBoxRigidBody;
@@ -18,7 +21,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test class for {@link UfoObjs}
+ *
+ * @author Michael Küchenmeister
  */
+
 public class TestUfoObjs {
     private static UfoObjs instance;
     private static Simulation simulation;
@@ -160,19 +166,127 @@ public class TestUfoObjs {
     public void checkSensorCylinder() {
         Vector3f sensorPos = Jme3MathHelper.of(1,1,1);
         Vector3f direction = Jme3MathHelper.of(0,0,1);
-        Vector3f dimension = Jme3MathHelper.of(3,2,3);
+        Vector3f dimension = Jme3MathHelper.of(5,5,10);
 
         Set<HitMark> hits = instance.checkSensorCylinder(sensorPos,direction,dimension);
         checkRayTestValues(hits); // See this method below
     }
 
     /**
+     * Test method for {@link UfoObjs#checkDroneCollision(Vector3f, float)}
+     */
+    @Test
+    public void checkDroneCollision() {
+        Vector3f origin;
+
+        // drone in front of a obstacle. obstacle position = (2.5, 1.0, 3.5)
+        origin = Jme3MathHelper.of(2,1, 2);
+        assertTrue(instance.checkDroneCollision(origin,2.0f));
+        origin = Jme3MathHelper.of(2, 1, 1);
+        assertFalse(instance.checkDroneCollision(origin,2.0f));
+
+        // Test drone to the right of a obstacle. obstacle position = (2.5, 1.0, 3.5)
+        origin = Jme3MathHelper.of(4, 1, 3);
+        assertTrue(instance.checkDroneCollision(origin, 2.0f));
+        origin = Jme3MathHelper.of(5, 1, 3);
+        assertFalse(instance.checkDroneCollision(origin, 2.0f));
+
+        // Test drone to the left of a obstacle. obstacle position = (-0.5, 1.0, 3.5)
+        origin = Jme3MathHelper.of(-2,1,3);
+        assertTrue(instance.checkDroneCollision(origin,2.0f));
+        origin = Jme3MathHelper.of(-3,1,3);
+        assertFalse(instance.checkDroneCollision(origin,2.0f));
+
+        // Test drone behind the obstacle. obstacle position = (1.0, 1.0, 5.0)
+        origin = Jme3MathHelper.of(1,1,6);
+        assertTrue(instance.checkDroneCollision(origin,2.0f));
+        origin = Jme3MathHelper.of(1,1,8);
+        assertFalse(instance.checkDroneCollision(origin,2.0f));
+
+        // Test drone over the obstacle. obstacle position = (1.0, 1.0, 5.0)
+        origin = Jme3MathHelper.of(1,2,5);
+        assertTrue(instance.checkDroneCollision(origin,2.0f));
+        origin = Jme3MathHelper.of(1, 4, 5);
+        assertFalse(instance.checkDroneCollision(origin,2.0f));
+
+        // Test drone under the obstacle. obstacle position = (4.0, 10.0, 1.0)
+        origin = Jme3MathHelper.of(4, 9,1);
+        assertTrue(instance.checkDroneCollision(origin,2.0f));
+        origin = Jme3MathHelper.of(4,7,1);
+        assertFalse(instance.checkDroneCollision(origin,2.0f));
+    }
+
+    /**
      * Test method for {@link UfoObjs#save()}
      */
-    @Disabled
     @Test
     public void save() {
-        // TODO: Write test method for save the actual environmental context into file
+        ObstacleJsonDTO testDTO = instance.save();
+
+        if(testDTO == null) {
+            fail("The returned ObstacleJsonDTO is null!");
+        }
+
+        // Check the value of rayDensity
+        ObstacleConfigurationDTO testConfDTO = testDTO.config;
+        assertEquals(10,testConfDTO.rayDensity);
+
+        Set<ObstacleDTO> obstacles = testDTO.obstacles;
+        int numberObstacles = 0;
+
+        // Check the values of the different obstacles
+        for(ObstacleDTO o : obstacles) {
+            if(o.id == 1L) {
+                assertEquals("testObj1", o.modelName);
+                assertEquals("/test1", o.modelPath);
+                assertArrayEquals(new Float[]{2.5f,1.0f,3.5f},o.position);
+                assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},o.rotation);
+                assertArrayEquals(new Float[]{0.25f,0.25f,0.25f},o.scale);
+                Set<HitBoxDTO> hitbox = o.hitboxes;
+                HitBoxDTO h = hitbox.stream().findFirst().get(); // Get the first element from hitbox set
+                assertArrayEquals(new Float[]{2.5f,1.0f,3.5f},h.position);
+                assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},h.rotation);
+                assertArrayEquals(new Float[]{0.5f,0.5f,0.5f},h.dimension);
+                numberObstacles++;
+            } else if(o.id == 2L) {
+                assertEquals("testObj2", o.modelName);
+                assertEquals("/test2", o.modelPath);
+                assertArrayEquals(new Float[]{-0.5f,1.0f,3.5f},o.position);
+                assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},o.rotation);
+                assertArrayEquals(new Float[]{0.25f,0.25f,0.25f},o.scale);
+                Set<HitBoxDTO> hitbox = o.hitboxes;
+                HitBoxDTO h = hitbox.stream().findFirst().get(); // Get the first element from hitbox set
+                assertArrayEquals(new Float[]{-0.5f,1.0f,3.5f},h.position);
+                assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},h.rotation);
+                assertArrayEquals(new Float[]{0.5f,0.5f,0.5f},h.dimension);
+                numberObstacles++;
+            } else if(o.id == 3L) {
+                assertEquals("testObj3", o.modelName);
+                assertEquals("/test3", o.modelPath);
+                assertArrayEquals(new Float[]{1.0f,1.0f,5.0f},o.position);
+                assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},o.rotation);
+                assertArrayEquals(new Float[]{0.25f,0.25f,0.25f},o.scale);
+                Set<HitBoxDTO> hitbox = o.hitboxes;
+                HitBoxDTO h = hitbox.stream().findFirst().get(); // Get the first element from hitbox set
+                assertArrayEquals(new Float[]{1.0f,1.0f,5.0f},h.position);
+                assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},h.rotation);
+                assertArrayEquals(new Float[]{0.5f,0.5f,0.5f},h.dimension);
+                numberObstacles++;
+            } else if(o.id == 4L) {
+                assertEquals("testObj4", o.modelName);
+                assertEquals("/test4", o.modelPath);
+                assertArrayEquals(new Float[]{4.0f,10.0f,1.0f},o.position);
+                assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},o.rotation);
+                assertArrayEquals(new Float[]{0.25f,0.25f,0.25f},o.scale);
+                Set<HitBoxDTO> hitbox = o.hitboxes;
+                HitBoxDTO h = hitbox.stream().findFirst().get(); // Get the first element from hitbox set
+                assertArrayEquals(new Float[]{4.0f,10.0f,1.0f},h.position);
+                assertArrayEquals(new Float[]{0.0f,0.0f,0.0f},h.rotation);
+                assertArrayEquals(new Float[]{0.5f,0.5f,0.5f},h.dimension);
+                numberObstacles++;
+            }
+        }
+        assertEquals(4,numberObstacles, "The returned ObstacleJsonDTO contains not all obstacles!");
     }
 
     /**
@@ -219,7 +333,7 @@ public class TestUfoObjs {
                         "      \"scale\":[0.25,0.25,0.25]" +
                         "    }" +
                         "  ]," +
-                        "  \"config\":{\"rayDensity\":100}" +
+                        "  \"config\":{\"rayDensity\":10}" +
                         "}";
 
         Gson gson = new Gson();
@@ -232,12 +346,6 @@ public class TestUfoObjs {
         config.setObstacleConfigList(configList);
 
         instance.initialize(simulation);
-
-        // Add all obstacles
-        Set<ObstacleDTO> obstacleSet = obstacleConfig.obstacles;
-        for(ObstacleDTO obstacle : obstacleSet) {
-            instance.addObstacle(obstacle);
-        }
     }
 
     /**
@@ -245,9 +353,10 @@ public class TestUfoObjs {
      * @param hits
      *
      *                   (1.0,1.0,1.0)
-     *                      Drone
-     *                        *
-     *                      | | |
+     *                      Drone         ------
+     *                        *           | o4 |
+     *                      | | |         ------
+     *                     |     |     (4.0,10.0,1.0)
      *                   |    |    |
      *            ------      |     ------
      *            | o2 |      |     | o1 |
@@ -273,35 +382,31 @@ public class TestUfoObjs {
             }
         }
 
-        // The values were calculated with our JBullet Sandbox project. That should actually be the shortest hits
-        // See a sketch above!
-        int numberHitObj = 0;
+        int numberHitObj1 = 0; // Number of hits on obstacle 1
+        int numberHitObj2 = 0; // Number of hits on obstacle 2
+        int numberHitObj3 = 0; // Number of hits on obstacle 3
+        int numberHitObj4 = 0; // Number of hits on obstacle 4
 
         if(hits != null) {
             for (HitMark h : hits) {
-                // TODO: Maybe don´t use the values of the exact edges, because the rays could not hit them exactly
-                if (h.getObstacle().getID().equals(1L)) {
-                    assertEquals(2.236068f, h.getDistance());
-                    assertEquals(Jme3MathHelper.of(2.0f, 1.0f, 3.0f), h.worldHit());
-                    assertEquals(Jme3MathHelper.of(1.0f, 0.0f, 2.0f), h.relativeHit());
-                    assertEquals(hitObs1, h.getObstacle());
-                    numberHitObj++;
-                } else if (h.getObstacle().getID().equals(2L)) {
-                    assertEquals(2.236068f, h.getDistance());
-                    assertEquals(Jme3MathHelper.of(-5.9604645E-8f, 1, 3.0000002f), h.worldHit());
-                    assertEquals(Jme3MathHelper.of(-1, 0, 2.0000002f), h.relativeHit());
-                    assertEquals(hitObs2, h.getObstacle());
-                    numberHitObj++;
-                } else if (h.getObstacle().getID().equals(3L)) {
-                    assertEquals(3.500000f, h.getDistance());
-                    assertEquals(Jme3MathHelper.of(1.0f, 1.0f, 4.5f), h.worldHit());
-                    assertEquals(Jme3MathHelper.of(0.0f, 0.0f, 3.5f), h.relativeHit());
-                    assertEquals(hitObs3, h.getObstacle());
-                    numberHitObj++;
+                if (h.getObstacle().equals(hitObs1)) {
+                    numberHitObj1++;
+                } else if (h.getObstacle().equals(hitObs2)) {
+                    numberHitObj2++;
+                } else if (h.getObstacle().equals(hitObs3)) {
+                    numberHitObj3++;
+                } else if (h.getObstacle().equals(hitObs4)) {
+                    numberHitObj4++; // Check a obstacle which is out of range. It´s on position (4.0, 10.0, 1.0)
                 }
-                assertNotEquals(h.getObstacle(), hitObs4); // Check a obstacle which is out of range. It´s on position (4.0, 10.0, 1.0)
             }
-            assertEquals(3, numberHitObj, "Not all obstacles were hitted");
+            if(numberHitObj1+numberHitObj2+numberHitObj3+numberHitObj4 == 0) {
+                fail("No obstacle was hitted!");
+            } else {
+                assertTrue(numberHitObj1 > 0, "Obstacle 1 on position (2.5, 1.0, 3.5) was not hitted!");
+                assertTrue(numberHitObj2 > 0, "Obstacle 2 on position (-0.5, 1.0, 3.5) was not hitted!");
+                assertTrue(numberHitObj3 > 0, "Obstacle 3 on position (1.0, 1.0, 5.0 was not hitted!");
+                assertEquals(0, numberHitObj4, "Obstacle 4 on position (4.0, 10.0, 1.0) which should be out of range was hitted!");
+            }
         } else {
             fail("The returned HitMark set is null");
         }

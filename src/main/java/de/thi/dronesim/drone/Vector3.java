@@ -1,5 +1,10 @@
 package de.thi.dronesim.drone;
 
+/**
+ * @author Bakri Aghyourli
+ * @author Dominik Bartl
+ */
+
 public class Vector3 {
 
     public double x, y, z;
