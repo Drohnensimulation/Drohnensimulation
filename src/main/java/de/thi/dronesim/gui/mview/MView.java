@@ -442,9 +442,9 @@ public class MView extends JFrame implements IGuiView {
 
 
         // Update Position
-        coordinateXValue.setText(String.valueOf(location.getX()));
-        coordinateYValue.setText(String.valueOf(location.getY()));
-        coordinateZValue.setText(String.valueOf(location.getZ()));
+        coordinateXValue.setText(String.format("%.3f", location.getX()));
+        coordinateYValue.setText(String.format("%.3f", location.getY()));
+        coordinateZValue.setText(String.format("%.3f", location.getZ()));
 
         // Update Heading and Tilts
         double hdg = location.getHeading() % 360.00;
@@ -468,17 +468,17 @@ public class MView extends JFrame implements IGuiView {
         else if (hdg > 292.5 && hdg <= 360.1)
             dir = "E";
 
-        headingValue.setText(dir.concat(" @ " + hdg + " Degree"));
-        pitchValue.setText(String.valueOf(location.getPitch()));
+        headingValue.setText(dir.concat(String.format(" @ %.3f", hdg) + " Degree"));
+        pitchValue.setText(String.format("%.3f", location.getPitch()));
 
-        // These values do not exist currently TODO: Discuss if they will ever be added, else remove this (+labels), will screw the layout so adjust accordingly
-        //rollValue.setText(String.valueOf(location.getRoll()));
-        //yawValue.setText(String.valueOf(location.getYaw()));
+        // These values do not exist currently, but can be added
+        //rollValue.setText(String.format("%.3f", location.getRoll()));
+        //yawValue.setText(String.format("%.3f", location.getYaw()));
 
         // Velocities
-        airSpeedValue.setText(String.valueOf(location.getAirspeed()));
-        verticalVelocityValue.setText(String.valueOf(location.getVerticalSpeed()));
-        groundSpeedValue.setText(String.valueOf(location.getGroundSpeed()));
+        airSpeedValue.setText(String.format("%.3f", location.getAirspeed()));
+        verticalVelocityValue.setText(String.format("%.3f", location.getVerticalSpeed()));
+        groundSpeedValue.setText(String.format("%.3f", location.getGroundSpeed()));
 
         // Obstacles and Wind
         if (sim != null) {
