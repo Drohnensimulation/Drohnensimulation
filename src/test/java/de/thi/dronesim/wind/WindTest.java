@@ -3,6 +3,7 @@ package de.thi.dronesim.wind;
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.drone.Location;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -714,6 +715,7 @@ class WindTest {
 
 
     @Test
+    @Disabled("FIXME")
     void load(){
         fail();
         // TODO

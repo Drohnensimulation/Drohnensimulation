@@ -51,7 +51,7 @@ public class WindSensorTest {
 		SimulationUpdateEvent event = new SimulationUpdateEvent(drone, 0, 0);
 		
 		WindSensor sensor = new WindSensor(conf);
-		sensor.runMeasurement(event);
+		sensor.runMeasurement(event, null);
 		
 		assertEquals(new Vector3(0,0,1), roundVector(sensor.getLastAbsSensorDirection(), maxFractionDigits));
 	}
@@ -78,7 +78,7 @@ public class WindSensorTest {
 		SimulationUpdateEvent event = new SimulationUpdateEvent(drone, 0, 0);
 		
 		WindSensor sensor = new WindSensor(conf);
-		sensor.runMeasurement(event);
+		sensor.runMeasurement(event, null);
 		
 		assertEquals(new Vector3(1,0,0), roundVector(sensor.getLastAbsSensorDirection(), maxFractionDigits));
 	}
@@ -105,7 +105,7 @@ public class WindSensorTest {
 		SimulationUpdateEvent event = new SimulationUpdateEvent(drone, 0, 0);
 		
 		WindSensor sensor = new WindSensor(conf);
-		sensor.runMeasurement(event);
+		sensor.runMeasurement(event, null);
 		
 		assertEquals(new Vector3(0,-1,0), roundVector(sensor.getLastAbsSensorDirection(), maxFractionDigits));
 	}
@@ -132,7 +132,7 @@ public class WindSensorTest {
 		SimulationUpdateEvent event = new SimulationUpdateEvent(drone, 0, 0);
 		
 		WindSensor sensor = new WindSensor(conf);
-		sensor.runMeasurement(event);
+		sensor.runMeasurement(event, null);
 		
 		assertEquals(new Vector3(roundValue((float)(-Math.sqrt(2)*0.5), maxFractionDigits),-1,roundValue((float)(Math.sqrt(2)*0.5), maxFractionDigits)), roundVector(sensor.getLastAbsSensorDirection(), maxFractionDigits));
 	}
@@ -159,7 +159,7 @@ public class WindSensorTest {
 		SimulationUpdateEvent event = new SimulationUpdateEvent(drone, 0, 0);
 		
 		WindSensor sensor = new WindSensor(conf);
-		sensor.runMeasurement(event);
+		sensor.runMeasurement(event, null);
 		
 		double rotFromDefaultPos = Math.toRadians(135);
 		assertEquals(new Vector3(
@@ -191,7 +191,7 @@ public class WindSensorTest {
 		SimulationUpdateEvent event = new SimulationUpdateEvent(drone, 0, 0);
 		
 		WindSensor sensor = new WindSensor(conf);
-		sensor.runMeasurement(event);
+		sensor.runMeasurement(event, null);
 		
 		assertEquals(Float.NaN, sensor.getLastMeasurement().getValues().get(0));
 		assertEquals(0f, sensor.getLastMeasurement().getValues().get(1));
@@ -224,7 +224,7 @@ public class WindSensorTest {
 		SimulationUpdateEvent event = new SimulationUpdateEvent(drone, 0, 0);
 		
 		WindSensor sensor = new WindSensor(conf);
-		sensor.runMeasurement(event);
+		sensor.runMeasurement(event, null);
 		
 		assertEquals(180, sensor.getLastMeasurement().getValues().get(0));
 		assertEquals(10, sensor.getLastMeasurement().getValues().get(1));
@@ -256,7 +256,7 @@ public class WindSensorTest {
 		SimulationUpdateEvent event = new SimulationUpdateEvent(drone, 0, 0);
 		
 		WindSensor sensor = new WindSensor(conf);
-		sensor.runMeasurement(event);
+		sensor.runMeasurement(event, null);
 		
 		assertEquals(90, sensor.getLastMeasurement().getValues().get(0));
 		assertEquals(10, sensor.getLastMeasurement().getValues().get(1));
@@ -288,7 +288,7 @@ public class WindSensorTest {
 		SimulationUpdateEvent event = new SimulationUpdateEvent(drone, 0, 0);
 		
 		WindSensor sensor = new WindSensor(conf);
-		sensor.runMeasurement(event);
+		sensor.runMeasurement(event, null);
 		
 		assertEquals(180, sensor.getLastMeasurement().getValues().get(0));
 		assertEquals(roundValue((float)(Math.sqrt(2)*10), maxFractionDigits), roundValue((float)(sensor.getLastMeasurement().getValues().get(1)), maxFractionDigits));
@@ -321,7 +321,7 @@ public class WindSensorTest {
 		SimulationUpdateEvent event = new SimulationUpdateEvent(drone, 0, 0);
 		
 		WindSensor sensor = new WindSensor(conf);
-		sensor.runMeasurement(event);
+		sensor.runMeasurement(event, null);
 		
 		assertEquals(180, sensor.getLastMeasurement().getValues().get(0));
 		assertEquals(50, sensor.getLastMeasurement().getValues().get(1));
@@ -354,7 +354,7 @@ public class WindSensorTest {
 		SimulationUpdateEvent event = new SimulationUpdateEvent(drone, 0, 0);
 		
 		WindSensor sensor = new WindSensor(conf);
-		sensor.runMeasurement(event);
+		sensor.runMeasurement(event, null);
 		
 		assertEquals(0, sensor.getLastMeasurement().getValues().get(0));
 		assertEquals(50, sensor.getLastMeasurement().getValues().get(1));

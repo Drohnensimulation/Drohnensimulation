@@ -20,17 +20,6 @@ public class Drone {
         radius = 1f;
     }
     
-    /**
-     * radius default value is 1
-     * 
-     * @deprecated use {@link #Drone(x, y, z, radius)} to manually define hitbox radius instead.
-     */
-    @Deprecated
-    public Drone(float x, float y, float z) {
-        location = new Location(x, y, z);
-        this.radius = 1f;
-    }
-    
     public Drone(float x, float y, float z, float radius) {
     	location = new Location(x, y, z);
     	this.radius = radius;

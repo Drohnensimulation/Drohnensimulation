@@ -56,7 +56,7 @@ public class Simulation {
         this.config = ConfigReader.readConfig(configPath);
         this.children = new HashMap<>();
         LocationConfig locationConfig = config.getLocationConfig();
-        this.drone = new Drone(locationConfig.getX(), locationConfig.getY(), locationConfig.getZ());
+        this.drone = new Drone(locationConfig.getX(), locationConfig.getY(), locationConfig.getZ(), config.getDroneRadius());
     }
 
     /**
@@ -123,9 +123,7 @@ public class Simulation {
         }
 
         //Load sensors from sensor config into sensor class
-        if (config.getSensorConfigList() != null) {
-            getChild(SensorModule.class).initialize(this);
-        }
+        getChild(SensorModule.class).loadConfig(config.getSensorConfigList());
 
     }
 

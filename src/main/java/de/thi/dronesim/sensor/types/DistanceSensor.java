@@ -7,6 +7,7 @@ import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.ISensor;
+import de.thi.dronesim.sensor.SensorModule;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 import de.thi.dronesim.sensor.enums.CalcType;
 import de.thi.dronesim.sensor.enums.SensorForm;
@@ -39,6 +40,7 @@ public abstract class DistanceSensor implements ISensor {
 
     // see getter and setter for a documentation of the fields
     private String name;
+    private int id;
     private float range;
     private float sensorAngle;
     private float sensorRadius;
@@ -62,6 +64,7 @@ public abstract class DistanceSensor implements ISensor {
      */
     public DistanceSensor(SensorConfig config){
         this.name = config.getClassName();
+        this.id = config.getSensorId();
         this.range = config.getRange();
         this.sensorAngle = config.getSensorAngle();
         this.sensorRadius = config.getSensorRadius();
@@ -114,7 +117,7 @@ public abstract class DistanceSensor implements ISensor {
      *
      * @author Johannes Steierl
      */
-    public SensorResultDto getSensorResult(Vector3f origin, Vector3f direction, float range, Vector3f opening) {
+    public SensorResultDto getSensorResult(Vector3f origin, Vector3f direction, float range, Vector3f opening, SensorModule sensorModule) {
         //Helperclass only used in this method so far
         class ObstacleAndDistanceDTO {
             private Obstacle obstacle;
@@ -137,7 +140,7 @@ public abstract class DistanceSensor implements ISensor {
             }
         }
 
-        Set<HitMark> hitMarks = getSensorHits(origin, direction, range, opening, getSensorForm());
+        Set<HitMark> hitMarks = getSensorHits(origin, direction, range, opening, getSensorForm(), sensorModule);
 
         //grouping hitmarks by the hit object
         List<Set<HitMark>> hitmarksGroupedByObstacles = new ArrayList<>();
@@ -212,7 +215,6 @@ public abstract class DistanceSensor implements ISensor {
 
         SensorResultDto sensorResultDto = new SensorResultDto();
         sensorResultDto.setSensor(this);
-        Obstacle nearest = obstacleAndDistanceDTOS.get(0).getObstacle();
         obstacleAndDistanceDTOS.forEach(o -> sensorResultDto.getObstacle().add(o.getObstacle()));
         //first value of the values-array ist the nearest, the last is the farthest
         if (sensorResultDto.getValues() == null) {
@@ -241,9 +243,8 @@ public abstract class DistanceSensor implements ISensor {
      */
     public SensorConfig saveToConfig() {
         SensorConfig config = new SensorConfig();
-        config.setRange(range);
-        config.setSensorAngle(sensorAngle);
-        config.setSensorRadius(sensorRadius);
+        config.setSensorId(id);
+
         config.setMeasurementAccuracy(measurementAccuracy);
         config.setDirectionX(directionVector.getX());
         config.setDirectionY(directionVector.getY());
@@ -251,6 +252,13 @@ public abstract class DistanceSensor implements ISensor {
         config.setPosX(positionVector.getX());
         config.setPosY(positionVector.getY());
         config.setPosZ(positionVector.getZ());
+
+        config.setRange(range);
+        config.setSensorAngle(sensorAngle);
+        config.setSensorRadius(sensorRadius);
+        config.setSensorForm(sensorForm.name());
+        config.setCalcType(calcType.name());
+
         return config;
     }
 
@@ -465,9 +473,10 @@ public abstract class DistanceSensor implements ISensor {
      *
      * @author Johannes Steierl
      */
-    private Set<HitMark> getSensorHits(Vector3f origin, Vector3f orientation, float range, Vector3f opening, SensorForm sensorForm) {
-        UfoObjs ufoObjs = new UfoObjs();
-        Vector3f dimension = new Vector3f(0,0,0);
+    private Set<HitMark> getSensorHits(Vector3f origin, Vector3f orientation, float range, Vector3f opening, SensorForm sensorForm, SensorModule sensorModule) {
+        UfoObjs ufoObjs = sensorModule.getSimulation().getChild(UfoObjs.class);
+
+        Vector3f dimension;
         switch (sensorForm){
             case CONE:      return ufoObjs.checkSensorCone(origin, orientation, range, opening);
             case CUBOID:
@@ -497,8 +506,7 @@ public abstract class DistanceSensor implements ISensor {
 
     @Override
     public int getId() {
-        // TODO
-        return 0;
+        return id;
     }
 
     /**
@@ -646,4 +654,8 @@ public abstract class DistanceSensor implements ISensor {
 	    return this.getId() == sensor.getId();
     }
 
+    @Override
+    public String getType() {
+        return "DistanceSensor";
+    }
 }

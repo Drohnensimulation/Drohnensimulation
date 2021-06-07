@@ -123,7 +123,7 @@ public class SimulationTest {
         SimulationUpdateListener l4 = event -> assertEquals(4, i.getAndSet(0));
         simulation.registerUpdateListener(l4, 10);
 
-        assertEquals(6, simulation.getUpdateListeners().size());
+        assertEquals(8, simulation.getUpdateListeners().size());
         assertSame(l1, simulation.getUpdateListeners().get(1000));
         assertSame(l2, simulation.getUpdateListeners().get(799));
         assertSame(l3, simulation.getUpdateListeners().get(10));
