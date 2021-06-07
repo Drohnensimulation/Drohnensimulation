@@ -39,7 +39,7 @@ public class GpsSensor implements ISensor {
 	 * Creates a new GPS Sensor
 	 */
 	public GpsSensor(SensorConfig config) {
-		this.name = "Gpssensor";
+		this.name = "GpsSensor";
 		this.id = config.getSensorId();
 		this.measurements = new List<>();
 		this.lastHorizontalDistanceDeltas = new List<>();

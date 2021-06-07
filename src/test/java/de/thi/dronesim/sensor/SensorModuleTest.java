@@ -130,16 +130,16 @@ class SensorModuleTest {
 		assertEquals(WindSensor.class, child.getResultFromSensor(5).getSensor().getClass());
 
 		assertEquals("GpsSensor", child.getResultFromSensor(1).getSensor().getType());
-		assertEquals("InfrarotSensor", child.getResultFromSensor(2).getSensor().getType());
-		assertEquals("RotationSensor", child.getResultFromSensor(3).getSensor().getType());
-		assertEquals("UltrasonicSensor", child.getResultFromSensor(4).getSensor().getType());
+		assertEquals("DistanceSensor", child.getResultFromSensor(2).getSensor().getType());
+		assertEquals("DistanceSensor", child.getResultFromSensor(3).getSensor().getType());
+		assertEquals("DistanceSensor", child.getResultFromSensor(4).getSensor().getType());
 		assertEquals("WindSensor", child.getResultFromSensor(5).getSensor().getType());
 
-		assertEquals("Gpssensor", child.getResultFromSensor(1).getSensor().getName());
+		assertEquals("GpsSensor", child.getResultFromSensor(1).getSensor().getName());
 		assertEquals("InfraredSensor", child.getResultFromSensor(2).getSensor().getName());
 		assertEquals("RotationSensor", child.getResultFromSensor(3).getSensor().getName());
 		assertEquals("UltrasonicSensor", child.getResultFromSensor(4).getSensor().getName());
-		assertEquals("Windsensor", child.getResultFromSensor(5).getSensor().getName());
+		assertEquals("WindSensor", child.getResultFromSensor(5).getSensor().getName());
 
 		assertTrue(child.getResultFromSensor(1).getSensor().equals(child.getResultFromSensor(1).getSensor()));
 		assertFalse(child.getResultFromSensor(1).getSensor().equals(child.getResultFromSensor(2).getSensor()));

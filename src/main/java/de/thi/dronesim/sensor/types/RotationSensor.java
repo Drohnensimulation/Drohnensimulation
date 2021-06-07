@@ -38,12 +38,6 @@ public class RotationSensor extends DistanceSensor {
 		spinsToRotationVelocityConverter(spinsPerSecond);
 	}
 
-	@Override
-	public String getType() {
-		// TODO Auto-generated method stub
-		String name = "RotationSensor";
-		return name;
-	}
 	/**
 	 *  This Method converts spins per seconds into radiant. with this value it is possible to calculate the traveled distance
 	 */

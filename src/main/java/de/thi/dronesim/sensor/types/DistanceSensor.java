@@ -654,4 +654,8 @@ public abstract class DistanceSensor implements ISensor {
 	    return this.getId() == sensor.getId();
     }
 
+    @Override
+    public String getType() {
+        return "DistanceSensor";
+    }
 }

@@ -45,11 +45,12 @@ public class ConfigWriterTest {
         String expectedContent = "" +
                 "{\n" +
                 "  \"locationConfig\": null,\n" +
+                "  \"droneRadius\": 0.0,\n" +
                 "  \"obstacleConfigList\": null,\n" +
                 "  \"sensorConfigList\": null,\n" +
                 "  \"windConfigList\": null\n" +
                 "}";
 
-        assertEquals(content, expectedContent);
+        assertEquals(expectedContent, content);
     }
 }

@@ -29,15 +29,6 @@ public class UltrasonicSensor extends DistanceSensor {
 		this.startIncreaseTime= config.getStartIncreaseTime();
 	}
 
-	//public UltrasonicSensor() {}
-
-	@Override
-	public String getType() {
-		String name = "UltrasonicSensor";
-		return name;
-	}
-
-
 	/**
 	 *  This Method is resetting the startIncreaseTime to calculate the next measurement
 	 */

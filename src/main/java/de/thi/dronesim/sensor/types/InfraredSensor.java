@@ -12,13 +12,6 @@ public class InfraredSensor extends DistanceSensor {
 	}
 
 	@Override
-	public String getType() {
-		String name = "InfrarotSensor";
-		return name;
-		
-	}
-
-	@Override
 	public void runMeasurement(SimulationUpdateEvent event, SensorModule sensorModule) {
 		sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), calcConeHeight(), calcSurfaceVector(), sensorModule);
 	}

@@ -59,7 +59,7 @@ public class WindSensor implements ISensor {
 	 * @param config
 	 */
 	public WindSensor(SensorConfig config) {
-		this.name = "Windsensor";
+		this.name = "WindSensor";
 		this.id = config.getSensorId();
 		this.relativeDirection = new Vector3f(config.getDirectionX(), config.getDirectionY(), config.getDirectionZ());
 		
