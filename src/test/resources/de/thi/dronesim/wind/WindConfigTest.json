@@ -1,0 +1,57 @@
+{
+  "locationConfig": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+  },
+  "droneRadius": 0.0,
+  "obstacleConfigList": [],
+  "sensorConfigList": [],
+  "windConfigList": [
+    {
+      "windSpeed": 1.0,
+      "gustSpeed": 1.0,
+      "timeStart": 0.0,
+      "timeEnd": 10.0,
+      "altitudeBottom": 0.0,
+      "altitudeTop": 10.0,
+      "windDirection": 1.0
+    },
+    {
+      "windSpeed": 2.0,
+      "gustSpeed": 2.0,
+      "timeStart": 10.0,
+      "timeEnd": 20.0,
+      "altitudeBottom": 0.0,
+      "altitudeTop": 10.0,
+      "windDirection": 2.0
+    },
+    {
+      "windSpeed": 3.0,
+      "gustSpeed": 3.0,
+      "timeStart": 20.0,
+      "timeEnd": 30.0,
+      "altitudeBottom": 0.0,
+      "altitudeTop": 10.0,
+      "windDirection": 3.0
+    },
+    {
+      "windSpeed": 4.0,
+      "gustSpeed": 4.0,
+      "timeStart": 30.0,
+      "timeEnd": 40.0,
+      "altitudeBottom": 0.0,
+      "altitudeTop": 10.0,
+      "windDirection": 4.0
+    },
+    {
+      "windSpeed": 5.0,
+      "gustSpeed": 5.0,
+      "timeStart": 40.0,
+      "timeEnd": 50.0,
+      "altitudeBottom": 0.0,
+      "altitudeTop": 10.0,
+      "windDirection": 5.0
+    }
+  ]
+}

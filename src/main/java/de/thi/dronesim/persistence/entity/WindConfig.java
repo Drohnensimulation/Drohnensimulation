@@ -7,10 +7,6 @@ package de.thi.dronesim.persistence.entity;
  */
 public class WindConfig {
 
-    // TODO: add attributes, overwrite equals and hashcode
-
-    private int dummy;
-
     private double windSpeed;                           // Speed of the steady wind             [m/s]
     private double gustSpeed;                           // Max Speed of the gusts               [m/s]
     private double timeStart;                           // time of wind layer start             [s]
@@ -23,26 +19,46 @@ public class WindConfig {
     // Object Methods
     // /////////////////////////////////////////////////////////////////////////////
 
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         WindConfig that = (WindConfig) o;
 
-        return dummy == that.dummy;
+        if (Double.compare(that.windSpeed, windSpeed) != 0) return false;
+        if (Double.compare(that.gustSpeed, gustSpeed) != 0) return false;
+        if (Double.compare(that.timeStart, timeStart) != 0) return false;
+        if (Double.compare(that.timeEnd, timeEnd) != 0) return false;
+        if (Double.compare(that.altitudeBottom, altitudeBottom) != 0) return false;
+        if (Double.compare(that.altitudeTop, altitudeTop) != 0) return false;
+        return Double.compare(that.windDirection, windDirection) == 0;
     }
 
     @Override
     public int hashCode() {
-        return dummy;
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(windSpeed);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(gustSpeed);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(timeStart);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(timeEnd);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(altitudeBottom);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(altitudeTop);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(windDirection);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
     }
 
+    // /////////////////////////////////////////////////////////////////////////////
+    // Getter/ Setter
+    // /////////////////////////////////////////////////////////////////////////////
 
     public double getWindDirection() {
         return windDirection;
@@ -99,4 +115,5 @@ public class WindConfig {
     public void setWindSpeed(double windSpeed) {
         this.windSpeed = windSpeed;
     }
+
 }

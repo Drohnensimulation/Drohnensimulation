@@ -1,12 +1,18 @@
 
-package de.thi.dronesim.sensor;
+package de.thi.dronesim.sensor.types;
 
 import com.jme3.math.Vector3f;
-import de.thi.dronesim.sensor.types.RotationSensor;
+
+import de.thi.dronesim.persistence.entity.SensorConfig;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -15,6 +21,34 @@ import java.util.concurrent.TimeUnit;
  * @author Moris Breitenborn
  */
 public class RotationSensorTest {
+	
+	//All values
+	SensorConfig sensorConfigA = new SensorConfig();
+    @BeforeEach
+    public void init() {
+    	//All
+    	List<SensorConfig> sensorConfigsA = new ArrayList<>();
+    	sensorConfigA.setRange(10);
+    	sensorConfigA.setSensorAngle(11);
+    	sensorConfigA.setSensorRadius(13);
+        sensorConfigA.setMeasurementAccuracy(14);
+        sensorConfigA.setDirectionX(15);
+        sensorConfigA.setDirectionY(16);
+        sensorConfigA.setDirectionZ(17);
+        sensorConfigA.setPosX(18);
+        sensorConfigA.setPosY(19);
+        sensorConfigA.setPosZ(20);
+        //UltrasonicSensor
+        sensorConfigA.setRangeIncreaseVelocity(4);
+        sensorConfigA.setStartIncreaseTime(4);
+        //RotationSensor
+        sensorConfigA.setSpinsPerSecond(1);
+        sensorConfigA.setStartRotationTime(4);
+        sensorConfigsA.add(sensorConfigA);
+        //Form
+        sensorConfigA.setSensorForm("CONE");
+        sensorConfigA.setCalcType("AVG");
+    }
 
     /**
      * The traveled arc measure can be tested by giving 
@@ -28,20 +62,14 @@ public class RotationSensorTest {
 
     	int spinsPerSeconds = 1; // equals to 2PI
     	int passingTime = 4;
+    	sensorConfigA.setSpinsPerSecond(1);
     	
-    	RotationSensor rotSen = new RotationSensor(spinsPerSeconds,1);
+    	RotationSensor rotSen = new RotationSensor(sensorConfigA);
     	// set on one spin per second
     	rotSen.spinsToRotationVelocityConverter(spinsPerSeconds);
-    	// set startTime value
-    	rotSen.startRotation();
     	// let 4 seconds pass
-    	try {
-			TimeUnit.SECONDS.sleep(passingTime);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-    	double ArcMessuretest = rotSen.getTraveledArcMeasure();
+
+    	double ArcMessuretest = rotSen.getTraveledArcMeasure(passingTime);
     	
     	double low = (float) ((2*Math.PI)*spinsPerSeconds*passingTime);
     	double high = low + 0.3;
@@ -55,20 +83,13 @@ public class RotationSensorTest {
 
     	int spinsPerSeconds = 2; // equals to 4PI
     	int passingTime = 3;
+    	sensorConfigA.setSpinsPerSecond(2);
     	
-    	RotationSensor rotSen = new RotationSensor(spinsPerSeconds,1);
+    	RotationSensor rotSen = new RotationSensor(sensorConfigA);
     	// set on one spin per second
     	rotSen.spinsToRotationVelocityConverter(spinsPerSeconds);
-    	// set startTime value
-    	rotSen.startRotation();
-    	// let 4 seconds pass
-    	try {
-			TimeUnit.SECONDS.sleep(passingTime);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-    	double ArcMessuretest = rotSen.getTraveledArcMeasure();
+    	// let 3 seconds pass
+    	double ArcMessuretest = rotSen.getTraveledArcMeasure(passingTime);
     	
     	double low = (float) ((2*Math.PI)*spinsPerSeconds*passingTime);
     	double high = low + 0.3;
@@ -84,14 +105,15 @@ public class RotationSensorTest {
      */
     @Test
     void newOrientationTest1() {
+    	sensorConfigA.setSpinsPerSecond(1);
     	
-    	RotationSensor rotSen = new RotationSensor(1,1);
+    	RotationSensor rotSen = new RotationSensor(sensorConfigA);
     	
     	// one rotation per second equals 2PI
     	double oneRotation = (2*Math.PI)*5;
     	
     	rotSen.setDirection(1, 1, 1);
-    	Vector3f origiOrientation = rotSen.getOrientation();
+    	Vector3f origiOrientation = rotSen.getDirectionVector();
     	
     	Vector3f newOrietntation = rotSen.newOrientation(oneRotation);
     	
@@ -101,8 +123,8 @@ public class RotationSensorTest {
     
     @Test
     void newOrientationTest2() {
-    	
-    	RotationSensor rotSen = new RotationSensor(1,1);
+    	sensorConfigA.setSpinsPerSecond(1);
+    	RotationSensor rotSen = new RotationSensor(sensorConfigA);
     	
     	// one rotation per second equals 2PI
     	double halfRotation = (1*Math.PI);
@@ -116,6 +138,4 @@ public class RotationSensorTest {
     	// after one rotation it has to be the same Vector
     	assertEquals(expectedOrientation, newOrietntation);
     }
-    
-    
 }

@@ -1,134 +1,129 @@
 package de.thi.dronesim.sensor.types;
 
-import de.thi.dronesim.ISimulationChild;
-import de.thi.dronesim.Simulation;
-import de.thi.dronesim.obstacle.entity.HitMark;
-import de.thi.dronesim.sensor.ASensor;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
+import de.thi.dronesim.SimulationUpdateEvent;
+import de.thi.dronesim.persistence.entity.SensorConfig;
+import de.thi.dronesim.sensor.SensorModule;
+import de.thi.dronesim.sensor.dto.SensorResultDto;
 
 
-
-
-public class RotationSensor extends ASensor implements ISimulationChild {
+public class RotationSensor extends DistanceSensor {
 	/**
-	 * Imagine the rotation like a police blue light. The sensor rotates around the Y-axis 
-	 * 
-	 * Because of the cast from double into float at the Math. function there is always an 
-	 * inaccuracy of 0.00000x at the x and z values of the newOrientation Vector. 
+	 * Imagine the rotation like a police blue light. The sensor rotates around the Y-axis
+	 *
+	 * Because of the cast from double into float at the Math. function there is always an
+	 * inaccuracy of 0.00000x at the x and z values of the newOrientation Vector.
 	 * Because of this inaccuracy it can happen that the vector gets a huge x and z difference after a lot of spins.
 	 * Consequently the value types got changed into double
 	 * 
 	 * @author Moris Breitenborn
 	 */
 	
-	public int spinsPerSecond;
-	public float rotationVelocity; // 2Pi/s == one spin in one second as radiant
-	public int callTimerForSensorValues;
-	public Set<HitMark> values;
-	public Timer callTimerValues = new Timer( );
-	public float startRotationTime;
-	public float endRotationTime;
+	private int spinsPerSecond;
+	private float rotationVelocity; // 2Pi/s == one spin in one second as radiant
+	private float startRotationTime;
 
-	//Main simulation
-	private Simulation simulation;
-
-	public RotationSensor(int spinsPerSecond, int callTimerForSensorValues) {
-		this.spinsPerSecond = spinsPerSecond;
-		this.callTimerForSensorValues = callTimerForSensorValues;
+	/**
+	 * Constructor:
+	 * 
+	 * @param spinsPerSecond: defines how often the sensor circulate in one second
+	 * @param startRotationTime: defines the time when the Sensor starts to spin. if the value is 5 the rotation starts
+	 * after the Simulation is running for 5 seconds. 
+	 */
+	public RotationSensor(SensorConfig config) {
+		super(config);
+		this.spinsPerSecond = config.getSpinsPerSecond();
+		this.startRotationTime = config.getStartRotationTime();
 		spinsToRotationVelocityConverter(spinsPerSecond);
-		startRotation();
 	}
 
-	// Why did some one put this Constructor here???????
-	public RotationSensor() {
-	}
-
-	@Override
-	
-	public String getType() {
-		// TODO Auto-generated method stub
-		String name = "RotationSensor";
-		return name;
-	}
-	// converts spins per seconds into radiant. with this value it is possible to calculate the traveled distance
+	/**
+	 *  This Method converts spins per seconds into radiant. with this value it is possible to calculate the traveled distance
+	 */
 	public void spinsToRotationVelocityConverter(int spinsPerSecond) {
 		this.rotationVelocity = (float) ((2*Math.PI)*this.spinsPerSecond);
 	}
-	
-	// To calculate the rotation we measure the past time in nanoseconds. This method starts the timer. 
-	public void startRotation() {
-		this.startRotationTime = System.nanoTime();
+
+	/**
+	 *  This Method is resetting the startRotationTime to calculate the next measurement
+	 */
+	public void startRotation(SimulationUpdateEvent event) {
+		this.startRotationTime = (float) event.getTime();
 	}
 	
-	
-	// Calculates the arcMeasure by multiply the traveledTime and the given rotationVelocity
-	public double getTraveledArcMeasure() {
-		//calculate traveled time in nanoseconds
-		endRotationTime = System.nanoTime();
-		// traveled time converted into seconds
-		float travaledTime = (endRotationTime - this.startRotationTime) / 1000000000;
-		//restart rotation
-		startRotation();
-		//return arc measure
-		return travaledTime*rotationVelocity;
+	/**
+	 *  This Method calculate the time between this.startRotationTime and endRotationTime.
+	 *  If this.startRotationTime is smaller than endRotationTime the rotation did not start yet. There for the traveled 
+	 *  time is 0. The return value are seconds.
+	 */
+	private float traveledTime(SimulationUpdateEvent event) {
+		float endRotationTime = (float) event.getTime();
+		float traveledTime;
+		if(this.startRotationTime< endRotationTime) {
+			traveledTime = (endRotationTime - this.startRotationTime);
+			startRotation(event);
+		}else {
+			traveledTime = 0;
+		}
+		return traveledTime;
 	}
 	
-	// Calculate new OrientationVector with the getTraveledArcMeasure() return as parameter 
+	/**
+	 *  Calculates the arcMeasure by multiply the traveledTime and the given rotationVelocity.
+	 *  @param traveledTime
+	 */
+	public float getTraveledArcMeasure(float traveledTime) {
+		return traveledTime*rotationVelocity;
+	}
+	
+	/**
+	 *  Calculate new OrientationVector by rotating the orientation vector around the
+	 *  y-axis by the traveledArc value.
+	 *  
+	 *  @param traveledArc
+	 */
 	public Vector3f newOrientation(double traveledArc) {
 		
-		Vector3f orienataion = getOrientation();
-		
+		Vector3f orienataion = getDirectionVector();
 		//to reduce inaccuracy we convert the traveledArc <= 1 Rotation
 		double oneRotation = (2*Math.PI);
 		while (traveledArc > oneRotation) {
 			traveledArc = traveledArc - oneRotation;
 		}
-		
-		// Create a rotation Matrix to rotate around the y-axses 
+		// Create a rotation Matrix to rotate around the y-axis 
 		double cosPhi=  Math.cos(traveledArc);
 		double sinPhi= Math.sin(traveledArc);
 		double minSinPhi= (Math.sin(traveledArc)*(-1));
 		Matrix3f transformMatrixY = new Matrix3f((float)cosPhi, (float)0, (float)sinPhi, (float)0, (float)1, (float)0, (float)minSinPhi, (float)0, (float)cosPhi);
+		// Rotate
 		Vector3f newOrientation = transformMatrixY.mult(orienataion);
 		
 		return newOrientation;	
 	}
 	
-	
-	// This Method returns the values from "checkSensorCone" in a given time "callTimerForSensorValues"
-	public void startCallSensorValues() {
-		
-		callTimerValues.scheduleAtFixedRate(new TimerTask() {
-
-		    @Override
-		    public void run() {
-		    	setOrientation(newOrientation(getTraveledArcMeasure()));
-				values =  getSensorHits(getOrigin(), getOrientation(), getConeHeight(), getVectorAngel());
-		    }
-		}, 0, callTimerForSensorValues);
-	}
-	
-	public void stopCallingSensorValues() {
-		callTimerValues.cancel();
-	}
-	
-	
+	/**
+	 * After resetting the direction vector the current "SensorResultDto" is getting calculated
+	 * and set the result to this.sensorResultDtoValues
+	 * 
+	 */
 	@Override
-	public void initialize(Simulation simulation) {
-		this.simulation = simulation;
+	public void runMeasurement(SimulationUpdateEvent event, SensorModule sensorModule) {
+		setDirection(newOrientation(getTraveledArcMeasure(traveledTime(event))));
+		sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), calcConeHeight(), calcSurfaceVector(), sensorModule);
 	}
 
 	@Override
-	public Simulation getSimulation() {
-		return this.simulation;
+	public SensorResultDto getLastMeasurement() {
+		return sensorResultDtoValues;
 	}
 
-	
-
-	
+	@Override
+	public SensorConfig saveToConfig() {
+		SensorConfig config = super.saveToConfig();
+		config.setClassName(this.getClass().getSimpleName());
+		config.setSpinsPerSecond(spinsPerSecond);
+		config.setStartRotationTime(startRotationTime);
+		return config;
+	}
 }

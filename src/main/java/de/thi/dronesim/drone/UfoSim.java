@@ -67,7 +67,7 @@ package de.thi.dronesim.drone;
  *
  * class for the simulation of an ufo
  */
-@Deprecated
+@Deprecated(forRemoval = true)
 public final class UfoSim implements Runnable {
 
   // constants

@@ -1,6 +1,6 @@
 package de.thi.dronesim.gui;
 
-import de.thi.dronesim.drone.Location;
+import de.thi.dronesim.SimulationUpdateEvent;
 
 /**
  * InstrumentView Interface
@@ -9,5 +9,5 @@ import de.thi.dronesim.drone.Location;
  */
 public interface IGuiView {
 
-    void updateDroneStatus(Location location);
+    void updateDroneStatus(SimulationUpdateEvent simulationUpdateEvent);
 }

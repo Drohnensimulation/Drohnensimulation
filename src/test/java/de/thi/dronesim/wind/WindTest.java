@@ -2,15 +2,20 @@ package de.thi.dronesim.wind;
 
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.drone.Location;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import de.thi.dronesim.persistence.entity.WindConfig;
+import org.junit.jupiter.api.*;
 
-import java.lang.reflect.Field;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * @author Lausch, Christopher
+ * @author Hupp, Laurence
+ * @author Wittschen, Marvin
+ */
 class WindTest {
 
     private Wind wind;
@@ -19,11 +24,21 @@ class WindTest {
     private final List<WindLayer> windLayers = new ArrayList<>();
 
     @BeforeEach
-    public void setUpWind() throws Exception {
+    void setup() {
         simulation = new Simulation();
         windLayers.clear();
     }
 
+    @AfterEach
+    void stop() {
+        wind.onSimulationStop();
+    }
+
+    private void setupWind() {
+        wind = new Wind(windLayers);
+        wind.initialize(simulation);
+        wind.onSimulationStart();
+    }
 
     @Test
     void sort_timeAlreadySorted() {
@@ -32,7 +47,7 @@ class WindTest {
         List<WindLayer> layers = new ArrayList<>();
         layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
         layers.add(new WindLayer(0, 0, 20, 30, 0, 10, 0));
-        Wind wind = new Wind(new ArrayList<>(layers));
+        wind = new Wind(new ArrayList<>(layers));
 
         for (int i = 0; i < wind.getWindLayers().size(); i++) {
             assertEquals(result[i], wind.getWindLayers().indexOf(layers.get(i)));
@@ -46,7 +61,8 @@ class WindTest {
         List<WindLayer> layers = new ArrayList<>();
         layers.add(new WindLayer(0, 0, 20, 30, 0, 10, 0));
         layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
-        Wind wind = new Wind(new ArrayList<>(layers));
+        wind = new Wind(new ArrayList<>(layers));
+        wind.initialize(simulation);
 
         for (int i = 0; i < wind.getWindLayers().size(); i++) {
             assertEquals(result[i], layers.indexOf(wind.getWindLayers().get(i)));
@@ -60,7 +76,7 @@ class WindTest {
         List<WindLayer> layers = new ArrayList<>();
         layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
         layers.add(new WindLayer(0, 0, 0, 10, 20, 30, 0));
-        Wind wind = new Wind(new ArrayList<>(layers));
+        wind = new Wind(new ArrayList<>(layers));
 
         for (int i = 0; i < wind.getWindLayers().size(); i++) {
             assertEquals(result[i], wind.getWindLayers().indexOf(layers.get(i)));
@@ -74,7 +90,8 @@ class WindTest {
         List<WindLayer> layers = new ArrayList<>();
         layers.add(new WindLayer(0, 0, 0, 10, 20, 30, 0));
         layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
-        Wind wind = new Wind(new ArrayList<>(layers));
+        wind = new Wind(new ArrayList<>(layers));
+        wind.initialize(simulation);
 
         for (int i = 0; i < wind.getWindLayers().size(); i++) {
             assertEquals(result[i], layers.indexOf(wind.getWindLayers().get(i)));
@@ -90,7 +107,8 @@ class WindTest {
         layers.add(new WindLayer(0, 0, 20, 30, 20, 30, 0));
         layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
         layers.add(new WindLayer(0, 0, 0, 10, 20, 30, 0));
-        Wind wind = new Wind(new ArrayList<>(layers));
+        wind = new Wind(new ArrayList<>(layers));
+        wind.initialize(simulation);
 
         for (int i = 0; i < wind.getWindLayers().size(); i++) {
             assertEquals(result[i], layers.indexOf(wind.getWindLayers().get(i)));
@@ -107,7 +125,8 @@ class WindTest {
         layers.add(new WindLayer(0, 0, 40, 50, 40, 50, 0));
         layers.add(new WindLayer(0, 0, 10, 30, 0, 10, 0));
         layers.add(new WindLayer(0, 0, 0, 30, 40, 50, 0));
-        Wind wind = new Wind(new ArrayList<>(layers));
+        wind = new Wind(new ArrayList<>(layers));
+        wind.initialize(simulation);
 
         for (int i = 0; i < wind.getWindLayers().size(); i++) {
             assertEquals(result[i], layers.indexOf(wind.getWindLayers().get(i)));
@@ -146,7 +165,8 @@ class WindTest {
         expected.add(new WindLayer(0, 0, 20, 30, -10, 10, 0));
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -163,7 +183,8 @@ class WindTest {
         expected.add(new WindLayer(0, 0, 20, 30, -10, 10, 0));
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -180,7 +201,8 @@ class WindTest {
         expected.add(new WindLayer(0, 0, 10, 20, -10, 10, 0));
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -197,7 +219,8 @@ class WindTest {
         // Should be removed
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -214,7 +237,8 @@ class WindTest {
         expected.add(new WindLayer(0, 0, -10, 10, 20, 30, 0));
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -231,7 +255,8 @@ class WindTest {
         expected.add(new WindLayer(0, 0, -10, 10, 20, 30, 0));
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -248,7 +273,8 @@ class WindTest {
         expected.add(new WindLayer(0, 0, -10, 10, 10, 20, 0));
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -265,7 +291,8 @@ class WindTest {
         // Should be removed
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -282,7 +309,8 @@ class WindTest {
         expected.add(new WindLayer(0, 0, -10, 20, 30, 40, 0));
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -299,7 +327,8 @@ class WindTest {
         expected.add(new WindLayer(0, 0, 10, 20, -10, 10, 0));
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -316,7 +345,8 @@ class WindTest {
         // Should be removed
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -333,34 +363,68 @@ class WindTest {
         // Should be removed
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
 
-    private void setupWind() {
-        wind = new Wind(windLayers);
-        wind.initialize(simulation);
+    @Test
+    void findWindLayer_timeSeries() {
+        createLocation(20,10,210);
+        windLayers.add(new WindLayer(10, 10, 0, 20, 0, 100, 30));
+        windLayers.add(new WindLayer(11, 11, 20, 40, 0, 100, 30));
+        windLayers.add(new WindLayer(12, 12, 40, 60, 0, 100, 30));
+        windLayers.add(new WindLayer(13, 13, 60, 80, 0, 100, 30));
+        windLayers.add(new WindLayer(14, 14, 80, 100, 0, 100, 30));
+        setupWind();
+
+        wind.applyWind(location, 30);
+        assertEquals(21, location.getGroundSpeed(), 0.5,  "Wrong layer selected for t=30!");
+
+        wind.applyWind(location, 50);
+        assertEquals(22, location.getGroundSpeed(), 0.5,  "Wrong layer selected for t=50!");
+
+        wind.applyWind(location, 90);
+        assertEquals(24, location.getGroundSpeed(), 0.5,  "Wrong layer selected for t=90!");
     }
 
     @Test
     void applyWind_tailWind() {
         createLocation(20,10,210);
         windLayers.add(new WindLayer(10, 10, 0, 100, 0, 100, 30));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         assertEquals(20, location.getGroundSpeed(), 0.5,  "Wrong ground speed");
         assertEquals(210, location.getTrack(), 0.5,  "Wrong track");
+    }
+
+    @Test
+    void applyWind_tailWindEast() {
+        createLocation(20,10,90);
+        windLayers.add(new WindLayer(10, 10, 0, 100, 0, 100, 270));
+        setupWind();
+        wind.applyWind(location, 20);
+        assertEquals(20, location.getGroundSpeed(), 0.5,  "Wrong ground speed");
+        assertEquals(90, location.getTrack(), 0.5,  "Wrong track");
+    }
+
+    @Test
+    void applyWind_tailWindWest() {
+        createLocation(20,10,270);
+        windLayers.add(new WindLayer(10, 10, 0, 100, 0, 100, 90));
+        setupWind();
+        wind.applyWind(location, 20);
+        assertEquals(20, location.getGroundSpeed(), 0.5,  "Wrong ground speed");
+        assertEquals(270, location.getTrack(), 0.5,  "Wrong track");
     }
 
     @Test
     void applyWind_headWind() {
         createLocation(20,5,210);
         windLayers.add(new WindLayer(3, 3, 0, 100, 0, 100, 210));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         assertEquals(2, location.getGroundSpeed(), 0.5,  "Wrong ground speed");
         assertEquals(210, location.getTrack(), 0.5, "Wrong track");
     }
@@ -369,9 +433,8 @@ class WindTest {
     void applyWind_headWindStrong() {
         createLocation(20,2,210);
         windLayers.add(new WindLayer(10, 10, 0, 100, 0, 100, 210));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         assertEquals(8, location.getGroundSpeed(), 0.5,"Wrong ground speed");
         assertEquals(30, location.getTrack(), 0.5, "Wrong track");
     }
@@ -380,9 +443,8 @@ class WindTest {
     void applyWind_headLeft() {
         createLocation(20,10,0);
         windLayers.add(new WindLayer(5, 5, 0, 100, 0, 100, 315));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         assertEquals(7, location.getGroundSpeed(), 0.5,  "Wrong ground speed");
         assertEquals(29, location.getTrack(), 0.5,  "Wrong track");
     }
@@ -391,9 +453,8 @@ class WindTest {
     void applyWind_headLeftStrong() {
         createLocation(20,10,0);
         windLayers.add(new WindLayer(30, 30, 0, 100, 0, 100, 315));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         assertEquals(24, location.getGroundSpeed(), 0.5, "Wrong ground speed");
         assertEquals(118, location.getTrack(), 0.5,  "Wrong track");
     }
@@ -402,9 +463,8 @@ class WindTest {
     void applyWind_headRight() {
         createLocation(20,10,0);
         windLayers.add(new WindLayer(5, 5, 0, 100, 0, 100, 45));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         assertEquals(7, location.getGroundSpeed(), 0.5, "Wrong ground speed");
         assertEquals(331, location.getTrack(), 0.5, "Wrong track");
     }
@@ -413,9 +473,8 @@ class WindTest {
     void applyWind_tailLeft() {
         createLocation(20,10,0);
         windLayers.add(new WindLayer(5, 5, 0, 100, 0, 100, 225));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         assertEquals(14, location.getGroundSpeed(), 0.5, "Wrong ground speed");
         assertEquals(15, location.getTrack(),0.5, "Wrong track");
     }
@@ -424,9 +483,8 @@ class WindTest {
     void applyWind_tailRight() {
         createLocation(20,10,0);
         windLayers.add(new WindLayer(5, 5, 0, 100, 0, 100, 135));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         assertEquals(14, location.getGroundSpeed(), 0.5, "Wrong ground speed");
         assertEquals(345, location.getTrack(), 0.5, "Wrong track");
     }
@@ -435,9 +493,8 @@ class WindTest {
     void applyWind_left() {
         createLocation(20,10,0);
         windLayers.add(new WindLayer(5, 5, 0, 100, 0, 100, 90));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         assertEquals(11, location.getGroundSpeed(), 0.5,  "Wrong ground speed");
         assertEquals(333, location.getTrack(), 0.5,  "Wrong track");
     }
@@ -446,45 +503,43 @@ class WindTest {
     void applyWind_right() {
         createLocation(20,10,0);
         windLayers.add(new WindLayer(5, 5, 0, 100, 0, 100, 270));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         assertEquals(11, location.getGroundSpeed(), 0.5,  "Wrong ground speed");
         assertEquals(27, location.getTrack(), 0.5,  "Wrong track");
     }
 
-    @ Test
+    @RepeatedTest(100)
     void applyWind_gustGeneration() {
         WindLayer gustLayer = new WindLayer(5, 10, 0, 100, 0, 100, 135);
         windLayers.add(gustLayer);
 
         createLocation(5,10,330);
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
 
         assertTrue(gustLayer.isValid(),"Layer is invalid");
         assertTrue(gustLayer.getNextGustStart() > 0, "Start time was not generated");
-        assertTrue(gustLayer.getNextGustSpeed() > gustLayer.getWindSpeed(), "Gust speed is smaller " +
+        assertTrue(gustLayer.getNextGustSpeed() >= gustLayer.getWindSpeed(), "Gust speed is smaller " +
                 "than wind speed");
     }
 
-    @ Test
+    @Test
     void applyWind_gustCenter() {
         WindLayer gustLayer = new WindLayer(5, 20, 0, 100, 0, 100, 180);
         gustLayer.setNextGustStart(20);
         gustLayer.setNextGustSpeed(20);
+        gustLayer.setNextGustDuration(6);
         windLayers.add(gustLayer);
 
         createLocation(5,10,0);
-        setSimulationTime(22);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 23);
 
         assertEquals(30, location.getGroundSpeed(), 0.5);
     }
 
-    @ Test
+    @Test
     void applyWind_gustRise() {
         WindLayer gustLayer = new WindLayer(5, 20, 0, 100, 0, 100, 180);
         gustLayer.setNextGustStart(20);
@@ -492,14 +547,13 @@ class WindTest {
         windLayers.add(gustLayer);
 
         createLocation(5,10,0);
-        setSimulationTime(21);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 21);
 
         assertEquals(22.5, location.getGroundSpeed(), 0.5);
     }
 
-    @ Test
+    @Test
     void applyWind_gustFall() {
         WindLayer gustLayer = new WindLayer(5, 20, 0, 100, 0, 100, 180);
         gustLayer.setNextGustStart(20);
@@ -507,9 +561,8 @@ class WindTest {
         windLayers.add(gustLayer);
 
         createLocation(5,10,0);
-        setSimulationTime(23);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 23);
 
         assertEquals(22.5, location.getGroundSpeed(), 0.5);
     }
@@ -517,11 +570,10 @@ class WindTest {
     @Test
     void interpolation_leftOutside() {
         createLocation(2, 20, 0);
-        setSimulationTime(8);
         windLayers.add(new WindLayer(10, 10, 10, 20, 0, 10, 90));
 
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 8);
 
         assertEquals(20.6, location.getGroundSpeed(),0.5, "Wrong ground speed");
         assertEquals(351.9, location.getTrack(),0.5, "Wrong track");
@@ -530,10 +582,9 @@ class WindTest {
     @Test
     void interpolation_rightInside() {
         createLocation(2, 20, 0);
-        setSimulationTime(18);
         windLayers.add(new WindLayer(10, 10, 0, 20, 0, 10, 90));
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 18);
 
         assertEquals(21.4, location.getGroundSpeed(),0.5, "Wrong ground speed");
         assertEquals(341.1, location.getTrack(),0.5, "Wrong track");
@@ -542,10 +593,9 @@ class WindTest {
     @Test
     void interpolation_above() {
         createLocation(12, 20, 0);
-        setSimulationTime(10);
         windLayers.add(new WindLayer(10, 10, 0, 20, 0, 10, 90));
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 10);
 
         assertEquals(20.6, location.getGroundSpeed(),0.5, "Wrong ground speed");
         assertEquals(351.9, location.getTrack(),0.5, "Wrong track");
@@ -554,10 +604,9 @@ class WindTest {
     @Test
     void interpolation_underTop() {
         createLocation(8, 20, 0);
-        setSimulationTime(10);
         windLayers.add(new WindLayer(10, 10, 0, 20, 0, 10, 90));
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 10);
 
         assertEquals(21.4, location.getGroundSpeed(),0.5, "Wrong ground speed");
         assertEquals(341.1, location.getTrack(),0.5, "Wrong track");
@@ -566,10 +615,9 @@ class WindTest {
     @Test
     void interpolation_outsideOfRange() {
         createLocation(2, 20, 0);
-        setSimulationTime(1);
         windLayers.add(new WindLayer(10, 10, 10, 20, 0, 10, 0));
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 1);
 
         assertEquals(20, location.getGroundSpeed(), 0.5, "Wrong ground speed");
         assertEquals(0, location.getTrack(),0.5, "Wrong track");
@@ -578,10 +626,9 @@ class WindTest {
     @Test
     void interpolation_insideLayer() {
         createLocation(2, 20, 0);
-        setSimulationTime(10);
         windLayers.add(new WindLayer(10, 10, 0, 20, 0, 10, 0));
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 10);
 
         assertEquals(10, location.getGroundSpeed(),0.5, "Wrong ground speed");
         assertEquals(0, location.getTrack(),0.5, "Wrong track");
@@ -590,11 +637,10 @@ class WindTest {
     @Test
     void interpolation_twoLayersLeft() {
         createLocation(2, 20, 0);
-        setSimulationTime(27);
         windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 120));
         windLayers.add(new WindLayer(10, 10, 30, 60, 0, 10, 240));
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 27);
 
         assertEquals(25.42, location.getGroundSpeed(),0.5, "Wrong ground speed");
         assertEquals(348.26, location.getTrack(),0.5, "Wrong track");
@@ -603,11 +649,10 @@ class WindTest {
     @Test
     void interpolation_twoLayersRight() {
         createLocation(2, 20, 0);
-        setSimulationTime(32);
         windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 120));
         windLayers.add(new WindLayer(10, 10, 30, 60, 0, 10, 240));
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 32);
 
         assertEquals(25.24, location.getGroundSpeed(),0.5, "Wrong ground speed");
         assertEquals(7.89, location.getTrack(),0.5, "Wrong track");
@@ -616,11 +661,10 @@ class WindTest {
     @Test
     void interpolation_twoLayersCenter() {
         createLocation(2, 20, 0);
-        setSimulationTime(30);
         windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 120));
         windLayers.add(new WindLayer(10, 10, 30, 60, 0, 10, 240));
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 30);
 
         assertEquals(25, location.getGroundSpeed(),0.5, "Wrong ground speed");
         assertEquals(0, location.getTrack(),0.5, "Wrong track");
@@ -629,11 +673,10 @@ class WindTest {
     @Test
     void interpolation_twoLayersBottom() {
         createLocation(9, 20, 0);
-        setSimulationTime(20);
         windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 0));
         windLayers.add(new WindLayer(10, 10, 0, 30, 10, 20, 180));
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
 
         assertEquals(18, location.getGroundSpeed(),0.5, "Wrong ground speed");
         assertEquals(0, location.getTrack(),0.5, "Wrong track");
@@ -642,40 +685,66 @@ class WindTest {
     @Test
     void interpolation_twoLayersTop() {
         createLocation(11, 20, 0);
-        setSimulationTime(20);
         windLayers.add(new WindLayer(10, 10, 0, 30, 0, 10, 0));
         windLayers.add(new WindLayer(10, 10, 0, 30, 10, 20, 180));
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
 
         assertEquals(22, location.getGroundSpeed(),0.5, "Wrong ground speed");
         assertEquals(0, location.getTrack(),0.5, "Wrong track");
     }
 
     @Test
+    void interpolation_twoLayersAbove() {
+        createLocation(8, 20, 0);
+        windLayers.add(new WindLayer(10, 10, 0, 20, 10, 20, 90));
+        windLayers.add(new WindLayer(10, 10, 20, 40, 10, 20, 270));
+        setupWind();
+        wind.applyWind(location, 19);
+
+        assertEquals(20.01, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(358.28, location.getTrack(),0.5, "Wrong track");
+    }
+
+    @Test
+    void interpolation_threeLayers() {
+        createLocation(19, 20, 0);
+
+        windLayers.add(new WindLayer(10, 10, 0, 20, 20, 40, 90));
+        windLayers.add(new WindLayer(10, 10, 20, 40, 0, 20, 180));
+        windLayers.add(new WindLayer(10, 10, 20, 40, 20, 40, 270));
+        setupWind();
+        wind.applyWind(location, 18);
+
+
+
+        assertEquals(21.86, location.getGroundSpeed(),0.5, "Wrong ground speed");
+        assertEquals(355.8, location.getTrack(),0.5, "Wrong track");
+    }
+
+    @Test
     void interpolation_fourLayers() {
         createLocation(19, 20, 0);
-        setSimulationTime(18);
         windLayers.add(new WindLayer(10, 10, 0, 20, 0, 20, 30));
         windLayers.add(new WindLayer(10, 10, 0, 20, 20, 40, 60));
         windLayers.add(new WindLayer(10, 10, 20, 40, 0, 20, 90));
         windLayers.add(new WindLayer(10, 10, 20, 40, 20, 40, 120));
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 18);
 
         assertEquals(17.22, location.getGroundSpeed(),0.5, "Wrong ground speed");
         assertEquals(334.68, location.getTrack(),0.5, "Wrong track");
     }
+
     @Test
     void interpolation_fourLayersAltitudeFirst() {
         createLocation(13, 20, 0);
-        setSimulationTime(18);
         windLayers.add(new WindLayer(10, 10, 0, 20, 0, 20, 30));
        // windLayers.add(new WindLayer(10, 10, 0, 20, 20, 40, 60));
         windLayers.add(new WindLayer(10, 10, 20, 40, 0, 10, 90));
         windLayers.add(new WindLayer(10, 10, 20, 40, 10, 40, 120));
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 18);
 
         assertEquals(16.35, location.getGroundSpeed(),0.5, "Wrong ground speed");
         assertEquals(337.8, location.getTrack(),0.5, "Wrong track");
@@ -684,13 +753,12 @@ class WindTest {
     @Test
     void interpolation_fourLayersTimeFirst_1(){
         createLocation(19, 20, 0);
-        setSimulationTime(18);
         windLayers.add(new WindLayer(10, 10, 0, 30, 0, 20, 30));
         windLayers.add(new WindLayer(10, 10, 0, 20, 20, 40, 60));
         windLayers.add(new WindLayer(10, 10, 20, 40, 20, 40, 90));
         windLayers.add(new WindLayer(10, 10, 30, 40, 0, 20, 120));
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 18);
 
         assertEquals(14.95, location.getGroundSpeed(),0.5, "Wrong ground speed");
         assertEquals(333.7, location.getTrack(),0.5, "Wrong track");
@@ -699,68 +767,78 @@ class WindTest {
     @Test
     void interpolation_fourLayersTimeFirst_2() {
         createLocation(19, 20, 0);
-        setSimulationTime(32);
         windLayers.add(new WindLayer(10, 10, 0, 30, 0, 20, 30));
         windLayers.add(new WindLayer(10, 10, 0, 20, 20, 40, 60));
         windLayers.add(new WindLayer(10, 10, 20, 40, 20, 40, 90));
         windLayers.add(new WindLayer(10, 10, 30, 40, 0, 20, 120));
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 32);
 
         assertEquals(22.24, location.getGroundSpeed(),0.5, "Wrong ground speed");
         assertEquals(337.43, location.getTrack(),0.5, "Wrong track");
     }
 
-
-
     @Test
-    void load(){
-        fail();
-        // TODO
-        wind = new Wind("windlayer.json");
-        List<WindLayer> layers = wind.getWindLayers();
-        boolean result = true;
-        for(int i = 0; i < layers.size(); i++){
-            if(i != layers.size() -1){
-                if (layers.get(i + 1).getTimeStart() - layers.get(i).getTimeEnd() < 10)
-                    result = false;
-            }
+    void load() {
+        simulation = new Simulation("src/test/resources/de/thi/dronesim/wind/WindConfigTest.json");
+        wind = new Wind();
+        wind.initialize(simulation);
+
+        List<WindConfig> windConfigList = simulation.getConfig().getWindConfigList();
+        assertNotNull(windConfigList);
+
+        List<WindLayer> expected = new ArrayList<>();
+        expected.add(new WindLayer(1.0, 1.0, -10, 10, -10, 10, 1));
+        expected.add(new WindLayer(2.0, 2.0, 10, 20, -10, 10, 2));
+        expected.add(new WindLayer(3.0, 3.0, 20, 30, -10, 10, 3));
+        expected.add(new WindLayer(4.0, 4.0, 30, 40, -10, 10, 4));
+        expected.add(new WindLayer(5.0, 5.0, 40, 50, -10, 10, 5));
+        assertEquals(expected.size(), wind.getWindLayers().size());
+
+        // Compare with config
+        for (int i = 0; i < expected.size(); i++) {
+            assertConfig(expected.get(i), wind.getWindLayers().get(i));
         }
-        assertTrue(result);
     }
 
-    /**
-     * method to set the simulation time
-     * @param time set the simulation to that time
-     */
-    void setSimulationTime(int time) {
-        try {
-            Field timeField = simulation.getClass()
-                    .getDeclaredField("time");
-            timeField.setAccessible(true);
-            timeField.set(simulation, time);
-        } catch (Exception ignored) { }
+    private void assertConfig(WindLayer expected, WindLayer actual) {
+        assertEquals(expected.getTimeStart(), actual.getTimeStart());
+        assertEquals(expected.getTimeEnd(), actual.getTimeEnd());
+        assertEquals(expected.getWindSpeed(), actual.getWindSpeed());
+        assertEquals(expected.getGustSpeed(), actual.getGustSpeed());
+        assertEquals(expected.getWindDirection(), actual.getWindDirection());
+        assertEquals(expected.getAltitudeTop(), actual.getAltitudeTop());
+        assertEquals(expected.getAltitudeBottom(), actual.getAltitudeBottom());
     }
 
     /**
      * method to set the location of the drone
-     * @param y y coordinate
+     * @param y Y-coordinate
      * @param airspeed airspeed of the drone
      * @param heading heading of the drone
      */
-    public void createLocation(int y, int airspeed, int heading){
+    public void createLocation(int y, int airspeed, int heading) {
         location = new Location(0, y, 0);
         location.setAirspeed(airspeed);
         location.setHeading(heading);
     }
 
     @Test
+    void getWindAt_noWind() {
+        createLocation(20,10,210);
+        setupWind();
+        wind.applyWind(location, 20);
+        Wind.CurrentWind wind = Wind.getWindAt(location);
+        assertEquals(0, wind.getWindSpeed(), 1, "Wrong wind speed");
+        assertEquals(210, wind.getWindDirection(), 1, "Wrong wind direction");
+    }
+
+    @Test
     void getWindAt_tailWind() {
         createLocation(20,10,210);
         windLayers.add(new WindLayer(10, 10, 0, 100, 0, 100, 30));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         Wind.CurrentWind wind = Wind.getWindAt(location);
         assertEquals(10, wind.getWindSpeed(), 1, "Wrong wind speed");
         assertEquals(30, wind.getWindDirection(), 1, "Wrong wind direction");
@@ -770,9 +848,8 @@ class WindTest {
     void getWindAt_headWind() {
         createLocation(20,5,210);
         windLayers.add(new WindLayer(3, 3, 0, 100, 0, 100, 210));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         Wind.CurrentWind wind = Wind.getWindAt(location);
         assertEquals(3, wind.getWindSpeed(), 1, "Wrong wind speed");
         assertEquals(210, wind.getWindDirection(), 1, "Wrong wind direction");
@@ -782,9 +859,8 @@ class WindTest {
     void getWindAt_headWindStrong() {
         createLocation(20,2,210);
         windLayers.add(new WindLayer(10, 10, 0, 100, 0, 100, 210));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         Wind.CurrentWind wind = Wind.getWindAt(location);
         assertEquals(10, wind.getWindSpeed(), 1, "Wrong wind speed");
         assertEquals(210, wind.getWindDirection(), 1, "Wrong wind direction");
@@ -794,9 +870,8 @@ class WindTest {
     void getWindAt_headLeft() {
         createLocation(20,10,0);
         windLayers.add(new WindLayer(5, 5, 0, 100, 0, 100, 315));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         Wind.CurrentWind wind = Wind.getWindAt(location);
         assertEquals(5, wind.getWindSpeed(),1, "Wrong wind speed");
         assertEquals(315, wind.getWindDirection(), 1,"Wrong wind direction");
@@ -806,9 +881,8 @@ class WindTest {
     void getWindAt_headLeftStrong() {
         createLocation(20,10,0);
         windLayers.add(new WindLayer(30, 30, 0, 100, 0, 100, 315));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         Wind.CurrentWind wind = Wind.getWindAt(location);
         assertEquals(30, wind.getWindSpeed(), 1, "Wrong wind speed");
         assertEquals(315, wind.getWindDirection(), 1, "Wrong wind direction");
@@ -818,9 +892,8 @@ class WindTest {
     void getWindAt_headRight() {
         createLocation(20,10,0);
         windLayers.add(new WindLayer(5, 5, 0, 100, 0, 100, 45));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         Wind.CurrentWind wind = Wind.getWindAt(location);
         assertEquals(5, wind.getWindSpeed(), 1,  "Wrong wind speed");
         assertEquals(45, wind.getWindDirection(), 1,  "Wrong wind direction");
@@ -830,9 +903,8 @@ class WindTest {
     void getWindAt_tailLeft() {
         createLocation(20,10,0);
         windLayers.add(new WindLayer(5, 5, 0, 100, 0, 100, 225));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         Wind.CurrentWind wind = Wind.getWindAt(location);
         assertEquals(5, wind.getWindSpeed(), 1,  "Wrong wind speed");
         assertEquals(225, wind.getWindDirection(), 1, "Wrong wind direction");
@@ -842,9 +914,8 @@ class WindTest {
     void getWindAt_tailRight() {
         createLocation(20,10,0);
         windLayers.add(new WindLayer(5, 5, 0, 100, 0, 100, 135));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         Wind.CurrentWind wind = Wind.getWindAt(location);
         assertEquals(5, wind.getWindSpeed(), 1,  "Wrong wind speed");
         assertEquals(135, wind.getWindDirection(), 1,  "Wrong wind direction");
@@ -854,9 +925,8 @@ class WindTest {
     void getWindAt_left() {
         createLocation(20,10,0);
         windLayers.add(new WindLayer(5, 5, 0, 100, 0, 100, 90));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         Wind.CurrentWind wind = Wind.getWindAt(location);
         assertEquals(5, wind.getWindSpeed(), 1, "Wrong wind speed");
         assertEquals(90, wind.getWindDirection(), 1, "Wrong wind direction");
@@ -866,9 +936,8 @@ class WindTest {
     void getWindAt_right() {
         createLocation(20,10,0);
         windLayers.add(new WindLayer(5, 5, 0, 100, 0, 100, 270));
-        setSimulationTime(20);
         setupWind();
-        wind.applyWind(location);
+        wind.applyWind(location, 20);
         Wind.CurrentWind wind = Wind.getWindAt(location);
         assertEquals(5, wind.getWindSpeed(), 1, "Wrong wind speed");
         assertEquals(270, wind.getWindDirection(), 1, "Wrong wind direction");

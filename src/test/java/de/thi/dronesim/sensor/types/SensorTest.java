@@ -1,10 +1,17 @@
-package de.thi.dronesim.sensor;
+package de.thi.dronesim.sensor.types;
 
 import com.jme3.math.Vector3f;
-import de.thi.dronesim.sensor.types.InfraredSensor;
+
+import de.thi.dronesim.persistence.entity.SensorConfig;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Class to test Sensors.
@@ -13,24 +20,34 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class SensorTest {
 
-    /**
-     * The origin can not be calculated with a vector with zero coordinates.
-     * We get a Vector3f.NAN then.
-     */
-    @Test
-    void testGetOriginNan() {
-
-        // given
-        ASensor sensor = new InfraredSensor();
-
-        // when
-        Vector3f origin = sensor.getOrigin();
-
-        // then
-        Vector3f expected = Vector3f.NAN;
-        assertEquals(expected, origin);
+	//All values
+	SensorConfig sensorConfigA = new SensorConfig();
+    @BeforeEach
+    public void init() {
+    	//All
+    	List<SensorConfig> sensorConfigsA = new ArrayList<>();
+    	sensorConfigA.setRange(10);
+    	sensorConfigA.setSensorAngle(11);
+    	sensorConfigA.setSensorRadius(13);
+        sensorConfigA.setMeasurementAccuracy(14);
+        sensorConfigA.setDirectionX(15);
+        sensorConfigA.setDirectionY(16);
+        sensorConfigA.setDirectionZ(17);
+        sensorConfigA.setPosX(18);
+        sensorConfigA.setPosY(19);
+        sensorConfigA.setPosZ(20);
+        //UltrasonicSensor
+        sensorConfigA.setRangeIncreaseVelocity(4);
+        sensorConfigA.setStartIncreaseTime(4);
+        //RotationSensor
+        sensorConfigA.setSpinsPerSecond(1);
+        sensorConfigA.setStartRotationTime(4);
+        sensorConfigsA.add(sensorConfigA);
+        //Form
+        sensorConfigA.setSensorForm("CONE");
+        sensorConfigA.setCalcType("AVG");
     }
-
+	
     /**
      * Sensor pointing in direction of x.
      * With a angle of 45 degrees and a size of 1 the origin should be at -1 for x.
@@ -39,7 +56,7 @@ class SensorTest {
     void testGetOrigin1() {
 
         // given
-        ASensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(1, 0, 0);
         sensor.setPosition(0, 0, 0);
         sensor.setSensorAngle(45);
@@ -47,7 +64,7 @@ class SensorTest {
         sensor.setSize(1);
 
         // when
-        Vector3f origin = sensor.getOrigin();
+        Vector3f origin = sensor.calcOrigin();
 
         // then
         Vector3f expected = new Vector3f(-1F, 0F, 0F);
@@ -61,7 +78,7 @@ class SensorTest {
     void testGetOrigin2() {
 
         // given
-        ASensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(1, 0, 0);
         sensor.setPosition(1, 0, 0);
         sensor.setSensorAngle(45);
@@ -69,7 +86,7 @@ class SensorTest {
         sensor.setSize(1);
 
         // when
-        Vector3f origin = sensor.getOrigin();
+        Vector3f origin = sensor.calcOrigin();
 
         // then
         Vector3f expected = new Vector3f(0F, 0F, 0F);
@@ -83,7 +100,7 @@ class SensorTest {
     void testGetOrigin3() {
 
         // given
-        ASensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(0, 1, 0);
         sensor.setPosition(0, 0, 0);
         sensor.setSensorAngle(45);
@@ -91,7 +108,7 @@ class SensorTest {
         sensor.setSize(1);
 
         // when
-        Vector3f origin = sensor.getOrigin();
+        Vector3f origin = sensor.calcOrigin();
 
         // then
         Vector3f expected = new Vector3f(0F, -1F, 0F);
@@ -105,7 +122,7 @@ class SensorTest {
     void testGetOrigin4() {
 
         // given
-        ASensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(0, 0, 1);
         sensor.setPosition(0, 0, 0);
         sensor.setSensorAngle(45);
@@ -113,7 +130,7 @@ class SensorTest {
         sensor.setSize(1);
 
         // when
-        Vector3f origin = sensor.getOrigin();
+        Vector3f origin = sensor.calcOrigin();
 
         // then
         Vector3f expected = new Vector3f(0F, 0F, -1F);
@@ -127,7 +144,7 @@ class SensorTest {
     void testGetOrigin5() {
 
         // given
-        ASensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(1, 1, 0);
         sensor.setPosition(0, 0, 0);
         sensor.setSensorAngle(45);
@@ -135,7 +152,7 @@ class SensorTest {
         sensor.setSize(1);
 
         // when
-        Vector3f origin = sensor.getOrigin();
+        Vector3f origin = sensor.calcOrigin();
 
         // then
         Vector3f expected = new Vector3f(-0.70710677F, -0.70710677F, 0F);
@@ -150,7 +167,7 @@ class SensorTest {
     void testGetOrigin6() {
 
         // given
-        ASensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(1, 1, 1);
         sensor.setPosition(0, 0, 0);
         sensor.setSensorAngle(45);
@@ -158,7 +175,7 @@ class SensorTest {
         sensor.setSize(1);
 
         // when
-        Vector3f origin = sensor.getOrigin();
+        Vector3f origin = sensor.calcOrigin();
 
         // then
         Vector3f expected = new Vector3f(-1F, -1F, -1F).normalize();
@@ -172,7 +189,7 @@ class SensorTest {
     void testGetOrigin7() {
 
         // given
-        ASensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(1, 0, 0);
         sensor.setPosition(0, 0, 0);
         sensor.setSensorAngle(45);
@@ -180,7 +197,7 @@ class SensorTest {
         sensor.setSize(2);
 
         // when
-        Vector3f origin = sensor.getOrigin();
+        Vector3f origin = sensor.calcOrigin();
 
         // then
         Vector3f expected = new Vector3f(-2F, 0F, 0F);
@@ -194,7 +211,7 @@ class SensorTest {
     void testGetOrigin8() {
 
         // given
-        ASensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(1, 0, 0);
         sensor.setPosition(0, 0, 0);
         sensor.setSensorAngle(60F);
@@ -202,7 +219,7 @@ class SensorTest {
         sensor.setSize(1);
 
         // when
-        Vector3f origin = sensor.getOrigin();
+        Vector3f origin = sensor.calcOrigin();
 
         // then
         Vector3f expected = new Vector3f(-0.57735026F, 0F, 0F);
@@ -216,7 +233,7 @@ class SensorTest {
     void testGetOrigin9() {
 
         // given
-        ASensor sensor = new InfraredSensor();
+        DistanceSensor sensor = new InfraredSensor(sensorConfigA);
         sensor.setDirection(1, 1, 1);
         sensor.setPosition(1, 2, 3);
         sensor.setSensorAngle(45);
@@ -224,7 +241,7 @@ class SensorTest {
         sensor.setSize(1);
 
         // when
-        Vector3f origin = sensor.getOrigin();
+        Vector3f origin = sensor.calcOrigin();
 
         // then
         Vector3f expected = new Vector3f(-1F, -1F, -1F).normalize().add(new Vector3f(1F, 2F, 3F));

@@ -1,29 +1,26 @@
 package de.thi.dronesim.sensor.dto;
 
 import de.thi.dronesim.obstacle.entity.Obstacle;
-import de.thi.dronesim.sensor.ASensor;
+import de.thi.dronesim.sensor.ISensor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SensorResultDto {
-    private ASensor sensor;
-    private Obstacle obstacle;
+    private ISensor sensor;
+    private List<Obstacle> obstacle = new ArrayList<>();
     private List<Float> values;
 
-    public ASensor getSensor() {
+    public ISensor getSensor() {
         return sensor;
     }
 
-    public void setSensor(ASensor sensor) {
+    public void setSensor(ISensor sensor) {
         this.sensor = sensor;
     }
 
-    public Obstacle getObstacle() {
+    public List<Obstacle> getObstacle() {
         return obstacle;
-    }
-
-    public void setObstacle(Obstacle obstacle) {
-        this.obstacle = obstacle;
     }
 
     public List<Float> getValues() {

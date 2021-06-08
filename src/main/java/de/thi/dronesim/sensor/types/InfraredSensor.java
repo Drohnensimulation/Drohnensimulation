@@ -1,32 +1,30 @@
 package de.thi.dronesim.sensor.types;
 
-import de.thi.dronesim.ISimulationChild;
-import de.thi.dronesim.Simulation;
-import de.thi.dronesim.sensor.ASensor;
+import de.thi.dronesim.SimulationUpdateEvent;
+import de.thi.dronesim.persistence.entity.SensorConfig;
+import de.thi.dronesim.sensor.SensorModule;
+import de.thi.dronesim.sensor.dto.SensorResultDto;
 
-public class InfraredSensor extends ASensor implements ISimulationChild {
+public class InfraredSensor extends DistanceSensor {
 
-	//Main simulation
-	private Simulation simulation;
-
-	public InfraredSensor() {
-
-	}
-	
-	@Override
-	public String getType() {
-		String name = "InfrarotSensor";
-		return name;
-		
+	public InfraredSensor(SensorConfig config) {
+		super(config);
 	}
 
 	@Override
-	public void initialize(Simulation simulation) {
-		this.simulation = simulation;
+	public void runMeasurement(SimulationUpdateEvent event, SensorModule sensorModule) {
+		sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), calcConeHeight(), calcSurfaceVector(), sensorModule);
 	}
 
 	@Override
-	public Simulation getSimulation() {
-		return this.simulation;
+	public SensorResultDto getLastMeasurement() {
+		return sensorResultDtoValues;
+	}
+
+	@Override
+	public SensorConfig saveToConfig() {
+		SensorConfig config = super.saveToConfig();
+		config.setClassName(this.getClass().getSimpleName());
+		return config;
 	}
 }

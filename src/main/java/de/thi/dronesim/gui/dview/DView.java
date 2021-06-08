@@ -1,5 +1,6 @@
 package de.thi.dronesim.gui.dview;
 
+import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.gui.GuiManager;
 import de.thi.dronesim.gui.IGuiView;
 import de.thi.dronesim.gui.drenderer.DRenderer;
@@ -59,10 +60,12 @@ public class DView extends JFrame implements IGuiView {
 
     /**
      * updates the data displayed in the GUI
-     * @param location
+     * @param simulationUpdateEvent
      */
     @Override
-    public void updateDroneStatus(Location location) {
+    public void updateDroneStatus(SimulationUpdateEvent simulationUpdateEvent) {
+        Location location = simulationUpdateEvent.getDrone().getLocation(); // TODO: Use whole SimulationUpdateEvent if needed
+
         xCord.setText(String.valueOf(location.getX()));
         yCord.setText(String.valueOf(location.getY()));
         zCord.setText(String.valueOf(location.getZ()));
