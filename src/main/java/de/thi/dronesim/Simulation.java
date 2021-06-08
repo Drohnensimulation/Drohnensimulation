@@ -121,10 +121,6 @@ public class Simulation {
             for (ObstacleDTO obstacleDTO : getConfig().getObstacleConfigList().get(0).obstacles)
                 getChild(UfoObjs.class).addObstacle(obstacleDTO);
         }
-
-        //Load sensors from sensor config into sensor class
-        getChild(SensorModule.class).loadConfig(config.getSensorConfigList());
-
     }
 
     /**
