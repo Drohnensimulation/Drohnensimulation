@@ -15,7 +15,7 @@ import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.text.DefaultCaret;
 
-@Deprecated(since = "Use MView instead.")
+@Deprecated(since = "Use MView instead.", forRemoval = true)
 public class UfoMView extends JFrame implements Runnable, KeyListener {
 
   private UfoSim sim  = UfoSim.getInstance(); // UfoView instance

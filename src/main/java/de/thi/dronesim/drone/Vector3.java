@@ -5,6 +5,7 @@ package de.thi.dronesim.drone;
  * @author Dominik Bartl
  */
 
+@Deprecated(forRemoval = true)
 public class Vector3 {
 
     public double x, y, z;
