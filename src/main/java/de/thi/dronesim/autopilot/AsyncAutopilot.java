@@ -32,6 +32,7 @@ public abstract class AsyncAutopilot implements ISimulationChild, SimulationUpda
     @Override
     public void initialize(Simulation simulation) {
         this.simulation = simulation;
+        simulation.registerUpdateListener(this);
     }
 
     @Override

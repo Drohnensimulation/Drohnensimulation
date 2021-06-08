@@ -115,4 +115,5 @@ public class WindConfig {
     public void setWindSpeed(double windSpeed) {
         this.windSpeed = windSpeed;
     }
+
 }
