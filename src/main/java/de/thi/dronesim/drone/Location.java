@@ -9,11 +9,11 @@ public class Location {
     private static final double V_HORIZONTAL_MAX = 50 / 3.6;            // Maximum horizontal speed             [m/s]
     private static final double V_VERTICAL_MAX = 50 / 3.6;              // Maximum horizontal speed             [m/s]
 
-    private volatile Vector3f position;     // Vector of current position               [m]
+    private Vector3f position;     // Vector of current position               [m]
     private final Vector3f movement;     // Vector of travel direction               [m/s]
 
     private double track = 0;           // True movement direction                  [deg]
-    private volatile double hdg = 0;    // Direction in which the A/C faces         [deg]
+    private double hdg = 0;    // Direction in which the A/C faces         [deg]
     private double tas = 0;             // Speed relative to the wind               [m/s]
     private double gs = 0;              // Speed over ground                        [m/s]
     private double vs = 0;              // Speed along y-axis                       [m/s]
@@ -121,7 +121,7 @@ public class Location {
     /**
      * Sets all values to zero.
      */
-    public synchronized void reset() {
+    public void reset() {
         position.set(0, 0, 0);
         movement.set(0, 0, 0);
         hdg = 0;
