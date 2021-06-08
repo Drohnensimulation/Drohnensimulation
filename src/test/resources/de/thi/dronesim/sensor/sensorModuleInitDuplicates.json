@@ -1,0 +1,98 @@
+{
+  "locationConfig": {
+    "x": 1.0,
+    "y": 2.0,
+    "z": 3.0
+  },
+  "droneRadius": 0.0,
+  "obstacleConfigList": [
+    {
+      "obstacles": [],
+      "config": {
+        "rayDensity": 3
+      }
+    }
+  ],
+  "sensorConfigList": [
+    {
+      "className": "GpsSensor",
+      "sensorId": 1
+    },
+    {
+      "className": "InfraredSensor",
+      "sensorId": 1,
+      "measurementAccuracy": 14.0,
+      "directionX": 15.0,
+      "directionY": 16.0,
+      "directionZ": 17.0,
+      "posX": 18.0,
+      "posY": 19.0,
+      "posZ": 20.0,
+      "range": 10.0,
+      "sensorAngle": 11.0,
+      "sensorRadius": 13.0,
+      "sensorForm": "CONE",
+      "calcType": "AVG"
+    },
+    {
+      "className": "RotationSensor",
+      "sensorId": 3,
+      "measurementAccuracy": 14.0,
+      "directionX": 15.0,
+      "directionY": 16.0,
+      "directionZ": 17.0,
+      "posX": 18.0,
+      "posY": 19.0,
+      "posZ": 20.0,
+      "range": 10.0,
+      "sensorAngle": 11.0,
+      "sensorRadius": 13.0,
+      "sensorForm": "CONE",
+      "calcType": "AVG",
+      "spinsPerSecond": 0,
+      "startRotationTime": 0.0
+    },
+    {
+      "className": "UltrasonicSensor",
+      "sensorId": 4,
+      "measurementAccuracy": 14.0,
+      "directionX": 15.0,
+      "directionY": 16.0,
+      "directionZ": 17.0,
+      "posX": 18.0,
+      "posY": 19.0,
+      "posZ": 20.0,
+      "range": 10.0,
+      "sensorAngle": 11.0,
+      "sensorRadius": 13.0,
+      "sensorForm": "CONE",
+      "calcType": "AVG",
+      "startIncreaseTime": 0.0
+    },
+    {
+      "className": "WindSensor",
+      "sensorId": 5,
+      "directionX": 15.0,
+      "directionY": 16.0,
+      "directionZ": 17.0,
+      "zeroDegreeDirectionX": 0.0,
+      "zeroDegreeDirectionY": 0.0,
+      "zeroDegreeDirectionZ": 0.0,
+      "nintyDegreeDirectionX": 0.0,
+      "nintyDegreeDirectionY": 0.0,
+      "nintyDegreeDirectionZ": 0.0,
+      "rangeIncreaseVelocity": 0.0
+    }
+  ],
+  "windConfigList": [
+    {
+      "windSpeed": 0.0,
+      "gustSpeed": 0.0,
+      "timeStart": 0.0,
+      "timeEnd": 0.0,
+      "altitudeBottom": 0.0,
+      "altitudeTop": 0.0,
+      "windDirection": 0.0
+    }
+  ]
+}

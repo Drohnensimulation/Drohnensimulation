@@ -8,6 +8,9 @@ import de.thi.dronesim.obstacle.entity.Obstacle;
 
 import java.util.Set;
 
+/**
+ * @author Christian Schmied
+ */
 public interface IUfoObjs {
 
     /**
@@ -65,7 +68,18 @@ public interface IUfoObjs {
      * @param dimension Dimension des Quaders (x, y, z/Reichweite)
      * @return Referenz zu einem Getroffenen Objekt
      */
+    @Deprecated
     Set<HitMark> checkSensorCuboid(Vector3f origin, Vector3f orientation, Vector3f dimension);
+
+    /**
+     * Prüft auf Kollisionen entlang eines Quaders
+     * @param origin Fußpunkt
+     * @param orientation Richtung
+     * @param dimension Dimension des Quaders (x, y, z/Reichweite)
+     * @param rotation Roation around the orientation Vector in RAD where 0 is straight up into the sky
+     * @return Referenz zu einem Getroffenen Objekt
+     */
+    Set<HitMark> checkSensorCuboid(Vector3f origin, Vector3f orientation, Vector3f dimension, float rotation);
 
     /**
      * Prüft auf Kollisionen entlang eines Zylinders
@@ -75,6 +89,14 @@ public interface IUfoObjs {
      * @return Referenz zu einem Getroffenen Objekt
      */
     Set<HitMark> checkSensorCylinder(Vector3f origin, Vector3f orientation, Vector3f dimension);
+    
+    /**
+     * Prüft auf Kollisionen mit dem Drohnen-Hitbox
+     * @param origin Drohnen-Mittelpunkt
+     * @param radius Größe des kugelförmigen Hitboxes
+     * @return true wenn die Drohne mit einem fremden Objekt kollidiert
+     */
+    boolean checkDroneCollision(Vector3f origin, float radius);
 
     /**
      * Extracts the current state into the ConfigDTO

@@ -1,16 +1,11 @@
 package de.thi.dronesim.sensor.types;
 
-import de.thi.dronesim.Simulation;
-import de.thi.dronesim.obstacle.entity.HitMark;
+import de.thi.dronesim.SimulationUpdateEvent;
+import de.thi.dronesim.persistence.entity.SensorConfig;
+import de.thi.dronesim.sensor.SensorModule;
+import de.thi.dronesim.sensor.dto.SensorResultDto;
 
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import de.thi.dronesim.ISimulationChild;
-import de.thi.dronesim.sensor.ASensor;
-
-public class UltrasonicSensor extends ASensor implements ISimulationChild{
+public class UltrasonicSensor extends DistanceSensor {
 	
 	/**
 	 * To simulate a ultrasonic sensor the range get increased with a certain velocity up to the given max range.
@@ -18,55 +13,52 @@ public class UltrasonicSensor extends ASensor implements ISimulationChild{
 	 * @author Moris Breitenborn
 	 */
 
-	//Main simulation
-	private Simulation simulation;
+	private float rangeIncreaseVelocity; // meters per second
+	private float startIncreaseTime;
 	
-	public float rangeIncreaseVelocity; // meters per second
-	public float startIncreaseTime;
-	public float endIncreaseTime;
-	public int callTimerForSensorValues;
-	public Timer callTimerValues = new Timer( );
-	public Set<HitMark> values;
-
-	public UltrasonicSensor(float rangeIncreaseVelocity, int callTimerForSensorValues) {
-		this.rangeIncreaseVelocity =rangeIncreaseVelocity;
-		this.callTimerForSensorValues= callTimerForSensorValues;
-		this.startIncrease();
-
+	/**
+	 * Constructor:
+	 *
+	 * @param rangeIncreaseVelocity: defines how fast the sensor increase in one second
+	 * @param startIncreaseTime: defines the time when the Sensor starts to increase. if the value is 5 the increase starts
+	 * after the Simulation is running for 5 seconds.
+	 */
+	public UltrasonicSensor(SensorConfig config) {
+		super(config);
+		this.rangeIncreaseVelocity = config.getRangeIncreaseVelocity();
+		this.startIncreaseTime= config.getStartIncreaseTime();
 	}
 
-	public UltrasonicSensor() {}
-	
-	@Override
-	public String getType() {
-		String name = "UltrasonicSensor";
-		return name;
-	}
-
-	@Override
-	public void initialize(Simulation simulation) {
-		this.simulation = simulation;
-	}
-
-	@Override
-	public Simulation getSimulation() {
-		return this.simulation;
-	}
-	// Saves the start time
-	public void startIncrease() {
-		this.startIncreaseTime = System.nanoTime();
+	/**
+	 *  This Method is resetting the startIncreaseTime to calculate the next measurement
+	 */
+	public void startIncrease(SimulationUpdateEvent event) {
+		this.startIncreaseTime = (float) event.getTime();
 	}
 	
-	//calculate traveled time in nanoseconds
-	private float traveledTime() {
-		float endIncreaseTime = System.nanoTime();
-		// traveled time converted into seconds
-		float traveledTime = (endIncreaseTime - this.startIncreaseTime) / 1000000000;
+	/**
+	 *  This Method calculate the time between this.startIncreaseTime and endIncreaseTime.
+	 *  If this.startIncreaseTime is smaller than endIncreaseTime the increase did not start yet. There for the traveled
+	 *  time is 0. The return value got converted to seconds.
+	 */
+	private float traveledTime(SimulationUpdateEvent event) {
+		float endIncreaseTime = (float) event.getTime();
+		float traveledTime;
+		if(this.startIncreaseTime<endIncreaseTime) {
+			traveledTime = (endIncreaseTime - this.startIncreaseTime);
+			startIncrease(event);
+		}else {
+			traveledTime = 0;
+		}
 		return traveledTime;
 	}
 	
-	// Calculate the current cone height with help the time difference and the rangeIncreaseVelocity. first calculate the current
-	// range and add the getOriginToPositionLength()
+	/**
+	 * Calculate the current cone height with help the time difference and the rangeIncreaseVelocity. first calculate the current
+	 * range and add the getOriginToPositionLength()
+	 *
+	 * @param traveledTime
+	 */
 	public float getCurrentConeHeight(float traveledTime) {
 		// Multiply the Time with the velocity to get the distance
 		float travaledDistance = traveledTime*this.rangeIncreaseVelocity;
@@ -76,23 +68,31 @@ public class UltrasonicSensor extends ASensor implements ISimulationChild{
 			travaledDistance -= getRange();
 		}
 		// return the cone height by adding the OriginToPositionLength to travaledDistance;
-		return (float) travaledDistance+getOriginToPositionLength();
+		return (float) travaledDistance+ calcOriginToPositionLength();
 	}
 	
-	public void startCallSensorValues() {
-		
-		callTimerValues.scheduleAtFixedRate(new TimerTask() {
-
-		    @Override
-		    public void run() {
-		    	float traveledTime =  traveledTime();
-				values =  getSensorHits(getOrigin(), getOrientation(), getCurrentConeHeight(traveledTime), getVectorAngel()); // getCurrentConeHeight()
-		    }
-
-		}, 0, callTimerForSensorValues);
+	/**
+	 * Calculate the current cone height with help the time difference and the rangeIncreaseVelocity an passes these parameters to
+	 * getSensorResult(); The result get saved into this.sensorResultDtovalues
+	 *
+	 */
+	@Override
+	public void runMeasurement(SimulationUpdateEvent event, SensorModule sensorModule) {
+		float traveledTime =  traveledTime(event);
+		this.sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), getCurrentConeHeight(traveledTime), calcSurfaceVector(), sensorModule); // getCurrentConeHeight()
 	}
-	
-	public void stopCallingSensorValues() {
-		callTimerValues.cancel();
+
+	@Override
+	public SensorResultDto getLastMeasurement() {
+		return this.sensorResultDtoValues;
+	}
+
+	@Override
+	public SensorConfig saveToConfig() {
+		SensorConfig config = super.saveToConfig();
+		config.setClassName(this.getClass().getSimpleName());
+		config.setRangeIncreaseVelocity(rangeIncreaseVelocity);
+		config.setStartIncreaseTime(startIncreaseTime);
+		return config;
 	}
 }

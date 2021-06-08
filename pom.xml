@@ -45,12 +45,12 @@
         <dependency>
             <groupId>org.jmonkeyengine</groupId>
             <artifactId>jme3-desktop</artifactId>
-            <version>3.3.2-stable</version>
+            <version>3.4.0-stable</version>
         </dependency>
         <dependency>
             <groupId>org.jmonkeyengine</groupId>
             <artifactId>jme3-lwjgl</artifactId>
-            <version>3.3.2-stable</version>
+            <version>3.4.0-stable</version>
         </dependency>
 
         <!-- Swing dark mode -->

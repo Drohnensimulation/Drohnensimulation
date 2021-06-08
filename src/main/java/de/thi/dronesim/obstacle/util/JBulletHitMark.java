@@ -4,6 +4,9 @@ import com.bulletphysics.collision.dispatch.CollisionWorld;
 
 import javax.vecmath.Vector3f;
 
+/**
+ * @author Christian Schmied
+ */
 public class JBulletHitMark {
     public final HitBoxRigidBody body;
     public final Vector3f worldHit;

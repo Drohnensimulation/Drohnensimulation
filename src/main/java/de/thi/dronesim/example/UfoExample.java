@@ -1,89 +1,105 @@
 package de.thi.dronesim.example;// Importiere die Simulation
-import de.thi.dronesim.drone.UfoSim;
+
+import com.jme3.math.Vector3f;
+import de.thi.dronesim.Simulation;
+import de.thi.dronesim.drone.Location;
+import de.thi.dronesim.gui.GuiManager;
 
 // Das Programmierbeispiel in der Klasse de.thi.dronesim.example.UfoExample
 public class UfoExample {
 
     // Es spielt sich alles im Hauptprogramm ab.
     public static void main(String[] args) {
-        // In der folgenden Zeile definieren wir eine Referenz auf die Simulation.
-        UfoSim sim = UfoSim.getInstance();
 
-        // Oeffnen einer View
-        sim.openViewWindow();
+        //Lädt die Simulationsconfig und bereitet die Simulation vor.
+        Simulation sim = new Simulation("src/main/java/de/thi/dronesim/example/simtestconf.json");
+        sim.prepare();
 
-        // Doppelte Simulationsgeschwindigkeit
-        sim.setSpeedup(2);
+        GuiManager gui = sim.getChild(GuiManager.class);
+        sim.start();
+        gui.openDViewGui();
 
-        // Meldung auf die View-Konsole ausgeben und auf den Trigger warten
-        System.out.println("Press any key to start...");
-        while (!sim.getTrigger());   
 
-        // Der folgende Code fliegt das Ufo zur Position (20, 20, 0).
+        //Steuert die Drone vorübergehend, sollte in Autopilot.java ausgelagert werden.
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-        // Das Ufo fliegt senkrecht nach oben mit 10 km/h.
-        // Funktion getTimeAndPosition siehe unten
-        System.out.println(formatFlightData(sim) + "takeoff with 10 km/h to alt 10 m...");
-        sim.setI(90);
-        sim.requestDeltaV(10);
+        Location loc = sim.getDrone().getLocation();
+        loc.requestDeltaVerticalSpeed(0.0001);
 
-        // Wenn die Hoehe 8m erreicht ist, bremst das Ufo auf 1 km/h.
-        while (sim.getZ() < 8);
-        System.out.println(formatFlightData(sim) + "...slow down to 1 km/h... ");
-        sim.requestDeltaV(-9);
+//        loc.requestDeltaHeading(180);
+//        while (loc.getHeading() != 180) {}
+//        loc.requestDeltaAirspeed(1);
+//        while(loc.getPosition().z > -5 ) {}
 
-        // Wenn die Hoehe 9.95m erreicht ist, stoppt das Ufo und richtet sich horizontal aus.
-        while (sim.getZ() < 9.95);
-        System.out.println(formatFlightData(sim) + "...stop and turn horizontal");
-        sim.requestDeltaV(-1);
-        sim.setI(0); 
- 
-        // Weiter geht es in Richtung 45 Grad. Die zu fliegende Distanz ist dist.
-        sim.setD(45);
-        double dist = sim.getDist() + Math.sqrt(20 * 20 + 20 * 20);
 
-        // Das Ufo beschleunigt auf 15 km/h.
-        System.out.println(formatFlightData(sim) + "go " + 45 + " deg with 15 km/h...");
-        sim.requestDeltaV(15);
+        loc.requestDeltaVerticalSpeed(1);
+        while(loc.getPosition().y < 2 ) {}
+        loc.requestDeltaVerticalSpeed(-1);
 
-        // Wenn der Abstand zum Ziel 4m ist, bremst das Ufo auf 1 km/h.
-        while (dist - sim.getDist() > 4);
-        System.out.println(formatFlightData(sim) + "...slow down to 1 km/h... ");
-        sim.requestDeltaV(-14);
+        loc.requestDeltaHeading(180);
+        while (loc.getHeading() != 180) {}
 
-        // Wenn der Abstand zum Ziel 0.05m ist, stoppt das Ufo.
-        while (dist - sim.getDist() > 0.05);
-        System.out.println(formatFlightData(sim) + "...stop");
-        sim.requestDeltaV(-1);
+        loc.requestDeltaAirspeed(1);
+        while(loc.getPosition().z > 0.2)  {}
+        loc.requestDeltaAirspeed(-1);
 
-        // Das Ufo fliegt senkrecht nach unten mit 10 km/h.
-        System.out.println(formatFlightData(sim) + "landing with 10 km/h");
-        sim.setI(-90);
-        sim.requestDeltaV(10); 
+        loc.requestDeltaHeading(-90);
+        while (loc.getHeading() != 90) {}
 
-        // Wenn die Hoehe 3m erreicht, bremst das Ufo auf 1 km/h.
-        while (sim.getZ() > 3);
-        System.out.println(formatFlightData(sim) + "...slow down to 1 km/h...");
-        sim.requestDeltaV(-9);
+        loc.requestDeltaAirspeed(1);
+        while(loc.getPosition().x > 0.2)  {}
+        loc.requestDeltaAirspeed(-1);
 
-        // Das Ufo ist gelandet, wenn die He kleiner gleich 0 ist.
-        while (sim.getZ() > 0);
-        System.out.println(formatFlightData(sim) + "...happily landed");
+        loc.requestDeltaAirspeed(0.75);
+        loc.requestDeltaHeading(360);
+        while (loc.getHeading() >= 90) {}
+        while (loc.getHeading() < 90) {}
+        loc.requestDeltaAirspeed(-2);
 
-        // Meldung auf die View-Konsole ausgeben und auf den Trigger warten
-        System.out.println("Press any key to exit...");
-        while (!sim.getTrigger()); 
 
-        // Da im Hintergrund die Simulation laeuft, beenden wir das Programm explizit.
-        System.exit(1);
-    } 
 
-    // Hilfsfunktion zur Formatierung der Zeit und der Koordinaten des Ufos
-    private static String formatFlightData(UfoSim sim) {
-        return String.format("%5.1f", sim.getTime()) + "s: " + "[" +
-               String.format("%6.1f", sim.getX()) + " " +
-               String.format("%6.1f", sim.getY()) + " " +
-               String.format("%5.1f", sim.getZ()) + "] ";
-    } 
+        loc.requestDeltaVerticalSpeed(-1);
+        while(loc.getPosition().y > 1.25)  {}
+        loc.requestDeltaVerticalSpeed(1);
 
-} 
+
+        loc.requestDeltaVerticalSpeed(-0.0001);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        loc.requestDeltaVerticalSpeed(0.0001);
+
+
+        loc.requestDeltaVerticalSpeed(0.5);
+        Vector3f old = loc.getPosition();
+        while(loc.getPosition().y <= old.y+0.5) {}
+        loc.requestDeltaVerticalSpeed(-0.5);
+
+
+        loc.requestDeltaHeading(-360);
+        loc.requestDeltaAirspeed(1);
+        loc.requestDeltaVerticalSpeed(-0.25);
+        while ((loc.getHeading() <= 90 || loc.getHeading() >= 270) && loc.getPosition().y > 0.1 ) {}
+        loc.requestDeltaVerticalSpeed(0.75);
+        while (loc.getHeading() > 90 && loc.getPosition().y < 0.75) {}
+        loc.requestDeltaVerticalSpeed(-0.25);
+        while (loc.getHeading() > 90 ) {}
+        loc.requestDeltaAirspeed(-1);
+        loc.requestDeltaVerticalSpeed(-0.25);
+
+        loc.requestDeltaVerticalSpeed(-1);
+        while(loc.getPosition().y > 1.25)  {}
+        loc.requestDeltaVerticalSpeed(1);
+
+        loc.requestDeltaVerticalSpeed(-0.0001);
+
+
+    }
+
+}

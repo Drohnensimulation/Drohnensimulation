@@ -260,6 +260,10 @@ public class DRenderer extends SimpleApplication {
         updateGround();
     }
 
+    public RenderableDrone getDrone() {
+        return dronePerspectiveId == -1 ? null : drones.get(dronePerspectiveId);
+    }
+
     /**
      * Adds a listener on frame updates
      *

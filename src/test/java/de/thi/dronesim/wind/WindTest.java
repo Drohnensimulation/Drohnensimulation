@@ -5,6 +5,7 @@ import de.thi.dronesim.drone.Location;
 import de.thi.dronesim.persistence.entity.WindConfig;
 import org.junit.jupiter.api.*;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -812,7 +813,7 @@ class WindTest {
 
     /**
      * method to set the location of the drone
-     * @param y y coordinate
+     * @param y Y-coordinate
      * @param airspeed airspeed of the drone
      * @param heading heading of the drone
      */

@@ -8,6 +8,9 @@ import de.thi.dronesim.obstacle.entity.Obstacle;
 
 import javax.vecmath.Vector3f;
 
+/**
+ * @author Christian Schmied
+ */
 public class HitBoxRigidBody extends RigidBody {
     private final Obstacle obstacle;
 

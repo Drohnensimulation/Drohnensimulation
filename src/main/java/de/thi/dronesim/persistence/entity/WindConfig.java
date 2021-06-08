@@ -4,9 +4,6 @@ package de.thi.dronesim.persistence.entity;
  * Object that holds all configurations to a Wind-Layer.
  *
  * @author Daniel Stolle
- * @author Lausch, Christopher
- * @author Hupp, Laurence
- * @author Wittschen, Marvin
  */
 public class WindConfig {
 
@@ -24,35 +21,44 @@ public class WindConfig {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         WindConfig that = (WindConfig) o;
-        return windSpeed == that.windSpeed
-                && gustSpeed == that.gustSpeed
-                && timeStart == that.timeStart
-                && timeEnd == that.timeEnd
-                && altitudeBottom == that.altitudeBottom
-                && altitudeTop == that.altitudeTop
-                && windDirection == that.windDirection;
+
+        if (Double.compare(that.windSpeed, windSpeed) != 0) return false;
+        if (Double.compare(that.gustSpeed, gustSpeed) != 0) return false;
+        if (Double.compare(that.timeStart, timeStart) != 0) return false;
+        if (Double.compare(that.timeEnd, timeEnd) != 0) return false;
+        if (Double.compare(that.altitudeBottom, altitudeBottom) != 0) return false;
+        if (Double.compare(that.altitudeTop, altitudeTop) != 0) return false;
+        return Double.compare(that.windDirection, windDirection) == 0;
     }
 
     @Override
     public int hashCode() {
-        int hashCode = Double.hashCode(windSpeed);
-        hashCode *= 31 + Double.hashCode(gustSpeed);
-        hashCode *= 31 + Double.hashCode(timeStart);
-        hashCode *= 31 + Double.hashCode(timeEnd);
-        hashCode *= 31 + Double.hashCode(altitudeBottom);
-        hashCode *= 31 + Double.hashCode(altitudeTop);
-        hashCode *= 31 + Double.hashCode(windDirection);
-        return hashCode;
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(windSpeed);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(gustSpeed);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(timeStart);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(timeEnd);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(altitudeBottom);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(altitudeTop);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(windDirection);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
     }
 
+    // /////////////////////////////////////////////////////////////////////////////
+    // Getter/ Setter
+    // /////////////////////////////////////////////////////////////////////////////
 
     public double getWindDirection() {
         return windDirection;
