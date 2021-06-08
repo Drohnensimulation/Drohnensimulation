@@ -60,9 +60,10 @@ public class DRenderer extends SimpleApplication {
         settings.setWidth(1280);
         settings.setHeight(720);
         settings.setSamples(8);
+        settings.setFrameRate(60);
         setSettings(settings);
         setDisplayStatView(false);
-        setDisplayFps(true); // TODO: Set to false for production
+        setDisplayFps(false);
         setPauseOnLostFocus(false);
     }
 

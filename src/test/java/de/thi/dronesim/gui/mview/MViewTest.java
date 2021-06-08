@@ -11,7 +11,6 @@ import de.thi.dronesim.gui.GuiManager;
 public class MViewTest {
 
     public static void main(String[] args) {
-
         Simulation simulation = new Simulation();
         simulation.prepare();
         simulation.getChild(GuiManager.class).openMViewGui();
