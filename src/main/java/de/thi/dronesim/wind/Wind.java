@@ -10,6 +10,11 @@ import org.apache.logging.log4j.Logger;
 import javax.vecmath.Vector3d;
 import java.util.*;
 
+/**
+ * @author Lausch, Christopher
+ * @author Hupp, Laurence
+ * @author Wittschen, Marvin
+ */
 public class Wind implements ISimulationChild {
 
     protected static final double WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE = 5;        // range in m
@@ -17,19 +22,23 @@ public class Wind implements ISimulationChild {
 
     private final Logger logger = LogManager.getLogger();
 
-    //Main simulation
-    private Simulation simulation;
+    private Simulation simulation;                          // Main simulation
+    private final List<WindLayer> windLayers;               // list of wind layers
+    private int latestLayerId = 0;                          // Id of latest WindLayer to take into consideration based on time
 
-    private final List<WindLayer> windLayers;             // list of wind layers      [Windlayer]
-    private int latestLayerId = 0;
-
+    /**
+     * Default constructor called by {@link Simulation}
+     */
     public Wind() {
         windLayers = new ArrayList<>();
     }
 
-    public Wind(List<WindLayer> layers) {
+    /**
+     * Tester construction
+     * @param layers List of WindLayers to be applies
+     */
+    protected Wind(List<WindLayer> layers) {
         this.windLayers = layers;
-        process();
     }
 
     @Override
@@ -48,9 +57,8 @@ public class Wind implements ISimulationChild {
 
     @Override
     public Simulation getSimulation() {
-        return this.simulation;
+        return simulation;
     }
-
 
     /**
      * Calculates the wind direction and speed at the current time of a given location.
@@ -88,10 +96,7 @@ public class Wind implements ISimulationChild {
     }
 
     /**
-     *
-     * <p>
-     * By definition, each layer must be adjacent or at least 2 * WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE apart from each other. Same applies for time.
-     * </p>
+     * Processes the WindLayers to be used in the simulation environment
      */
     private void process() {
         sortWindLayer();
@@ -113,7 +118,7 @@ public class Wind implements ISimulationChild {
     }
 
     /**
-     * This function sorts the given WindLayer by Time
+     * This function sorts the given WindLayer by time and altitude, prioritizing time over altitude
      */
     private void sortWindLayer() {
         windLayers.sort(Comparator.comparing(WindLayer::getAltitudeBottom));
@@ -121,14 +126,16 @@ public class Wind implements ISimulationChild {
     }
 
     /**
-     *
-     * This Method normalizes the WindLayer already sorted, as defined in function load
-     * The borders of the wind layers are rounded up to the doubled interpolation range
+     * This Method normalizes the  already sorted WindLayers.
+     * <ul>
+     *     <li>The borders of the wind layers are rounded up to the doubled interpolation range</li>
+     *     <li>Layers with overlapping borders are being removed</li>
+     *     <li>Layers with invalid values are being removed</li>
+     * </ul>
+     * @see Wind#WIND_LAYER_INTERPOLATION_TIME_RANGE
+     * @see Wind#WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE
      */
     private void normalize() {
-        final double altDistance = 2 * WIND_LAYER_INTERPOLATION_ALTITUDE_RANGE;
-        final double timeDistance = 2 * WIND_LAYER_INTERPOLATION_TIME_RANGE;
-
         // Round time and altitude
         windLayers.forEach(WindLayer::normalize);
 
@@ -152,12 +159,13 @@ public class Wind implements ISimulationChild {
                 }
             }
         }
+        // Remove preciously collected invalid layers
         windLayers.removeAll(removed);
     }
 
     /**
-     * Searches oldest layer by time
-     * @param time Oldest time still in use
+     * Searches for latest layer based on time
+     * @param time Latest time taken into consideration
      */
     private void updateLatestLayer(double time) {
         for (int i = latestLayerId; i < windLayers.size(); i++) {
@@ -197,7 +205,7 @@ public class Wind implements ISimulationChild {
      */
     public void applyWind(Location location, double time) {
 
-        // Update oldest layer to set start point of search algorithm
+        // Update latest layer based on time to set start point of search algorithm
         updateLatestLayer(time - WIND_LAYER_INTERPOLATION_TIME_RANGE);
 
         // Find all 4 layers required. More layers can't have any effect by definition
@@ -269,17 +277,15 @@ public class Wind implements ISimulationChild {
                 location.getVerticalSpeed());
         speedVector.add(windSpeedVector);
 
-
         double track = calculateAngleOfVector(speedVector);
         // Apply changes
         location.setTrack(track);
         location.setGroundSpeed(Math.sqrt(speedVector.x * speedVector.x + speedVector.z * speedVector.z));
         location.setVerticalSpeed(speedVector.y);
-
     }
 
     /**
-     * 
+     * Creates a vector out of direction, airspeed and vertical speed
      * @param direction Speed direction in deg
      * @param speed Speed in m/s
      * @return A vector with x for east speed and z for north speed
@@ -303,14 +309,14 @@ public class Wind implements ISimulationChild {
         if (vector.z == 0)
             return  (vector.x >= 0) ? 0 : 180;
 
-        double ang = Math.toDegrees(Math.atan(vector.z / vector.x));
+        double angle = Math.toDegrees(Math.atan(vector.z / vector.x));
         if (vector.x < 0 && vector.z < 0) // quadrant Ⅲ
-            return 180 + ang;
+            return 180 + angle;
         if (vector.x < 0) // quadrant Ⅱ
-            return 180 + ang;
+            return 180 + angle;
         if (vector.z < 0) // quadrant Ⅳ
-            return 270 + (90 + ang);
-        return ang;
+            return 270 + (90 + angle);
+        return angle;
     }
 
     /**

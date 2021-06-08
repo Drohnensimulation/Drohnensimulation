@@ -4,12 +4,11 @@ package de.thi.dronesim.persistence.entity;
  * Object that holds all configurations to a Wind-Layer.
  *
  * @author Daniel Stolle
+ * @author Lausch, Christopher
+ * @author Hupp, Laurence
+ * @author Wittschen, Marvin
  */
 public class WindConfig {
-
-    // TODO: add attributes, overwrite equals and hashcode
-
-    private int dummy;
 
     private double windSpeed;                           // Speed of the steady wind             [m/s]
     private double gustSpeed;                           // Max Speed of the gusts               [m/s]
@@ -23,7 +22,6 @@ public class WindConfig {
     // Object Methods
     // /////////////////////////////////////////////////////////////////////////////
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -34,13 +32,25 @@ public class WindConfig {
         }
 
         WindConfig that = (WindConfig) o;
-
-        return dummy == that.dummy;
+        return windSpeed == that.windSpeed
+                && gustSpeed == that.gustSpeed
+                && timeStart == that.timeStart
+                && timeEnd == that.timeEnd
+                && altitudeBottom == that.altitudeBottom
+                && altitudeTop == that.altitudeTop
+                && windDirection == that.windDirection;
     }
 
     @Override
     public int hashCode() {
-        return dummy;
+        int hashCode = Double.hashCode(windSpeed);
+        hashCode *= 31 + Double.hashCode(gustSpeed);
+        hashCode *= 31 + Double.hashCode(timeStart);
+        hashCode *= 31 + Double.hashCode(timeEnd);
+        hashCode *= 31 + Double.hashCode(altitudeBottom);
+        hashCode *= 31 + Double.hashCode(altitudeTop);
+        hashCode *= 31 + Double.hashCode(windDirection);
+        return hashCode;
     }
 
 
@@ -99,4 +109,5 @@ public class WindConfig {
     public void setWindSpeed(double windSpeed) {
         this.windSpeed = windSpeed;
     }
+
 }

@@ -3,21 +3,26 @@ package de.thi.dronesim.wind;
 import javax.vecmath.Vector3d;
 import java.util.Random;
 
+/**
+ * @author Lausch, Christopher
+ * @author Hupp, Laurence
+ * @author Wittschen, Marvin
+ */
 public class WindLayer {
 
-    protected static final double GUST_RISE_TIME = 2;     // Time until gust reaches full speed   [s]
-    protected static final double MAX_CALM_TIME = 120;    // Maximum time for no gust             [s]
+    protected static final double GUST_RISE_TIME = 2;       // Time until gust reaches full speed   [s]
+    protected static final double MAX_CALM_TIME = 120;      // Maximum time for no gust             [s]
 
-    private final double windSpeed;                           // Speed of the steady wind             [m/s]
-    private final double gustSpeed;                           // Max Speed of the gusts               [m/s]
-    private final double windDirection;                       // current wind direction               [degree]
-    private double timeStart;                           // time of wind layer start             [s]
-    private double timeEnd;                             // time of wind layer end               [s]
-    private double altitudeBottom;                      // height of wind layer bottom          [m]
-    private double altitudeTop;                         // height of wind layer top             [m]
+    private final double windSpeed;                         // Speed of the steady wind             [m/s]
+    private final double gustSpeed;                         // Max Speed of the gusts               [m/s]
+    private final double windDirection;                     // current wind direction               [degree]
+    private double timeStart;                               // time of wind layer start             [s]
+    private double timeEnd;                                 // time of wind layer end               [s]
+    private double altitudeBottom;                          // height of wind layer bottom          [m]
+    private double altitudeTop;                             // height of wind layer top             [m]
 
-    private double nextGustStart = 0.0;                 // start time of the next gust          [s]
-    private double nextGustSpeed = 0.0;                // speed of the next gust               [m/s]
+    private double nextGustStart = 0.0;                     // start time of the next gust          [s]
+    private double nextGustSpeed = 0.0;                     // speed of the next gust               [m/s]
     private double nextGustDuration = GUST_RISE_TIME * 2;   // Duration of next must                [s]
 
     /**
@@ -54,7 +59,6 @@ public class WindLayer {
     }
 
     /**
-     *
      * @return True if all values are within their limits
      */
     public boolean isValid() {
@@ -76,7 +80,7 @@ public class WindLayer {
      * @return A vector with the speed
      */
     public Vector3d getSpeedVector(double time) {
-        double ws = calcWindSpeed(time);
+        double ws = calculateWindSpeed(time);
         double wd = (windDirection + 180) % 360;
         return Wind.createSpeedVector(wd, ws, 0);
     }
@@ -115,12 +119,12 @@ public class WindLayer {
      * Calculates wind speed with interpolation
      * @return New wind speed in m/s
      */
-    private double calcWindSpeed(double time) {
+    private double calculateWindSpeed(double time) {
         double windSpeed = this.windSpeed;
         // Check if new gust needs to be calculated
         if (gustSpeed > windSpeed) {
             if (time > nextGustStart + GUST_RISE_TIME * 2) {
-                calcNextGust(time);
+                calculateNextGust(time);
             } else if (time >= nextGustStart && gustSpeed > windSpeed) {
                 // Apply gust
                 windSpeed = gustInterpolation(time, nextGustSpeed, nextGustStart, nextGustDuration);
@@ -130,7 +134,7 @@ public class WindLayer {
     }
 
     /**
-     * Interpolation between gust and wind
+     * Interpolates between gust and wind
      * @param time Time for which the gust should be calculated in s
      * @param gustSpeed Maximum speed of the gust in m/s
      * @param gustStart Time at which the gust starts in s
@@ -140,21 +144,24 @@ public class WindLayer {
     private double gustInterpolation(double time, double gustSpeed, double gustStart, double gustDuration) {
         double y;
         double slope = (gustSpeed - windSpeed) / GUST_RISE_TIME;
+        // Rising part of the gust
         if (time <= (gustStart + GUST_RISE_TIME)) {
             y = slope * (time - gustStart);
         } else if (time < gustStart + gustDuration - GUST_RISE_TIME) {
-            y = gustSpeed;
+            // Stable part with maximum gust speed
+            y = gustSpeed - windSpeed;
         } else {
+            // Falling part of the gust back to the normal wind speed
            y = -1 * slope * (time - (gustStart + gustDuration - GUST_RISE_TIME)) + (gustSpeed - windSpeed);
         }
         return windSpeed + y;
     }
 
     /**
-     * calc next gust time and nex gust speed
-     * @param time current time         [s]
+     * Calculates next gust time and next gust speed
+     * @param time current time in s
      */
-    private void calcNextGust(double time) {
+    private void calculateNextGust(double time) {
         Random random = new Random();
         nextGustStart = random.nextDouble() * MAX_CALM_TIME + time;
         nextGustSpeed = random.nextDouble() * (gustSpeed - windSpeed) + windSpeed;
@@ -205,7 +212,7 @@ public class WindLayer {
         this.nextGustSpeed = nextGustSpeed;
     }
 
-    public void setNextGustDuration(double nextGustDuration) {
+    protected void setNextGustDuration(double nextGustDuration) {
         this.nextGustDuration = nextGustDuration;
     }
 

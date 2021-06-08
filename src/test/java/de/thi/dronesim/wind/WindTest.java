@@ -2,14 +2,19 @@ package de.thi.dronesim.wind;
 
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.drone.Location;
+import de.thi.dronesim.persistence.entity.WindConfig;
 import org.junit.jupiter.api.*;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * @author Lausch, Christopher
+ * @author Hupp, Laurence
+ * @author Wittschen, Marvin
+ */
 class WindTest {
 
     private Wind wind;
@@ -18,14 +23,20 @@ class WindTest {
     private final List<WindLayer> windLayers = new ArrayList<>();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         simulation = new Simulation();
         windLayers.clear();
+    }
+
+    @AfterEach
+    void stop() {
+        wind.onSimulationStop();
     }
 
     private void setupWind() {
         wind = new Wind(windLayers);
         wind.initialize(simulation);
+        wind.onSimulationStart();
     }
 
     @Test
@@ -35,7 +46,7 @@ class WindTest {
         List<WindLayer> layers = new ArrayList<>();
         layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
         layers.add(new WindLayer(0, 0, 20, 30, 0, 10, 0));
-        Wind wind = new Wind(new ArrayList<>(layers));
+        wind = new Wind(new ArrayList<>(layers));
 
         for (int i = 0; i < wind.getWindLayers().size(); i++) {
             assertEquals(result[i], wind.getWindLayers().indexOf(layers.get(i)));
@@ -49,7 +60,8 @@ class WindTest {
         List<WindLayer> layers = new ArrayList<>();
         layers.add(new WindLayer(0, 0, 20, 30, 0, 10, 0));
         layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
-        Wind wind = new Wind(new ArrayList<>(layers));
+        wind = new Wind(new ArrayList<>(layers));
+        wind.initialize(simulation);
 
         for (int i = 0; i < wind.getWindLayers().size(); i++) {
             assertEquals(result[i], layers.indexOf(wind.getWindLayers().get(i)));
@@ -63,7 +75,7 @@ class WindTest {
         List<WindLayer> layers = new ArrayList<>();
         layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
         layers.add(new WindLayer(0, 0, 0, 10, 20, 30, 0));
-        Wind wind = new Wind(new ArrayList<>(layers));
+        wind = new Wind(new ArrayList<>(layers));
 
         for (int i = 0; i < wind.getWindLayers().size(); i++) {
             assertEquals(result[i], wind.getWindLayers().indexOf(layers.get(i)));
@@ -77,7 +89,8 @@ class WindTest {
         List<WindLayer> layers = new ArrayList<>();
         layers.add(new WindLayer(0, 0, 0, 10, 20, 30, 0));
         layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
-        Wind wind = new Wind(new ArrayList<>(layers));
+        wind = new Wind(new ArrayList<>(layers));
+        wind.initialize(simulation);
 
         for (int i = 0; i < wind.getWindLayers().size(); i++) {
             assertEquals(result[i], layers.indexOf(wind.getWindLayers().get(i)));
@@ -93,7 +106,8 @@ class WindTest {
         layers.add(new WindLayer(0, 0, 20, 30, 20, 30, 0));
         layers.add(new WindLayer(0, 0, 0, 10, 0, 10, 0));
         layers.add(new WindLayer(0, 0, 0, 10, 20, 30, 0));
-        Wind wind = new Wind(new ArrayList<>(layers));
+        wind = new Wind(new ArrayList<>(layers));
+        wind.initialize(simulation);
 
         for (int i = 0; i < wind.getWindLayers().size(); i++) {
             assertEquals(result[i], layers.indexOf(wind.getWindLayers().get(i)));
@@ -110,7 +124,8 @@ class WindTest {
         layers.add(new WindLayer(0, 0, 40, 50, 40, 50, 0));
         layers.add(new WindLayer(0, 0, 10, 30, 0, 10, 0));
         layers.add(new WindLayer(0, 0, 0, 30, 40, 50, 0));
-        Wind wind = new Wind(new ArrayList<>(layers));
+        wind = new Wind(new ArrayList<>(layers));
+        wind.initialize(simulation);
 
         for (int i = 0; i < wind.getWindLayers().size(); i++) {
             assertEquals(result[i], layers.indexOf(wind.getWindLayers().get(i)));
@@ -149,7 +164,8 @@ class WindTest {
         expected.add(new WindLayer(0, 0, 20, 30, -10, 10, 0));
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -166,7 +182,8 @@ class WindTest {
         expected.add(new WindLayer(0, 0, 20, 30, -10, 10, 0));
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -183,7 +200,8 @@ class WindTest {
         expected.add(new WindLayer(0, 0, 10, 20, -10, 10, 0));
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -200,7 +218,8 @@ class WindTest {
         // Should be removed
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -217,7 +236,8 @@ class WindTest {
         expected.add(new WindLayer(0, 0, -10, 10, 20, 30, 0));
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -234,7 +254,8 @@ class WindTest {
         expected.add(new WindLayer(0, 0, -10, 10, 20, 30, 0));
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -251,7 +272,8 @@ class WindTest {
         expected.add(new WindLayer(0, 0, -10, 10, 10, 20, 0));
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -268,7 +290,8 @@ class WindTest {
         // Should be removed
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -285,7 +308,8 @@ class WindTest {
         expected.add(new WindLayer(0, 0, -10, 20, 30, 40, 0));
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -302,7 +326,8 @@ class WindTest {
         expected.add(new WindLayer(0, 0, 10, 20, -10, 10, 0));
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -319,7 +344,8 @@ class WindTest {
         // Should be removed
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -336,7 +362,8 @@ class WindTest {
         // Should be removed
 
         // Start normalization
-        Wind wind = new Wind(layers);
+        wind = new Wind(layers);
+        wind.initialize(simulation);
         // Test result
         assertEqualsWindLayerList(expected, wind.getWindLayers());
     }
@@ -501,11 +528,12 @@ class WindTest {
         WindLayer gustLayer = new WindLayer(5, 20, 0, 100, 0, 100, 180);
         gustLayer.setNextGustStart(20);
         gustLayer.setNextGustSpeed(20);
+        gustLayer.setNextGustDuration(6);
         windLayers.add(gustLayer);
 
         createLocation(5,10,0);
         setupWind();
-        wind.applyWind(location, 22);
+        wind.applyWind(location, 23);
 
         assertEquals(30, location.getGroundSpeed(), 0.5);
     }
@@ -750,9 +778,36 @@ class WindTest {
     }
 
     @Test
-    @Disabled
     void load() {
-        // TODO
+        simulation = new Simulation("src/test/resources/de/thi/dronesim/wind/WindConfigTest.json");
+        wind = new Wind();
+        wind.initialize(simulation);
+
+        List<WindConfig> windConfigList = simulation.getConfig().getWindConfigList();
+        assertNotNull(windConfigList);
+
+        List<WindLayer> expected = new ArrayList<>();
+        expected.add(new WindLayer(1.0, 1.0, -10, 10, -10, 10, 1));
+        expected.add(new WindLayer(2.0, 2.0, 10, 20, -10, 10, 2));
+        expected.add(new WindLayer(3.0, 3.0, 20, 30, -10, 10, 3));
+        expected.add(new WindLayer(4.0, 4.0, 30, 40, -10, 10, 4));
+        expected.add(new WindLayer(5.0, 5.0, 40, 50, -10, 10, 5));
+        assertEquals(expected.size(), wind.getWindLayers().size());
+
+        // Compare with config
+        for (int i = 0; i < expected.size(); i++) {
+            assertConfig(expected.get(i), wind.getWindLayers().get(i));
+        }
+    }
+
+    private void assertConfig(WindLayer expected, WindLayer actual) {
+        assertEquals(expected.getTimeStart(), actual.getTimeStart());
+        assertEquals(expected.getTimeEnd(), actual.getTimeEnd());
+        assertEquals(expected.getWindSpeed(), actual.getWindSpeed());
+        assertEquals(expected.getGustSpeed(), actual.getGustSpeed());
+        assertEquals(expected.getWindDirection(), actual.getWindDirection());
+        assertEquals(expected.getAltitudeTop(), actual.getAltitudeTop());
+        assertEquals(expected.getAltitudeBottom(), actual.getAltitudeBottom());
     }
 
     /**
