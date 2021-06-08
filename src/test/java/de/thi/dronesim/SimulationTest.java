@@ -1,8 +1,10 @@
 package de.thi.dronesim;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -132,6 +134,35 @@ public class SimulationTest {
         simulation.start();
         Thread.sleep(1000);
         simulation.stop();
+    }
+
+    @Test
+    void pauseResumeSimulation() throws InterruptedException {
+        Simulation simulation = new Simulation();
+        simulation.prepare();
+
+        AtomicInteger i = new AtomicInteger();
+        AtomicDouble flag = new AtomicDouble();
+
+        SimulationUpdateListener listener = event -> {
+            if(i.incrementAndGet() == 10){
+                flag.set(event.getTime());
+                simulation.pause();
+            }else if(i.incrementAndGet() == 11){
+                assertTrue(event.getTime() - flag.get() < 1_000);
+                simulation.stop();
+            }
+        };
+
+        simulation.start();
+
+        //Jep Busy Wait ;D
+        while(simulation.getState() != SimulationState.PAUSED){
+            Thread.sleep(10);
+        }
+        Thread.sleep(1_500);
+
+        simulation.start();
     }
 
 }
