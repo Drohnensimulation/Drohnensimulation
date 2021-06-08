@@ -154,7 +154,12 @@ public class Simulation {
             final SimulationUpdateEvent event = new SimulationUpdateEvent(drone, time, tps);
             // Notify listeners
             updateListeners.forEach((priority, listener) -> listener.onUpdate(event));
-            // Update time
+            // Stop simulation if drone is crashed
+            if (drone.isCrashed()) {
+                stop();
+                return;
+            }
+            // Update time for next tick
             time += 1000.0 / tps;
         }, 0, (int) (1e6 / tps * speed), TimeUnit.MICROSECONDS);
     }
