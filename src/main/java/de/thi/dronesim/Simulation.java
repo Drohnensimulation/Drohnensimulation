@@ -37,7 +37,7 @@ public class Simulation {
     private final ScheduledExecutorService executorService;
     private ScheduledFuture<?> status;
 
-    private final SortedMap<Integer, SimulationUpdateListener> updateListeners = new TreeMap<>();
+    private final TreeMap<Integer, SimulationUpdateListener> updateListeners = new TreeMap<>();
 
     /**
      * Constructor with empty SimulationConfig SimulationConfig
@@ -145,11 +145,19 @@ public class Simulation {
      * Schedules the task by the tps and speed
      */
     private void schedule() {
+        int period = (int) (1e6 / tps / speed);
         status = executorService.scheduleAtFixedRate(() -> {
             // Create event
             final SimulationUpdateEvent event = new SimulationUpdateEvent(drone, time, tps);
             // Notify listeners
-            updateListeners.forEach((priority, listener) -> listener.onUpdate(event));
+            updateListeners.descendingMap().forEach((priority, listener) -> {
+                try {
+                    listener.onUpdate(event);
+                } catch (Throwable t) {
+                    logger.error( "Exception updating event listener");
+                    t.printStackTrace();
+                }
+            });
             // Stop simulation if drone is crashed
             if (drone.isCrashed()) {
                 stop();
@@ -157,7 +165,7 @@ public class Simulation {
             }
             // Update time for next tick
             time += 1000.0 / tps;
-        }, 0, (int) (1e6 / tps * speed), TimeUnit.MICROSECONDS);
+        }, 0, period, TimeUnit.MICROSECONDS);
     }
 
     /**
@@ -196,7 +204,7 @@ public class Simulation {
      * @param priority Priority of the listener.
      *                  <ul>
      *                    <li>Higher priorities will be triggered first.</li>
-     *                    <li>If the listener has the same priority than an already added listener, its priority get decremented</li>
+     *                    <li>If the listener has the same priority than an already added listener, its priority gets decremented.</li>
      *                    <li>Reserved priorities:
      *                      <ul>
      *                          <li>900 - Location: requested input update</li>
@@ -204,6 +212,7 @@ public class Simulation {
      *                      </ul>
      *                    </li>
      *                    <li>If no priority is required, priority zero should be used.</li>
+     *                    <li>Listeners with priority zero must not edit any values.</li>
      *                 </ul>
      */
     public void registerUpdateListener(SimulationUpdateListener listener, int priority) {
@@ -232,6 +241,7 @@ public class Simulation {
 
     /**
      * Get the currently Single Drone from the Simulation
+     * <p>NOTE:<br>Do not modify the drone or any child property while the simulation is running</p>
      * @return a Drone Object
      */
     public Drone getDrone() {
