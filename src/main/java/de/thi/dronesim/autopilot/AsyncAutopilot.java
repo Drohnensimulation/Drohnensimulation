@@ -57,7 +57,7 @@ public abstract class AsyncAutopilot implements ISimulationChild, SimulationUpda
         lastEvent = event;
 
         // CHeck if statement is meat
-        if (expectation.evaluate(event)) {
+        if (expectation != null && expectation.evaluate(event)) {
             conditionValid = true;
             this.notifyAll();
         }
