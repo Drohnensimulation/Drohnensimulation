@@ -143,7 +143,7 @@ public class SimulationTest {
     @Test
     void pauseResumeSimulation() throws InterruptedException {
 
-        final Logger logger = LogManager.getLogger(this.getClass());
+        final Logger logger = LogManager.getLogger(SimulationTest.class);
 
         Simulation simulation = new Simulation();
         simulation.prepare();

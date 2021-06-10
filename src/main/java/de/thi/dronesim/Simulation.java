@@ -25,7 +25,7 @@ import java.util.concurrent.*;
  */
 public class Simulation {
 
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger(Simulation.class);
     private static Set<Class<? extends ISimulationChild>> implementingChildren;
     private final SimulationConfig config;
     private final Map<Class<? extends ISimulationChild>, ISimulationChild> children;
