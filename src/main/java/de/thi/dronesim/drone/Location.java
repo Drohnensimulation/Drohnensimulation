@@ -2,6 +2,9 @@ package de.thi.dronesim.drone;
 
 import com.jme3.math.Vector3f;
 
+/**
+ * @author Marvin Wittschen
+ */
 public class Location {
 
     private static final double ACCELERATION_HORIZONTAL = 10 / 3.6;     // Constant horizontal acceleration     [m/s^2]
@@ -9,11 +12,11 @@ public class Location {
     private static final double V_HORIZONTAL_MAX = 50 / 3.6;            // Maximum horizontal speed             [m/s]
     private static final double V_VERTICAL_MAX = 50 / 3.6;              // Maximum horizontal speed             [m/s]
 
-    private Vector3f position;     // Vector of current position               [m]
-    private final Vector3f movement;     // Vector of travel direction               [m/s]
+    private Vector3f position;          // Vector of current position               [m]
+    private final Vector3f movement;    // Vector of travel direction               [m/s]
 
     private double track = 0;           // True movement direction                  [deg]
-    private double hdg = 0;    // Direction in which the A/C faces         [deg]
+    private double hdg = 0;             // Direction in which the A/C faces         [deg]
     private double tas = 0;             // Speed relative to the wind               [m/s]
     private double gs = 0;              // Speed over ground                        [m/s]
     private double vs = 0;              // Speed along y-axis                       [m/s]
