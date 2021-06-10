@@ -190,6 +190,7 @@ public class Simulation {
 
     /**
      * Pauses the Sim, @see{start()}
+     * @author Christian Schmied
      */
     public void pause() {
         if(this.simState == SimulationState.RUNNING){
@@ -208,6 +209,11 @@ public class Simulation {
         return status != null && !status.isCancelled() && !status.isDone();
     }
 
+    /**
+     *
+     * @author Christian Schmied
+     * @return The current Simulation State
+     */
     public SimulationState getState() {
         return this.simState;
     }

@@ -137,6 +137,9 @@ public class SimulationTest {
         simulation.stop();
     }
 
+    /**
+     * @author Christian Schmied
+     */
     @Test
     void pauseResumeSimulation() throws InterruptedException {
 
