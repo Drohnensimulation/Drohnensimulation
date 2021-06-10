@@ -19,6 +19,7 @@ import java.util.concurrent.*;
  * Holds the whole Context of a Simulation
  *
  * @author Christian Schmied
+ * @author Marvin Wittschen
  */
 public class Simulation {
 

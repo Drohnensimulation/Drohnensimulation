@@ -6,6 +6,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * @author Marvin Wittschen
+ */
 public class SimulationTest {
 
     public static class MyTestChild implements ISimulationChild {

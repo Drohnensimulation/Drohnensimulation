@@ -6,6 +6,9 @@ import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.SimulationUpdateListener;
 import de.thi.dronesim.drone.Location;
 
+/**
+ * @author Marvin Wittschen
+ */
 public abstract class AsyncAutopilot implements ISimulationChild, SimulationUpdateListener, Runnable {
 
     private Simulation simulation;
