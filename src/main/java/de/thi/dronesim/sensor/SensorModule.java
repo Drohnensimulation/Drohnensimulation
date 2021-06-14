@@ -109,6 +109,7 @@ public class SensorModule implements ISimulationChild {
     public void initialize(Simulation simulation) {
         this.simulation = simulation;
         simulation.registerUpdateListener(this::runAllMeasurements);
+        loadConfig(simulation.getConfig().getSensorConfigList());
     }
 
     @Override
