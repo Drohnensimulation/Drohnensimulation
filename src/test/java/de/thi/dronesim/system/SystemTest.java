@@ -11,12 +11,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SystemTest {
 
+    // The file to load for testing. They need to be in the folder "testconfigs"
+    private static final String FILENAME = "testconfig_1.json";
+
     // Test with graphical output
     @Test
-    @Order(1)
     void TestSimulationDView()  {
-        // Start Position: (10, 0, 10) -> Goal (-10, 1, -10)
-        Simulation sim = new Simulation("src/test/java/de/thi/dronesim/system/testconfig_1.json");
+        // Start Position: (0, 0, 10) -> Goal (0, 1, -10)
+        Simulation sim = new Simulation("src/test/java/de/thi/dronesim/system/testconfigs/".concat(FILENAME));
 
         sim.prepare();
         GuiManager gui = sim.getChild(GuiManager.class);
@@ -31,11 +33,14 @@ public class SystemTest {
             e.printStackTrace();
         }
 
+        System.out.println("Test Start!");
         sim.start();
 
-        // Normally, an autopilot should be configurable to pilot towards the target destination
         Location l = sim.getDrone().getLocation();
         assertNotNull(l, "Could not get Location of Drone.");
+
+        // The following attempts to fly the drone from (0, 0, 10) to (0, 0, -10)
+        // at a fly-height of 5, with maximum speed and a heading of 90 degrees (eastwards)
 
         // Take off
         l.requestDeltaVerticalSpeed(1);
@@ -78,10 +83,9 @@ public class SystemTest {
 
     // Test without graphical output. Basically the same as above!
     @Test
-    @Order(2)
     void TestSimulationMView() {
         // Test normal config
-        Simulation sim = new Simulation("src/test/java/de/thi/dronesim/system/testconfig_1.json");
+        Simulation sim = new Simulation("src/test/java/de/thi/dronesim/system/testconfigs/".concat(FILENAME));
         sim.prepare();
 
         GuiManager gui = sim.getChild(GuiManager.class);
@@ -97,13 +101,16 @@ public class SystemTest {
             e.printStackTrace();
         }
 
+        System.out.println("Test Start!");
         sim.start();
 
-        // Normally, an autopilot should be configurable to pilot towards the target destination
         Location l = sim.getDrone().getLocation();
         assertNotNull(l, "Could not get Location of Drone.");
 
-        // Take off
+        // The following attempts to fly the drone from (0, 0, 10) to (0, 0, -10)
+        // at a fly-height of 5, with maximum speed and a heading of 90 degrees (eastwards)
+
+        //Take off
         l.requestDeltaVerticalSpeed(1);
         while(l.getY() <= 4.4f) {}
         l.requestDeltaVerticalSpeed(-0.9);
@@ -136,7 +143,7 @@ public class SystemTest {
 
         l.requestDeltaVerticalSpeed(0.1);
 
-        System.out.println("Test Finished: DView");
+        System.out.println("Test Finished: MView");
 
         // Keep open:
         while(true) {}
