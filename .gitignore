@@ -39,6 +39,7 @@ target
 
 # JMonkey Engine
 *.dll
+*.so
 
 # Some AttachPids
 .attach_pid*
