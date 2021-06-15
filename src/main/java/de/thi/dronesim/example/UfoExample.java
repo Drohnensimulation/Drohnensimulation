@@ -4,20 +4,26 @@ import com.jme3.math.Vector3f;
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.drone.Location;
 import de.thi.dronesim.gui.GuiManager;
+import de.thi.dronesim.sensor.SensorModule;
+import de.thi.dronesim.sensor.dto.SensorResultDto;
+
+import java.util.List;
 
 // Das Programmierbeispiel in der Klasse de.thi.dronesim.example.UfoExample
 public class UfoExample {
+
+
 
     // Es spielt sich alles im Hauptprogramm ab.
     public static void main(String[] args) {
 
         //Lädt die Simulationsconfig und bereitet die Simulation vor.
-        Simulation sim = new Simulation("src/main/java/de/thi/dronesim/example/simtestconf.json");
+        Simulation sim = new Simulation("src/main/java/de/thi/dronesim/example/simtestconf2.json");
         sim.prepare();
 
-        GuiManager gui = sim.getChild(GuiManager.class);
+        //GuiManager gui = sim.getChild(GuiManager.class);
         sim.start();
-        gui.openDViewGui();
+        //gui.openDViewGui();
 
 
         //Steuert die Drone vorübergehend, sollte in Autopilot.java ausgelagert werden.
@@ -39,6 +45,9 @@ public class UfoExample {
         loc.requestDeltaVerticalSpeed(1);
         while(loc.getPosition().y < 2 ) {}
         loc.requestDeltaVerticalSpeed(-1);
+        SensorModule child = sim.getChild(SensorModule.class);
+
+        List<SensorResultDto> what = child.getResultsFromAllSensors();
 
         loc.requestDeltaHeading(180);
         while (loc.getHeading() != 180) {}
@@ -46,6 +55,7 @@ public class UfoExample {
         loc.requestDeltaAirspeed(1);
         while(loc.getPosition().z > 0.2)  {}
         loc.requestDeltaAirspeed(-1);
+
 
         loc.requestDeltaHeading(-90);
         while (loc.getHeading() != 90) {}
