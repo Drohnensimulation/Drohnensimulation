@@ -31,9 +31,6 @@ public abstract class DistanceSensor implements ISensor {
     // /////////////////////////////////////////////////////////////////////////////
     private static final Logger logger = LogManager.getLogger();
 
-    //TODO: -Beschreibung des Kegels
-    //		-Vervollständigung der Methodenimplementierung
-
     // /////////////////////////////////////////////////////////////////////////////
     // Fields
     // /////////////////////////////////////////////////////////////////////////////
@@ -461,6 +458,8 @@ public abstract class DistanceSensor implements ISensor {
      *Gets the Rays that hit an Obstacle
      *
      * the dimension Vector represents the sensorform, so by a cubuid the x = width, y = length and z = height
+     * the cuboid and pyramid musst have a square as base (the length of the edges is the radius)
+     * the cylinder musst have a circle as base
      *
      * @param origin coords of the top of the sensorform
      * @param orientation Drone is heading this direction
@@ -504,6 +503,11 @@ public abstract class DistanceSensor implements ISensor {
         return name;
     }
 
+    /**
+     * The unique identifier for a sensor
+     *
+     * @return the id from the configuration
+     */
     @Override
     public int getId() {
         return id;
@@ -642,20 +646,49 @@ public abstract class DistanceSensor implements ISensor {
 		this.measurementAccuracy = accuracy;
 	}
 
+    /**
+     * The specified form of the view of the sensor
+     * supported forms: Cone, Cylinder, Pyramid, Cuboid
+     *
+     * @return the form of the sensor specified in the config
+     */
     protected SensorForm getSensorForm() {
         return sensorForm;
     }
 
+    /**
+     * CalcType specifies how the sensor is calculating the distance to the obstacles.
+     * supported Types:
+     * <ul>
+     *     <li>Average (AVG)</li>
+     *     <li>Nearest (NEAREST)</li>
+     *     <li>Farest (FAREST)</li>
+     * </ul>
+     *
+     * @return the calculationtype specified in the config
+     */
     protected CalcType getCalcType() {
         return calcType;
     }
 
-    public boolean equals(ISensor sensor){
-	    return this.getId() == sensor.getId();
-    }
-
+    /**
+     * The type of the Sensor - what the sensor is measuring
+     * Distancesensor implizites the type of the sensor (it measures the distance)
+     * @return DistanceSensor as type of the sensor
+     */
     @Override
     public String getType() {
         return "DistanceSensor";
+    }
+
+    /**
+     * Id as unique identifier is a good attribute to compare two sensors
+     *
+     * @param sensor - the other sensor, which can be any type of an sensor
+     * @return true if they are the same
+     *         false if they are not the same
+     */
+    public boolean equals(ISensor sensor){
+	    return this.getId() == sensor.getId();
     }
 }
