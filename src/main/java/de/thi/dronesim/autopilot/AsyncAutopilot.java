@@ -6,6 +6,9 @@ import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.SimulationUpdateListener;
 import de.thi.dronesim.drone.Location;
 
+/**
+ * @author Marvin Wittschen
+ */
 public abstract class AsyncAutopilot implements ISimulationChild, SimulationUpdateListener, Runnable {
 
     private Simulation simulation;
@@ -32,6 +35,7 @@ public abstract class AsyncAutopilot implements ISimulationChild, SimulationUpda
     @Override
     public void initialize(Simulation simulation) {
         this.simulation = simulation;
+        simulation.registerUpdateListener(this);
     }
 
     @Override
@@ -56,7 +60,7 @@ public abstract class AsyncAutopilot implements ISimulationChild, SimulationUpda
         lastEvent = event;
 
         // CHeck if statement is meat
-        if (expectation.evaluate(event)) {
+        if (expectation != null && expectation.evaluate(event)) {
             conditionValid = true;
             this.notifyAll();
         }

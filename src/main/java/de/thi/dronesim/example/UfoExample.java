@@ -6,6 +6,7 @@ import de.thi.dronesim.drone.Location;
 import de.thi.dronesim.gui.GuiManager;
 
 // Das Programmierbeispiel in der Klasse de.thi.dronesim.example.UfoExample
+@Deprecated(forRemoval = true)
 public class UfoExample {
 
     // Es spielt sich alles im Hauptprogramm ab.

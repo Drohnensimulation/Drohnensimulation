@@ -12,6 +12,8 @@ public class Drone {
      */
     private float radius;
 
+    private boolean crashed = false;
+
     /**
      * default (0, 0, 0, 1)
      */
@@ -33,4 +35,15 @@ public class Drone {
 		return radius;
 	}
 
+    public void setRadius(float radius) {
+        this.radius = radius;
+    }
+
+    public boolean isCrashed() {
+        return crashed;
+    }
+
+    public void setCrashed(boolean crashed) {
+        this.crashed = crashed;
+    }
 }
