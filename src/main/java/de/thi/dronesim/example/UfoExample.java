@@ -1,16 +1,15 @@
 package de.thi.dronesim.example;// Importiere die Simulation
 
-import com.jme3.math.Vector3f;
 import de.thi.dronesim.Simulation;
-import de.thi.dronesim.drone.Location;
+import de.thi.dronesim.autopilot.AsyncAutopilot;
+import de.thi.dronesim.autopilot.Autopilot;
 import de.thi.dronesim.gui.GuiManager;
 
 // Das Programmierbeispiel in der Klasse de.thi.dronesim.example.UfoExample
-@Deprecated(forRemoval = true)
 public class UfoExample {
 
     // Es spielt sich alles im Hauptprogramm ab.
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         //Lädt die Simulationsconfig und bereitet die Simulation vor.
         Simulation sim = new Simulation("src/main/java/de/thi/dronesim/example/simtestconf.json");
@@ -20,87 +19,154 @@ public class UfoExample {
         sim.start();
         gui.openDViewGui();
 
+        Autopilot auto = sim.getChild(Autopilot.class);
 
-        //Steuert die Drone vorübergehend, sollte in Autopilot.java ausgelagert werden.
+        //Wait until GUI is ready. Can be deleted if start button works.
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        Location loc = sim.getDrone().getLocation();
-        loc.requestDeltaVerticalSpeed(0.0001);
+        testflight(auto);
+        //testcrash(auto);
+    }
 
-//        loc.requestDeltaHeading(180);
-//        while (loc.getHeading() != 180) {}
-//        loc.requestDeltaAirspeed(1);
-//        while(loc.getPosition().z > -5 ) {}
+    private static void testflight(Autopilot auto) throws InterruptedException {
+        //Set low speed for the rotor rotation
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(0.00001));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() >= 0.00001);
 
+        //Fly drone to 2m high
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getPosition().y > 2);
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(-1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getVerticalSpeed() <= 0.1);
 
-        loc.requestDeltaVerticalSpeed(1);
-        while(loc.getPosition().y < 2 ) {}
-        loc.requestDeltaVerticalSpeed(-1);
+        //Rotate drone 180°
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaHeading(180));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getHeading() == 180);
 
-        loc.requestDeltaHeading(180);
-        while (loc.getHeading() != 180) {}
+        //Fly drone near z = 0
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getPosition().z < 0.2);
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(-1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() <= 0.1);
 
-        loc.requestDeltaAirspeed(1);
-        while(loc.getPosition().z > 0.2)  {}
-        loc.requestDeltaAirspeed(-1);
+        //Turn drone -90°
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaHeading(-90));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getHeading() == 90);
 
-        loc.requestDeltaHeading(-90);
-        while (loc.getHeading() != 90) {}
+        //Fly drone near x = 0
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getPosition().x < 0.5);
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(-1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() <= 0.1);
 
-        loc.requestDeltaAirspeed(1);
-        while(loc.getPosition().x > 0.2)  {}
-        loc.requestDeltaAirspeed(-1);
+        //Fly around in a circle
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() >= 1);
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaHeading(360));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getHeading() < 90);
+        auto.awaitCondition(event -> event.getDrone().getLocation().getHeading() == 90);
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(-2));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() <= 0.1);
 
-        loc.requestDeltaAirspeed(0.75);
-        loc.requestDeltaHeading(360);
-        while (loc.getHeading() >= 90) {}
-        while (loc.getHeading() < 90) {}
-        loc.requestDeltaAirspeed(-2);
+        //Fly down to 1.25m
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(-1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getPosition().y <= 1.25);
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getVerticalSpeed() >= -0.1);
 
-
-
-        loc.requestDeltaVerticalSpeed(-1);
-        while(loc.getPosition().y > 1.25)  {}
-        loc.requestDeltaVerticalSpeed(1);
-
-
-        loc.requestDeltaVerticalSpeed(-0.0001);
+        //Short pause
+        auto.getSimulation().getDrone().getLocation().setAirspeed(0);
+        auto.getSimulation().getDrone().getLocation().setVerticalSpeed(0);
         try {
-            Thread.sleep(1000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        loc.requestDeltaVerticalSpeed(0.0001);
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(0.00001));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() >= 0.00001);
+
+        //Fly up a certain distance depending on the current location
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(0.5));
+        double i = (auto.getSimulation().getDrone().getLocation().getPosition().y + 0.5);
+        auto.awaitCondition(event ->
+                event.getDrone().getLocation().getPosition().y >= i);
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(-0.5));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getVerticalSpeed() >= -0.1);
 
 
-        loc.requestDeltaVerticalSpeed(0.5);
-        Vector3f old = loc.getPosition();
-        while(loc.getPosition().y <= old.y+0.5) {}
-        loc.requestDeltaVerticalSpeed(-0.5);
+        //Fly in a circle down to the ground and back up
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() >= 1);
+
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(-0.25));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getVerticalSpeed() <= 0.2);
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaHeading(-360));
+
+        auto.awaitCondition(event -> (event.getDrone().getLocation().getHeading() > 90
+                || event.getDrone().getLocation().getHeading() < 270)
+                && event.getDrone().getLocation().getPosition().y <= 0.1);
+
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(0.75));
+
+        auto.awaitCondition(event -> event.getDrone().getLocation().getHeading() <= 90
+                && event.getDrone().getLocation().getPosition().y >= 0.75);
+
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(-0.25));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getHeading() <= 90);
+
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(-1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() <= 0.1);
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(-0.25));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getVerticalSpeed() <= 0.1);
 
 
-        loc.requestDeltaHeading(-360);
-        loc.requestDeltaAirspeed(1);
-        loc.requestDeltaVerticalSpeed(-0.25);
-        while ((loc.getHeading() <= 90 || loc.getHeading() >= 270) && loc.getPosition().y > 0.1 ) {}
-        loc.requestDeltaVerticalSpeed(0.75);
-        while (loc.getHeading() > 90 && loc.getPosition().y < 0.75) {}
-        loc.requestDeltaVerticalSpeed(-0.25);
-        while (loc.getHeading() > 90 ) {}
-        loc.requestDeltaAirspeed(-1);
-        loc.requestDeltaVerticalSpeed(-0.25);
+        //Turn around 180°
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaHeading(-180));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getHeading() == 270);
 
-        loc.requestDeltaVerticalSpeed(-1);
-        while(loc.getPosition().y > 1.25)  {}
-        loc.requestDeltaVerticalSpeed(1);
+        //Fly near x = 0
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getPosition().x >= -0.2);
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(-1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() >= 0.1);
 
-        loc.requestDeltaVerticalSpeed(-0.0001);
+        //Fly down to 1.25m
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(-1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getPosition().y <= 1.25);
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getVerticalSpeed() >= -0.1);
 
+        //Set both speed values to 0 to stop the rotation of the rotors
+        auto.getSimulation().getDrone().getLocation().setAirspeed(0);
+        auto.getSimulation().getDrone().getLocation().setVerticalSpeed(0);
+    }
 
+    private static void testcrash(Autopilot auto) throws InterruptedException {
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(.00001));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() >= .00001);
+
+        //Fly to 0.5m height
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getPosition().y > 0.5);
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(-1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getVerticalSpeed() <= 0.1);
+
+        //Turn around 180°
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaHeading(180));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getHeading() == 180);
+
+        auto.getSimulation();
+        //Fly forwards to z = -0.2
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getPosition().z <= -0.2);
+        auto.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(-1));
+        auto.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() >= 0.1);
+
+        System.out.println(auto.getSimulation().getDrone().isCrashed());
     }
 
 }
