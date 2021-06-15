@@ -60,6 +60,7 @@ public class GuiManager implements ISimulationChild, SimulationUpdateListener {
     public void openMViewGui() {
         if (!existsGui()) {
             instrumentView = new MView(this);
+            instrumentView.init(simulation);
         }
     }
 
@@ -70,6 +71,7 @@ public class GuiManager implements ISimulationChild, SimulationUpdateListener {
         if (!existsGui()) {
             dRenderer = initDRenderer();
             instrumentView = new DView(this, dRenderer);
+            instrumentView.init(simulation);
         }
     }
 
@@ -97,8 +99,8 @@ public class GuiManager implements ISimulationChild, SimulationUpdateListener {
     }
 
     private DRenderer initDRenderer() {
-        // Create DView
-        DRenderer dView = new DRenderer();
+        // Create DRenderer
+        DRenderer dRenderer = new DRenderer();
 
         // Add map objects
         List<RenderableObject> mapObjects = new ArrayList<>();
@@ -120,14 +122,14 @@ public class GuiManager implements ISimulationChild, SimulationUpdateListener {
                     // TODO: Read path and load from local object file
             }
         }
-        dView.addRenderableObjects(mapObjects);
+        dRenderer.addRenderableObjects(mapObjects);
 
         // Add drone
         RenderableDrone drone = new RenderableDrone(simulation.getDrone().getRadius());
         updateDroneLocation(drone, simulation.getDrone().getLocation());
-        dView.addRenderableObject(drone);
+        dRenderer.addRenderableObject(drone);
 
-        // Return DView
-        return dView;
+        // Return DRenderer
+        return dRenderer;
     }
 }

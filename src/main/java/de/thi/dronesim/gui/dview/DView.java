@@ -87,6 +87,11 @@ public class DView extends JFrame implements IGuiView {
         setVisible(true);
     }
 
+    @Override
+    public void init(Simulation simulation) {
+        // TODO: Use simulation if needed
+    }
+
     /**
      * updates the data displayed in the GUI
      *

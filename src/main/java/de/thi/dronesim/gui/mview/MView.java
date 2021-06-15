@@ -401,6 +401,11 @@ public class MView extends JFrame implements IGuiView {
     }
 
     @Override
+    public void init(Simulation simulation) {
+        // TODO: Use simulation if needed
+    }
+
+    @Override
     public void updateDroneStatus(SimulationUpdateEvent simulationUpdateEvent) {
         Drone d = simulationUpdateEvent.getDrone();
         Location location = d.getLocation();
