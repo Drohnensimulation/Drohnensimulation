@@ -47,7 +47,7 @@ public class Wind implements ISimulationChild {
         loadConfig();
         process();
         // Register update handler
-        simulation.registerUpdateListener(event -> applyWind(event.getDrone().getLocation(), event.getTime()));
+        simulation.registerUpdateListener(event -> applyWind(event.getDrone().getLocation(), event.getTime()), 850);
     }
 
     @Override

@@ -4,7 +4,7 @@ import de.thi.dronesim.Simulation;
 import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.drone.Location;
 import de.thi.dronesim.gui.GuiManager;
-import de.thi.dronesim.gui.IGuiView;
+import de.thi.dronesim.gui.AGuiFrame;
 import de.thi.dronesim.gui.drenderer.DRenderer;
 import de.thi.dronesim.gui.dview.component.JCompass;
 import org.apache.logging.log4j.LogManager;
@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * @author Niklas Thurner
  */
-public class DView extends JFrame implements IGuiView {
+public class DView extends AGuiFrame {
 
     private boolean toggleWind = false;
     private boolean toggleObstacles = false;
@@ -85,6 +85,11 @@ public class DView extends JFrame implements IGuiView {
         disableWindSidebar();
         pack();
         setVisible(true);
+    }
+
+    @Override
+    public void init(Simulation simulation) {
+        // TODO: Use simulation if needed
     }
 
     /**

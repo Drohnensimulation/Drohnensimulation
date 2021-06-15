@@ -396,6 +396,9 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
 	@Override
 	public boolean checkDroneCollision(Vector3f origin, float radius) {
+		if (simulation.getDrone().isCrashed())
+			return true;
+		
     	float goldenRatio = (1f + (float) Math.sqrt(5)) / 2;
         float angle = 2 * (float) Math.PI * goldenRatio;
         
@@ -415,9 +418,11 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
             		sin * (float) Math.sin(azimuth),
             		(float) Math.cos(inclination)).normalizeLocal();
             
-            //check for collision
-            if(this.rayTest(origin, ray, radius) != null)
+            //check for collision & set crash flag
+            if(this.rayTest(origin, ray, radius) != null) {
+            	simulation.getDrone().setCrashed(true);
             	return true;
+            }
         }
         return false;
 	}
