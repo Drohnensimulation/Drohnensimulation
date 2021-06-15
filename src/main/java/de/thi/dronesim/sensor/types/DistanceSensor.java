@@ -36,8 +36,8 @@ public abstract class DistanceSensor implements ISensor {
     // /////////////////////////////////////////////////////////////////////////////
 
     // see getter and setter for a documentation of the fields
-    private String name;
-    private int id;
+    private final String name;
+    private final int id;
     private float range;
     private float sensorAngle;
     private float sensorRadius;
@@ -105,10 +105,10 @@ public abstract class DistanceSensor implements ISensor {
      *      Obstacle: is the nearest Obstacle
      *      values: the avg Distances of all ObstacleAndDistanceDtos sorted, so that the smalest float is on the first place
      *
-     * @param origin
-     * @param direction
-     * @param range
-     * @param opening
+     * @param origin the tip of the sensorform
+     * @param direction direction in which the sensor is heading
+     * @param range the range how far the sensor can "see"
+     * @param opening a Vector that describes the opening angle of the sensor
      *
      * @return SensorResultDto
      *
@@ -220,17 +220,6 @@ public abstract class DistanceSensor implements ISensor {
         obstacleAndDistanceDTOS.forEach(o -> sensorResultDto.getValues().add(o.getAvgDistance()));
 
         return sensorResultDto;
-    }
-
-    /**
-     * Returns the shortest distance to an object.
-     *
-     * @return distance in meter
-     */
-    public double getDistance() {
-        double measurement = 0; /*TODO: Call Obstacle Team-Method*/
-
-        return this.handleMeasurementAccuracy(measurement);
     }
 
     /**
@@ -422,22 +411,6 @@ public abstract class DistanceSensor implements ISensor {
     // /////////////////////////////////////////////////////////////////////////////
     // private Methods
     // /////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Versieht die gemessene Entfernung zum Hindernis mit einer Messungenauigkeit
-     *
-     * @param measurement die gemessene Entfernung
-     * @return Die Entfernung, versehen mit der Ungenauigkeit
-     */
-    private double handleMeasurementAccuracy(double measurement) {
-        if (Double.compare(this.measurementAccuracy, Double.MAX_VALUE) == 0) {
-            return Double.compare(measurement, 0.0) > 0 ? 1.0 : 0.0;
-        } else if (Double.compare(this.measurementAccuracy, 0.0) == 0) {
-            return measurement;
-        } else {
-            return (int) (measurement / this.measurementAccuracy + 0.5) * this.measurementAccuracy;
-        }
-    }
 
     /**
      * Method to get the angle between the orientation of the drone and a hitpoint
