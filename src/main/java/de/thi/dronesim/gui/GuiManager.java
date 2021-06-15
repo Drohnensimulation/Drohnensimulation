@@ -24,7 +24,7 @@ import java.util.List;
 public class GuiManager implements ISimulationChild, SimulationUpdateListener {
 
     private Simulation simulation;
-    private IGuiView instrumentView;
+    private AGuiFrame instrumentView;
     private DRenderer dRenderer;
 
     @Override

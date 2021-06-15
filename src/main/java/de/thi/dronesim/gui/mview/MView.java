@@ -5,7 +5,7 @@ import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.drone.Drone;
 import de.thi.dronesim.drone.Location;
 import de.thi.dronesim.gui.GuiManager;
-import de.thi.dronesim.gui.IGuiView;
+import de.thi.dronesim.gui.AGuiFrame;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 import de.thi.dronesim.sensor.SensorModule;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
@@ -21,7 +21,7 @@ import java.util.List;
  */
 
 @SuppressWarnings("FieldCanBeLocal")
-public class MView extends JFrame implements IGuiView {
+public class MView extends AGuiFrame {
 
     // These values are currently set to fit the current information
     private static final int WINDOW_MIN_WIDTH = 550;
