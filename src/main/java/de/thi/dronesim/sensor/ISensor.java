@@ -19,7 +19,7 @@ public interface ISensor {
 
 	SensorConfig saveToConfig();
 
-	void runMeasurement(SimulationUpdateEvent event);
+	void runMeasurement(SimulationUpdateEvent event, SensorModule sensorModule);
 
 	SensorResultDto getLastMeasurement();
 

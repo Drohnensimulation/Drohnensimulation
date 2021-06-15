@@ -29,25 +29,29 @@ public class RenderableDrone extends RenderableObject {
      *
      * @param center Coordinates of the object center
      * @param rotation Rotations around the object-axes (arc measure)
+     * @param radius Radius of drone
      */
-    public RenderableDrone(Vector3f center, Vector3f rotation) {
-        super(center, new Vector3f(1, 1, 1), rotation, null);
+    public RenderableDrone(Vector3f center, Vector3f rotation, float radius) {
+        super(center, new Vector3f(radius > .3 ? radius : .3f, radius > .3 ? radius : .3f, radius > .3 ? radius : .3f), rotation, null);
     }
 
     /**
      * Instantiates a new renderable drone
      *
      * @param center Coordinates of the object center
+     * @param radius Radius of drone
      */
-    public RenderableDrone(Vector3f center) {
-        super(center, null);
+    public RenderableDrone(Vector3f center, float radius) {
+        super(center, new Vector3f(radius > .3 ? radius : .3f, radius > .3 ? radius : .3f, radius > .3 ? radius : .3f), null);
     }
 
     /**
      * Instantiates a new renderable drone at 0/0/0
+     *
+     * @param radius Radius of drone
      */
-    public RenderableDrone() {
-        super(new Vector3f(0, 0, 0), null);
+    public RenderableDrone(float radius) {
+        super(new Vector3f(0, 0, 0), new Vector3f(radius > .3 ? radius : .3f, radius > .3 ? radius : .3f, radius > .3 ? radius : .3f), null);
     }
 
     /**
@@ -172,10 +176,11 @@ public class RenderableDrone extends RenderableObject {
         center = object.getLocalTranslation();
         if(rotateRotors) {
             for (int i = 0; i < 2; i++) {
-                rotorsCw[i].rotate(0, -.07f, 0);
-                rotorsCcw[i].rotate(0, .07f, 0);
+                rotorsCw[i].rotate(0, -.5f, 0);
+                rotorsCcw[i].rotate(0, .5f, 0);
             }
         }
+        object.setLocalScale(scale);
     }
 
     /**

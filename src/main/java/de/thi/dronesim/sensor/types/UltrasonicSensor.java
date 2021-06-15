@@ -2,6 +2,7 @@ package de.thi.dronesim.sensor.types;
 
 import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.persistence.entity.SensorConfig;
+import de.thi.dronesim.sensor.SensorModule;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 
 public class UltrasonicSensor extends DistanceSensor {
@@ -27,15 +28,6 @@ public class UltrasonicSensor extends DistanceSensor {
 		this.rangeIncreaseVelocity = config.getRangeIncreaseVelocity();
 		this.startIncreaseTime= config.getStartIncreaseTime();
 	}
-
-	//public UltrasonicSensor() {}
-
-	@Override
-	public String getType() {
-		String name = "UltrasonicSensor";
-		return name;
-	}
-
 
 	/**
 	 *  This Method is resetting the startIncreaseTime to calculate the next measurement
@@ -85,13 +77,22 @@ public class UltrasonicSensor extends DistanceSensor {
 	 *
 	 */
 	@Override
-	public void runMeasurement(SimulationUpdateEvent event) {
+	public void runMeasurement(SimulationUpdateEvent event, SensorModule sensorModule) {
 		float traveledTime =  traveledTime(event);
-		this.sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), getCurrentConeHeight(traveledTime), calcSurfaceVector()); // getCurrentConeHeight()
+		this.sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), getCurrentConeHeight(traveledTime), calcSurfaceVector(), sensorModule); // getCurrentConeHeight()
 	}
 
 	@Override
 	public SensorResultDto getLastMeasurement() {
 		return this.sensorResultDtoValues;
+	}
+
+	@Override
+	public SensorConfig saveToConfig() {
+		SensorConfig config = super.saveToConfig();
+		config.setClassName(this.getClass().getSimpleName());
+		config.setRangeIncreaseVelocity(rangeIncreaseVelocity);
+		config.setStartIncreaseTime(startIncreaseTime);
+		return config;
 	}
 }

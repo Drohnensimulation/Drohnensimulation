@@ -1,13 +1,18 @@
 package de.thi.dronesim.gui.mview;
 
+import de.thi.dronesim.Simulation;
 import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.drone.Drone;
 import de.thi.dronesim.drone.Location;
 import de.thi.dronesim.gui.GuiManager;
 import de.thi.dronesim.gui.IGuiView;
+import de.thi.dronesim.obstacle.entity.Obstacle;
+import de.thi.dronesim.sensor.SensorModule;
+import de.thi.dronesim.sensor.dto.SensorResultDto;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 /**
  * Alternative GUI for text-only display.
@@ -24,6 +29,7 @@ public class MView extends JFrame implements IGuiView {
 
     // Current Manager
     private final GuiManager guiManager;
+    private final Simulation sim;
 
     // Main Panel
     private final JPanel contentPane;
@@ -93,6 +99,7 @@ public class MView extends JFrame implements IGuiView {
 
         // Holding a ref to the manager, so we can access the simulation, so our buttons can start/pause it.
         this.guiManager = guiManager;
+        this.sim = guiManager.getSimulation();
 
         // Init
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -413,7 +420,8 @@ public class MView extends JFrame implements IGuiView {
             }
         }
 
-        // Just for a better visual...
+        // Only update if we have a change, small save I guess
+        // Just for a better visual representation, if times are single digit, we add a 0 in front
         StringBuilder time = new StringBuilder();
         if (hours < 10)
             time.append(String.format("0%d", hours));
@@ -432,10 +440,11 @@ public class MView extends JFrame implements IGuiView {
 
         runtimeValue.setText(time.toString());
 
+
         // Update Position
-        coordinateXValue.setText(String.valueOf(location.getX()));
-        coordinateYValue.setText(String.valueOf(location.getY()));
-        coordinateZValue.setText(String.valueOf(location.getZ()));
+        coordinateXValue.setText(String.format("%.3f", location.getX()));
+        coordinateYValue.setText(String.format("%.3f", location.getY()));
+        coordinateZValue.setText(String.format("%.3f", location.getZ()));
 
         // Update Heading and Tilts
         double hdg = location.getHeading() % 360.00;
@@ -459,27 +468,80 @@ public class MView extends JFrame implements IGuiView {
         else if (hdg > 292.5 && hdg <= 360.1)
             dir = "E";
 
-        headingValue.setText(dir.concat(" @ " + hdg + " Degree"));
-        pitchValue.setText(String.valueOf(location.getPitch()));
+        headingValue.setText(dir.concat(String.format(" @ %.3f", hdg) + " Degree"));
+        pitchValue.setText(String.format("%.3f", location.getPitch()));
 
-        // These values do not exist currently TODO: Discuss if they will ever be added, else remove this (+labels), will screw the layout so adjust accordingly
-        //rollValue.setText(String.valueOf(location.getRoll()));
-        //yawValue.setText(String.valueOf(location.getYaw()));
+        // These values do not exist currently, but can be added
+        //rollValue.setText(String.format("%.3f", location.getRoll()));
+        //yawValue.setText(String.format("%.3f", location.getYaw()));
 
         // Velocities
-        airSpeedValue.setText(String.valueOf(location.getAirspeed()));
-        verticalVelocityValue.setText(String.valueOf(location.getVerticalSpeed()));
-        groundSpeedValue.setText(String.valueOf(location.getGroundSpeed()));
+        airSpeedValue.setText(String.format("%.3f", location.getAirspeed()));
+        verticalVelocityValue.setText(String.format("%.3f", location.getVerticalSpeed()));
+        groundSpeedValue.setText(String.format("%.3f", location.getGroundSpeed()));
 
-        // TODO: Figure out how to access sensors now to update the obstacle/wind stuff...
+        // Obstacles and Wind
+        if (sim != null) {
+            SensorModule sensorModule = sim.getChild(SensorModule.class);
 
+            // If we have a sensormodule, read it
+            if (sensorModule != null) {
+                List<SensorResultDto> sensorList = sensorModule.getResultsFromAllSensors();
+                Obstacle obstacle = null;
+                for (SensorResultDto res : sensorList) {
+                    // Handle Wind
+                    if (res.getSensor() != null) {
+                        float wind = res.getValues().get(0);
+
+                        // It is possible for there to be no wind, which results in NaN
+                        if (Float.isNaN(wind)) {
+                            windValue.setText("Windless");
+                        } else {
+                            windValue.setText(String.format("%3.2f", wind));
+                        }
+
+                        continue;
+                    } // if (res.getSensor)
+
+                    // Handle Obstacles ... TODO: Needs the actual module running...
+                    List<Obstacle> list = res.getObstacle();
+                    if (list.isEmpty())
+                        continue;
+
+                    obstacleValue.setText(String.valueOf(res.getValues().get(0)) + " m");
+                } // for
+
+            } // (sensorModule != null)
+        }
+
+        if (!sim.isRunning() && !wasStopped && wasStarted) {
+            startButton.setText("Exit Simulation");
+            statusValue.setText("Simulation Ended");
+            wasStopped = true;
+        }
     }
 
+    // TODO: Remove once simulation was updated to return its state (?). Just to prevent an exception.
+    boolean wasStarted = false;
+    boolean wasStopped = false;
+
     private void runSimulation() {
-        if (guiManager.getSimulation().isRunning()) {
-            guiManager.getSimulation().stop();
-        } else {
-            guiManager.getSimulation().start();
+        // Simulation is running and was not stopped yet, so stop it:
+        if (sim.isRunning() && !wasStopped) {
+            wasStopped = true;
+            sim.stop();
+
+            startButton.setText("Exit Simulation");
+            statusValue.setText("Simulation Ended");
+            startButton.removeAll();
+        // Simulation was running, but was stopped and now the button function as "exit":
+        } else if (wasStopped && wasStarted) {
+            System.exit(0);
+        // Simulation has yet to start, so do that:
+        } else if (!wasStarted){
+            wasStarted = true;
+            sim.start();
+
             startButton.setText("Stop Simulation");
             statusValue.setText("Running...");
         }

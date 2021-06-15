@@ -1,12 +1,9 @@
 package de.thi.dronesim;
 
 import de.thi.dronesim.drone.Drone;
-import de.thi.dronesim.obstacle.UfoObjs;
-import de.thi.dronesim.obstacle.dto.ObstacleDTO;
 import de.thi.dronesim.persistence.ConfigReader;
 import de.thi.dronesim.persistence.entity.LocationConfig;
 import de.thi.dronesim.persistence.entity.SimulationConfig;
-import de.thi.dronesim.sensor.SensorModule;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.reflections.Reflections;
@@ -22,6 +19,7 @@ import java.util.concurrent.*;
  * Holds the whole Context of a Simulation
  *
  * @author Christian Schmied
+ * @author Marvin Wittschen
  */
 public class Simulation {
 
@@ -37,7 +35,7 @@ public class Simulation {
     private final ScheduledExecutorService executorService;
     private ScheduledFuture<?> status;
 
-    private final SortedMap<Integer, SimulationUpdateListener> updateListeners = new TreeMap<>();
+    private final TreeMap<Integer, SimulationUpdateListener> updateListeners = new TreeMap<>();
 
     /**
      * Constructor with empty SimulationConfig SimulationConfig
@@ -56,7 +54,7 @@ public class Simulation {
         this.config = ConfigReader.readConfig(configPath);
         this.children = new HashMap<>();
         LocationConfig locationConfig = config.getLocationConfig();
-        this.drone = new Drone(locationConfig.getX(), locationConfig.getY(), locationConfig.getZ());
+        this.drone = new Drone(locationConfig.getX(), locationConfig.getY(), locationConfig.getZ(), config.getDroneRadius());
     }
 
     /**
@@ -115,18 +113,6 @@ public class Simulation {
         this.registerUpdateListener(event -> drone.getLocation().updatePosition(event.getTps()), 800);
 
         this.instantiateChildren();
-
-        //Load obstacles from obstacle config into obstacle class
-        if (config.getObstacleConfigList() != null) {
-            for (ObstacleDTO obstacleDTO : getConfig().getObstacleConfigList().get(0).obstacles)
-                getChild(UfoObjs.class).addObstacle(obstacleDTO);
-        }
-
-        //Load sensors from sensor config into sensor class
-        if (config.getSensorConfigList() != null) {
-            getChild(SensorModule.class).loadConfig(config.getSensorConfigList());
-        }
-
     }
 
     /**
@@ -151,14 +137,27 @@ public class Simulation {
      * Schedules the task by the tps and speed
      */
     private void schedule() {
+        int period = (int) (1e6 / tps / speed);
         status = executorService.scheduleAtFixedRate(() -> {
             // Create event
             final SimulationUpdateEvent event = new SimulationUpdateEvent(drone, time, tps);
             // Notify listeners
-            updateListeners.forEach((priority, listener) -> listener.onUpdate(event));
-            // Update time
+            updateListeners.descendingMap().forEach((priority, listener) -> {
+                try {
+                    listener.onUpdate(event);
+                } catch (Throwable t) {
+                    logger.error( "Exception updating event listener");
+                    t.printStackTrace();
+                }
+            });
+            // Stop simulation if drone is crashed
+            if (drone.isCrashed()) {
+                stop();
+                return;
+            }
+            // Update time for next tick
             time += 1000.0 / tps;
-        }, 0, (int) (1e6 / tps * speed), TimeUnit.MICROSECONDS);
+        }, 0, period, TimeUnit.MICROSECONDS);
     }
 
     /**
@@ -197,7 +196,7 @@ public class Simulation {
      * @param priority Priority of the listener.
      *                  <ul>
      *                    <li>Higher priorities will be triggered first.</li>
-     *                    <li>If the listener has the same priority than an already added listener, its priority get decremented</li>
+     *                    <li>If the listener has the same priority than an already added listener, its priority gets decremented.</li>
      *                    <li>Reserved priorities:
      *                      <ul>
      *                          <li>900 - Location: requested input update</li>
@@ -205,6 +204,7 @@ public class Simulation {
      *                      </ul>
      *                    </li>
      *                    <li>If no priority is required, priority zero should be used.</li>
+     *                    <li>Listeners with priority zero must not edit any values.</li>
      *                 </ul>
      */
     public void registerUpdateListener(SimulationUpdateListener listener, int priority) {
@@ -233,6 +233,7 @@ public class Simulation {
 
     /**
      * Get the currently Single Drone from the Simulation
+     * <p>NOTE:<br>Do not modify the drone or any child property while the simulation is running</p>
      * @return a Drone Object
      */
     public Drone getDrone() {

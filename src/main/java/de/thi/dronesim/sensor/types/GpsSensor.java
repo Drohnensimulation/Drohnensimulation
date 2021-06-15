@@ -3,6 +3,7 @@ package de.thi.dronesim.sensor.types;
 import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.ISensor;
+import de.thi.dronesim.sensor.SensorModule;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public class GpsSensor implements ISensor {
 	 * Creates a new GPS Sensor
 	 */
 	public GpsSensor(SensorConfig config) {
-		this.name = "Gpssensor";
+		this.name = "GpsSensor";
 		this.id = config.getSensorId();
 		this.measurements = new List<>();
 		this.lastHorizontalDistanceDeltas = new List<>();
@@ -75,7 +76,7 @@ public class GpsSensor implements ISensor {
 	 * Must be called every frame 
 	 */
 	@Override
-	public void runMeasurement(SimulationUpdateEvent event) {
+	public void runMeasurement(SimulationUpdateEvent event, SensorModule sensorModule) {
 		float xCoord = event.getDrone().getLocation().getX();
 		float yCoord = event.getDrone().getLocation().getY();
 		float zCoord = event.getDrone().getLocation().getZ();

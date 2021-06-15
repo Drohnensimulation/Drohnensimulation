@@ -10,6 +10,7 @@ import de.thi.dronesim.sensor.dto.SensorResultDto;
 import java.util.List;
 
 // Das Programmierbeispiel in der Klasse de.thi.dronesim.example.UfoExample
+@Deprecated(forRemoval = true)
 public class UfoExample {
 
 

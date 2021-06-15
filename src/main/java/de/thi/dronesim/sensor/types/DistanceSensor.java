@@ -7,6 +7,7 @@ import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.ISensor;
+import de.thi.dronesim.sensor.SensorModule;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
 import de.thi.dronesim.sensor.enums.CalcType;
 import de.thi.dronesim.sensor.enums.SensorForm;
@@ -30,15 +31,13 @@ public abstract class DistanceSensor implements ISensor {
     // /////////////////////////////////////////////////////////////////////////////
     private static final Logger logger = LogManager.getLogger();
 
-    //TODO: -Beschreibung des Kegels
-    //		-Vervollständigung der Methodenimplementierung
-
     // /////////////////////////////////////////////////////////////////////////////
     // Fields
     // /////////////////////////////////////////////////////////////////////////////
 
     // see getter and setter for a documentation of the fields
-    private String name;
+    private final String name;
+    private final int id;
     private float range;
     private float sensorAngle;
     private float sensorRadius;
@@ -62,6 +61,7 @@ public abstract class DistanceSensor implements ISensor {
      */
     public DistanceSensor(SensorConfig config){
         this.name = config.getClassName();
+        this.id = config.getSensorId();
         this.range = config.getRange();
         this.sensorAngle = config.getSensorAngle();
         this.sensorRadius = config.getSensorRadius();
@@ -105,16 +105,16 @@ public abstract class DistanceSensor implements ISensor {
      *      Obstacle: is the nearest Obstacle
      *      values: the avg Distances of all ObstacleAndDistanceDtos sorted, so that the smalest float is on the first place
      *
-     * @param origin
-     * @param direction
-     * @param range
-     * @param opening
+     * @param origin the tip of the sensorform
+     * @param direction direction in which the sensor is heading
+     * @param range the range how far the sensor can "see"
+     * @param opening a Vector that describes the opening angle of the sensor
      *
      * @return SensorResultDto
      *
      * @author Johannes Steierl
      */
-    public SensorResultDto getSensorResult(Vector3f origin, Vector3f direction, float range, Vector3f opening) {
+    public SensorResultDto getSensorResult(Vector3f origin, Vector3f direction, float range, Vector3f opening, SensorModule sensorModule) {
         //Helperclass only used in this method so far
         class ObstacleAndDistanceDTO {
             private Obstacle obstacle;
@@ -137,7 +137,7 @@ public abstract class DistanceSensor implements ISensor {
             }
         }
 
-        Set<HitMark> hitMarks = getSensorHits(origin, direction, range, opening, getSensorForm());
+        Set<HitMark> hitMarks = getSensorHits(origin, direction, range, opening, getSensorForm(), sensorModule);
 
         //grouping hitmarks by the hit object
         List<Set<HitMark>> hitmarksGroupedByObstacles = new ArrayList<>();
@@ -212,7 +212,6 @@ public abstract class DistanceSensor implements ISensor {
 
         SensorResultDto sensorResultDto = new SensorResultDto();
         sensorResultDto.setSensor(this);
-        Obstacle nearest = obstacleAndDistanceDTOS.get(0).getObstacle();
         obstacleAndDistanceDTOS.forEach(o -> sensorResultDto.getObstacle().add(o.getObstacle()));
         //first value of the values-array ist the nearest, the last is the farthest
         if (sensorResultDto.getValues() == null) {
@@ -224,26 +223,14 @@ public abstract class DistanceSensor implements ISensor {
     }
 
     /**
-     * Returns the shortest distance to an object.
-     *
-     * @return distance in meter
-     */
-    public double getDistance() {
-        double measurement = 0; /*TODO: Call Obstacle Team-Method*/
-
-        return this.handleMeasurementAccuracy(measurement);
-    }
-
-    /**
      * Create a {@link SensorConfig} with all values
      *
      * @return the config-object to save
      */
     public SensorConfig saveToConfig() {
         SensorConfig config = new SensorConfig();
-        config.setRange(range);
-        config.setSensorAngle(sensorAngle);
-        config.setSensorRadius(sensorRadius);
+        config.setSensorId(id);
+
         config.setMeasurementAccuracy(measurementAccuracy);
         config.setDirectionX(directionVector.getX());
         config.setDirectionY(directionVector.getY());
@@ -251,6 +238,13 @@ public abstract class DistanceSensor implements ISensor {
         config.setPosX(positionVector.getX());
         config.setPosY(positionVector.getY());
         config.setPosZ(positionVector.getZ());
+
+        config.setRange(range);
+        config.setSensorAngle(sensorAngle);
+        config.setSensorRadius(sensorRadius);
+        config.setSensorForm(sensorForm.name());
+        config.setCalcType(calcType.name());
+
         return config;
     }
 
@@ -419,22 +413,6 @@ public abstract class DistanceSensor implements ISensor {
     // /////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Versieht die gemessene Entfernung zum Hindernis mit einer Messungenauigkeit
-     *
-     * @param measurement die gemessene Entfernung
-     * @return Die Entfernung, versehen mit der Ungenauigkeit
-     */
-    private double handleMeasurementAccuracy(double measurement) {
-        if (Double.compare(this.measurementAccuracy, Double.MAX_VALUE) == 0) {
-            return Double.compare(measurement, 0.0) > 0 ? 1.0 : 0.0;
-        } else if (Double.compare(this.measurementAccuracy, 0.0) == 0) {
-            return measurement;
-        } else {
-            return (int) (measurement / this.measurementAccuracy + 0.5) * this.measurementAccuracy;
-        }
-    }
-
-    /**
      * Method to get the angle between the orientation of the drone and a hitpoint
      *
      * @param hitMark the hitpoint of an ray
@@ -453,6 +431,8 @@ public abstract class DistanceSensor implements ISensor {
      *Gets the Rays that hit an Obstacle
      *
      * the dimension Vector represents the sensorform, so by a cubuid the x = width, y = length and z = height
+     * the cuboid and pyramid musst have a square as base (the length of the edges is the radius)
+     * the cylinder musst have a circle as base
      *
      * @param origin coords of the top of the sensorform
      * @param orientation Drone is heading this direction
@@ -465,9 +445,10 @@ public abstract class DistanceSensor implements ISensor {
      *
      * @author Johannes Steierl
      */
-    private Set<HitMark> getSensorHits(Vector3f origin, Vector3f orientation, float range, Vector3f opening, SensorForm sensorForm) {
-        UfoObjs ufoObjs = new UfoObjs();
-        Vector3f dimension = new Vector3f(0,0,0);
+    private Set<HitMark> getSensorHits(Vector3f origin, Vector3f orientation, float range, Vector3f opening, SensorForm sensorForm, SensorModule sensorModule) {
+        UfoObjs ufoObjs = sensorModule.getSimulation().getChild(UfoObjs.class);
+
+        Vector3f dimension;
         switch (sensorForm){
             case CONE:      return ufoObjs.checkSensorCone(origin, orientation, range, opening);
             case CUBOID:
@@ -495,10 +476,14 @@ public abstract class DistanceSensor implements ISensor {
         return name;
     }
 
+    /**
+     * The unique identifier for a sensor
+     *
+     * @return the id from the configuration
+     */
     @Override
     public int getId() {
-        // TODO
-        return 0;
+        return id;
     }
 
     /**
@@ -634,16 +619,49 @@ public abstract class DistanceSensor implements ISensor {
 		this.measurementAccuracy = accuracy;
 	}
 
+    /**
+     * The specified form of the view of the sensor
+     * supported forms: Cone, Cylinder, Pyramid, Cuboid
+     *
+     * @return the form of the sensor specified in the config
+     */
     protected SensorForm getSensorForm() {
         return sensorForm;
     }
 
+    /**
+     * CalcType specifies how the sensor is calculating the distance to the obstacles.
+     * supported Types:
+     * <ul>
+     *     <li>Average (AVG)</li>
+     *     <li>Nearest (NEAREST)</li>
+     *     <li>Farest (FAREST)</li>
+     * </ul>
+     *
+     * @return the calculationtype specified in the config
+     */
     protected CalcType getCalcType() {
         return calcType;
     }
 
+    /**
+     * The type of the Sensor - what the sensor is measuring
+     * Distancesensor implizites the type of the sensor (it measures the distance)
+     * @return DistanceSensor as type of the sensor
+     */
+    @Override
+    public String getType() {
+        return "DistanceSensor";
+    }
+
+    /**
+     * Id as unique identifier is a good attribute to compare two sensors
+     *
+     * @param sensor - the other sensor, which can be any type of an sensor
+     * @return true if they are the same
+     *         false if they are not the same
+     */
     public boolean equals(ISensor sensor){
 	    return this.getId() == sensor.getId();
     }
-
 }
