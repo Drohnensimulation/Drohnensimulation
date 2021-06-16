@@ -23,13 +23,15 @@ import java.util.concurrent.*;
  */
 public class Simulation {
 
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger(Simulation.class);
     private static Set<Class<? extends ISimulationChild>> implementingChildren;
     private final SimulationConfig config;
     private final Map<Class<? extends ISimulationChild>, ISimulationChild> children;
     private final Drone drone;
 
-    private double time;                                           // elapsed simulation time since reset [s]
+    private SimulationState simState = null;
+
+    private double time = 0;                                           // elapsed simulation time since reset [s]
     private int tps = 32;
     private double speed = 1;
     private final ScheduledExecutorService executorService;
@@ -46,6 +48,7 @@ public class Simulation {
         this.config = new SimulationConfig(); //Empty Config
         this.children = new HashMap<>();
         this.drone = new Drone();
+        this.simState = SimulationState.CREATED;
     }
 
     public Simulation(String configPath) {
@@ -55,6 +58,7 @@ public class Simulation {
         this.children = new HashMap<>();
         LocationConfig locationConfig = config.getLocationConfig();
         this.drone = new Drone(locationConfig.getX(), locationConfig.getY(), locationConfig.getZ(), config.getDroneRadius());
+        this.simState = SimulationState.CREATED;
     }
 
     /**
@@ -124,9 +128,10 @@ public class Simulation {
             // Simulation already running
             return;
         }
-
-        // Notify all children that the simulation is about to start
-        children.forEach((key1, value1) -> value1.onSimulationStart());
+        if(simState == SimulationState.PREPARED) {
+            // Notify all children that the simulation is about to start
+            children.forEach((key1, value1) -> value1.onSimulationStart());
+        }
         // Start execution
         schedule();
 
@@ -158,6 +163,7 @@ public class Simulation {
             // Update time for next tick
             time += 1000.0 / tps;
         }, 0, period, TimeUnit.MICROSECONDS);
+        this.simState = SimulationState.RUNNING;
     }
 
     /**
@@ -180,6 +186,20 @@ public class Simulation {
         children.forEach((aClass, iSimulationChild) -> iSimulationChild.onSimulationStop());
 
         logger.printf(Level.INFO, "Simulation stopped after %.2f seconds.",time);
+        this.simState = SimulationState.STOPPED;
+    }
+
+    /**
+     * Pauses the Sim, @see{start()}
+     * @author Christian Schmied
+     */
+    public void pause() {
+        if(this.simState == SimulationState.RUNNING){
+            if(isRunning()) {
+                this.status.cancel(true);
+            }
+        }
+        this.simState = SimulationState.PAUSED;
     }
 
     /**
@@ -188,6 +208,15 @@ public class Simulation {
      */
     public boolean isRunning() {
         return status != null && !status.isCancelled() && !status.isDone();
+    }
+
+    /**
+     *
+     * @author Christian Schmied
+     * @return The current Simulation State
+     */
+    public SimulationState getState() {
+        return this.simState;
     }
 
     /**
