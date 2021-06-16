@@ -391,9 +391,12 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         return hits;
     }
 
-    @Override
-    public boolean checkDroneCollision(Vector3f origin, float radius) {
-        float goldenRatio = (1f + (float) Math.sqrt(5)) / 2;
+	@Override
+	public boolean checkDroneCollision(Vector3f origin, float radius) {
+		if (simulation.getDrone().isCrashed())
+			return true;
+		
+    	float goldenRatio = (1f + (float) Math.sqrt(5)) / 2;
         float angle = 2 * (float) Math.PI * goldenRatio;
 
         Vector3f ray = new Vector3f();
@@ -403,18 +406,24 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         float azimuth;
         float sin;
 
+        // TODO probably insert a Sphere into the JBullet context and do a "collision check"
+        //   could be faster than radial Ray-Castings
+
         for (int l = 0; l < rayCount; l++) {
             inclination = (float) Math.acos(1 - 2 * l / (float) rayCount);
             azimuth = angle * l;
             sin = (float) Math.sin(inclination);
 
             ray.set(sin * (float) Math.cos(azimuth),
-                    sin * (float) Math.sin(azimuth),
-                    (float) Math.cos(inclination)).normalizeLocal();
-
-            //check for collision
-            if (this.rayTest(origin, ray, radius) != null)
-                return true;
+            		sin * (float) Math.sin(azimuth),
+            		(float) Math.cos(inclination)).normalizeLocal();
+            
+            //check for collision & set crash flag
+            if(this.rayTest(origin, ray, radius) != null) {
+                // The Collision update is handled by the UfoObjsCrash Listener
+            	// simulation.getDrone().setCrashed(true);
+            	return true;
+            }
         }
         return false;
     }
@@ -445,6 +454,10 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
     @Override
     public void initialize(Simulation simulation) {
         this.simulation = simulation;
+
+        // Register the DroneCrashListener
+        this.simulation.registerUpdateListener(new DroneCrashListener(this), DroneCrashListener.LISTENER_PRIORITY);
+
         // Clear old Obstacles when Simulation is changed
         if (!this.obstacles.isEmpty()) {
             Set<Obstacle> obs = new HashSet<>(this.getObstacles());
