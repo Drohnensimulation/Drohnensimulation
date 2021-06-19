@@ -29,7 +29,7 @@ public abstract class DistanceSensor implements ISensor {
     // /////////////////////////////////////////////////////////////////////////////
     // Logger
     // /////////////////////////////////////////////////////////////////////////////
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger(DistanceSensor.class);
 
     //TODO: -Beschreibung des Kegels
     //		-Vervollständigung der Methodenimplementierung
