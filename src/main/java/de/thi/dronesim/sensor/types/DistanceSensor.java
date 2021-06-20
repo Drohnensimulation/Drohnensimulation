@@ -137,8 +137,8 @@ public abstract class DistanceSensor implements ISensor {
             }
         }
 
-        //Set<HitMark> hitMarks = getSensorHits(origin, direction, range, opening, getSensorForm(), sensorModule);
-        Set<HitMark> hitMarks = getPasta(origin, direction, range, opening);
+        Set<HitMark> hitMarks = getSensorHits(origin, direction, range, opening, getSensorForm(), sensorModule);
+
 
         //grouping hitmarks by the hit object
         List<Set<HitMark>> hitmarksGroupedByObstacles = new ArrayList<>();
@@ -664,72 +664,5 @@ public abstract class DistanceSensor implements ISensor {
      */
     public boolean equals(ISensor sensor){
 	    return this.getId() == sensor.getId();
-    }
-
-
-
-
-
-    public Set<HitMark> getPasta(Vector3f origin, Vector3f orientation, float range, Vector3f opening){
-
-        //returns only dummy data, no real reference to real data
-        Set<HitMark> hitMarks = Set.of();
-        Random random = new Random();
-
-        origin = new Vector3f(5,5,0);
-
-        Obstacle obstacle1 = new Obstacle();
-        Obstacle obstacle2 = new Obstacle();
-        Obstacle obstacle3 = new Obstacle();
-        Obstacle obstacle = new Obstacle();
-
-
-        Vector3f relativeHit = new Vector3f(5,7,0);
-
-        float x;
-        float y;
-        float z;
-
-        for(int i = 0; i<30; i++){
-            int xmax;
-            int xmin;
-            int ymax;
-            int ymin;
-            if(i<10){
-                xmax = 14;
-                xmin = 8;
-                ymax = 14;
-                ymin = 10;
-                obstacle = obstacle1;
-
-            }else if(i>10 && i<20){
-                xmax = 20;
-                xmin = 15;
-                ymax = 4;
-                ymin = 1;
-                obstacle = obstacle2;
-
-            }else{
-                xmax = 5;
-                xmin = 1;
-                ymax = 13;
-                ymin = 10;
-                obstacle = obstacle3;
-
-            }
-            x = Float.parseFloat(Integer.toString(random.nextInt(xmax - xmin + 1) + xmin));
-            y = Float.parseFloat(Integer.toString(random.nextInt(ymax - ymin + 1) + ymin));
-            z = 3;
-            Vector3f worldHit = new Vector3f(x,y,z);
-            relativeHit.x = x - origin.x;
-            relativeHit.y = y - origin.y;
-            relativeHit.z = y - origin.z;
-            float distance = relativeHit.length();
-            HitMark mark = new HitMark(distance, worldHit, relativeHit, obstacle3);
-
-            hitMarks.add(mark);
-        }
-
-        return hitMarks;
     }
 }

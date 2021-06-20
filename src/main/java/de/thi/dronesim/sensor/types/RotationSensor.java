@@ -19,30 +19,36 @@ public class RotationSensor extends DistanceSensor {
 	 * 
 	 * @author Moris Breitenborn
 	 */
-	
-	private int spinsPerSecond;
+
+	/**
+	 * Constructor:
+	 *
+	 * @param spinsPerSecond: defines how often the sensor circulate in one second
+	 * @param startRotationTime: defines the time when the Sensor starts to spin. if the value is 5 the rotation starts
+	 * after the Simulation is running for 5 seconds.
+	 * @param rotationVelocity: defines the velocity of the rotation
+	 */
+	private final int spinsPerSecond;
 	private float rotationVelocity; // 2Pi/s == one spin in one second as radiant
 	private float startRotationTime;
 
 	/**
 	 * Constructor:
 	 * 
-	 * @param spinsPerSecond: defines how often the sensor circulate in one second
-	 * @param startRotationTime: defines the time when the Sensor starts to spin. if the value is 5 the rotation starts
-	 * after the Simulation is running for 5 seconds. 
+	 * @param config: contains the config values for the sensor
 	 */
 	public RotationSensor(SensorConfig config) {
 		super(config);
 		this.spinsPerSecond = config.getSpinsPerSecond();
 		this.startRotationTime = config.getStartRotationTime();
-		spinsToRotationVelocityConverter(spinsPerSecond);
+		spinsToRotationVelocityConverter(this.spinsPerSecond);
 	}
 
 	/**
 	 *  This Method converts spins per seconds into radiant. with this value it is possible to calculate the traveled distance
 	 */
 	public void spinsToRotationVelocityConverter(int spinsPerSecond) {
-		this.rotationVelocity = (float) ((2*Math.PI)*this.spinsPerSecond);
+		this.rotationVelocity = (float) ((2*Math.PI)*spinsPerSecond);
 	}
 
 	/**

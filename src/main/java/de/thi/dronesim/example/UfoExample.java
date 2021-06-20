@@ -12,7 +12,7 @@ public class UfoExample {
     public static void main(String[] args) throws InterruptedException {
 
         //Load Simulation config and prepares Simulation
-        Simulation sim = new Simulation("src/main/java/de/thi/dronesim/example/simtestconf.json");
+        Simulation sim = new Simulation("src/main/java/de/thi/dronesim/example/simtestconf2.json");
         sim.prepare();
 
         GuiManager gui = sim.getChild(GuiManager.class);

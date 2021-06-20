@@ -5,7 +5,7 @@
     "y": "0",
     "z": "1"
   },
-
+  "droneRadius": 1.0,
 
 
   "obstacleConfigList":
@@ -124,7 +124,7 @@
         "scale": [1.0, 1.0, 1.0]
       }],
       "config": {
-        "rayDensity": 100
+        "rayDensity": 5
       }
     }]
   ,
@@ -143,10 +143,10 @@
       "posY": 19.0,
       "posZ": 20.0,
 
-      "range": 10.0,
+      "range": 40.0,
       "sensorAngle": 11.0,
-      "sensorRadius": 20,
-      "sensorForm": "CONE",
+      "sensorRadius": 40,
+      "sensorForm": "CYLINDER",
       "calcType": "NEAREST",
 
       "zeroDegreeDirectionX": 0.0,
