@@ -408,6 +408,12 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         return checkSphereBodyCollisionImp(origin, radius);
     }
 
+    /**
+     * @author Christian Schmied
+     * @param origin
+     * @param radius
+     * @return
+     */
     boolean checkSphereBodyCollisionImp(Vector3f origin, float radius) {
         RigidBody hitBody = jBullet.createSphere(VecMathHelper.of(origin), radius);
         try {
@@ -418,6 +424,12 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         return false;
     }
 
+    /**
+     * @author Bakri Aghyourli
+     * @param origin
+     * @param radius
+     * @return
+     */
     boolean checkSphereRayCollisionImp(Vector3f origin, float radius) {
         float goldenRatio = (1f + (float) Math.sqrt(5)) / 2;
         float angle = 2 * (float) Math.PI * goldenRatio;
@@ -428,9 +440,6 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         float inclination;
         float azimuth;
         float sin;
-
-        // TODO probably insert a Sphere into the JBullet context and do a "collision check"
-        //   could be faster than radial Ray-Castings
 
         for (int l = 0; l < rayCount; l++) {
             inclination = (float) Math.acos(1 - 2 * l / (float) rayCount);

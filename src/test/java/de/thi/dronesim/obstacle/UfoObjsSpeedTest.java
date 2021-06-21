@@ -13,6 +13,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
 
+/**
+ * @author Christian Schmied
+ */
 public class UfoObjsSpeedTest {
     private static final Logger logger = LogManager.getLogger(UfoObjsSpeedTest.class);
     private static int NUM_RUNS = 50_000;
@@ -21,6 +24,7 @@ public class UfoObjsSpeedTest {
 
     /**
      * Helper method to load the configuration
+     * @author Michael Küchenmeister
      */
     private static void loadTestConfig() {
         String jsonObj =

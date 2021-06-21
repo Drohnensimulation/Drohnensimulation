@@ -16,8 +16,6 @@ import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
 import de.thi.dronesim.helpers.VecMathHelper;
 import de.thi.dronesim.obstacle.entity.Obstacle;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
@@ -32,13 +30,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class JBulletContext {
     private static final Vector3f GRAVITY = null;//new Vector3f(0, -9.81f, 0);
-    private final Logger logger;
     private final DynamicsWorld dynamicsWorld;
 
     private final ReadWriteLock rwLock;
 
     public JBulletContext() {
-        logger = LogManager.getLogger(JBulletContext.class);
         rwLock = new ReentrantReadWriteLock();
         BroadphaseInterface broadphase = new DbvtBroadphase();
         CollisionConfiguration collisionConfiguration = new DefaultCollisionConfiguration();
@@ -83,18 +79,29 @@ public class JBulletContext {
         }
     }
 
-    public RigidBody createSphere(Vector3f position, float radius) {
+    /**
+     * @param origin
+     * @param radius
+     * @return a new Sphere as RigidBody
+     * @author Christian Schmied
+     */
+    public RigidBody createSphere(Vector3f origin, float radius) {
         CollisionShape sphereShape = new SphereShape(radius);
         MotionState sphereMotionState = new DefaultMotionState(
                 new Transform(new Matrix4f(
                         new Quat4f(1, 1, 1, 1),
-                        position,
+                        origin,
                         1
                 )));
         RigidBodyConstructionInfo sphereConstructionInfo = new RigidBodyConstructionInfo(0, sphereMotionState, sphereShape);
         return new RigidBody(sphereConstructionInfo);
     }
 
+    /**
+     * @param body The RigidBody used as CollisionBody
+     * @return Feature resolving to the collision state
+     * @author Christian Schmied
+     */
     public Future<Boolean> checkCollision(final RigidBody body) {
         rwLock.writeLock().lock();
         final CompletableFuture<Boolean> future = new CompletableFuture<>();
