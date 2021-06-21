@@ -85,8 +85,6 @@ public class DView extends AGuiFrame {
      * @param dRenderer
      */
     public DView(GuiManager guiManager, DRenderer dRenderer) {
-
-        //TODO simulation must be initialized
         super("Ufo Simulation");
         getContentPane().add(mainPanel);
         Canvas canvas = dRenderer.getCanvas();
@@ -142,7 +140,6 @@ public class DView extends AGuiFrame {
         double t = simulationUpdateEvent.getTime() / 1000;
         StringBuilder time = calculateTime(t);
         this.time.setText(time.toString());
-        //TODO windData should be updated as well, when there is data to display
         SensorModule sensorModule = simulation.getChild(SensorModule.class);
         List<SensorResultDto> sensorResultDtos = sensorModule.getResultsFromAllSensors();
         setObstacleAndWind(sensorResultDtos);
