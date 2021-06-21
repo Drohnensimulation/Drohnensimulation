@@ -28,7 +28,7 @@
         <children>
           <component id="e49a0" class="javax.swing.JButton" binding="birdView">
             <constraints>
-              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="1" use-parent-layout="false"/>
+              <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="1" use-parent-layout="false"/>
               <gridbag weightx="1.0" weighty="1.0"/>
             </constraints>
             <properties>
@@ -37,7 +37,7 @@
           </component>
           <component id="d761a" class="javax.swing.JButton" binding="thirdPerson">
             <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="1" use-parent-layout="false"/>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="1" use-parent-layout="false"/>
               <gridbag weightx="1.0" weighty="1.0"/>
             </constraints>
             <properties>
@@ -48,7 +48,7 @@
           </component>
           <component id="37d0b" class="javax.swing.JButton" binding="firstPerson">
             <constraints>
-              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
               <gridbag weightx="1.0" weighty="1.0"/>
             </constraints>
             <properties>
@@ -58,7 +58,7 @@
           </component>
           <component id="66eb7" class="javax.swing.JButton" binding="nearbyObstaclesButton">
             <constraints>
-              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
               <gridbag weightx="1.0" weighty="1.0"/>
             </constraints>
             <properties>
@@ -68,11 +68,23 @@
           </component>
           <component id="6cb59" class="javax.swing.JButton" binding="windButton" default-binding="true">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
               <gridbag weightx="1.0" weighty="1.0"/>
             </constraints>
             <properties>
               <text value="Wind-data"/>
+            </properties>
+          </component>
+          <component id="b149" class="javax.swing.JLabel" binding="status">
+            <constraints>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag top="0" left="0" bottom="5" right="0" weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <horizontalAlignment value="0"/>
+              <horizontalTextPosition value="0"/>
+              <name value=""/>
+              <text value=""/>
             </properties>
           </component>
         </children>
@@ -82,7 +94,9 @@
           <grid row="0" column="0" row-span="3" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
           <gridbag weightx="1.0" weighty="1.0"/>
         </constraints>
-        <properties/>
+        <properties>
+          <preferredSize width="204" height="220"/>
+        </properties>
         <border type="bevel-raised"/>
         <children>
           <component id="32a5c" class="javax.swing.JLabel">
@@ -106,11 +120,13 @@
               <component id="af56b" class="javax.swing.JLabel" binding="windData">
                 <constraints border-constraint="South"/>
                 <properties>
-                  <alignmentX value="0.0"/>
+                  <alignmentX value="0.5"/>
                   <horizontalAlignment value="0"/>
                   <horizontalTextPosition value="0"/>
+                  <maximumSize width="-1" height="-1"/>
+                  <preferredSize width="100" height="50"/>
                   <requestFocusEnabled value="false"/>
-                  <text value="Data"/>
+                  <text value=""/>
                 </properties>
               </component>
             </children>
@@ -328,7 +344,7 @@
             <properties/>
             <border type="bevel-raised"/>
             <children>
-              <component id="8e28c" class="javax.swing.JLabel">
+              <component id="8e28c" class="javax.swing.JLabel" binding="time">
                 <constraints>
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="0" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -338,10 +354,11 @@
                 <properties>
                   <horizontalAlignment value="0"/>
                   <horizontalTextPosition value="0"/>
-                  <text value="0.0"/>
+                  <maximumSize width="-1" height="-1"/>
+                  <text value="00:00:00"/>
                 </properties>
               </component>
-              <component id="67fa0" class="javax.swing.JLabel" binding="time">
+              <component id="67fa0" class="javax.swing.JLabel">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                   <gridbag weightx="1.0" weighty="1.0"/>
@@ -361,6 +378,16 @@
               <text value=""/>
             </properties>
           </component>
+          <component id="10a3" class="javax.swing.JButton" binding="stopButton">
+            <constraints>
+              <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <horizontalTextPosition value="0"/>
+              <text value=""/>
+            </properties>
+          </component>
         </children>
       </grid>
       <grid id="5ba81" binding="obstacles" layout-manager="GridBagLayout">
@@ -368,7 +395,10 @@
           <grid row="0" column="2" row-span="3" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
           <gridbag weightx="1.0" weighty="0.0"/>
         </constraints>
-        <properties/>
+        <properties>
+          <minimumSize width="120" height="40"/>
+          <preferredSize width="120" height="40"/>
+        </properties>
         <border type="bevel-raised"/>
         <children>
           <grid id="24827" binding="obstaclePanel" layout-manager="GridBagLayout">
