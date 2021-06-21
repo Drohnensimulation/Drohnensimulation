@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
  */
 public class SensorModule implements ISimulationChild {
 
+    public static final int LISTENER_PRIORITY = 700;
+
     // /////////////////////////////////////////////////////////////////////////////
     // Fields
     // /////////////////////////////////////////////////////////////////////////////
@@ -108,7 +110,7 @@ public class SensorModule implements ISimulationChild {
     @Override
     public void initialize(Simulation simulation) {
         this.simulation = simulation;
-        simulation.registerUpdateListener(this::runAllMeasurements);
+        simulation.registerUpdateListener(this::runAllMeasurements, LISTENER_PRIORITY);
         loadConfig(simulation.getConfig().getSensorConfigList());
     }
 
