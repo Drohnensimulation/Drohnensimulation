@@ -94,7 +94,9 @@
           <grid row="0" column="0" row-span="3" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
           <gridbag weightx="1.0" weighty="1.0"/>
         </constraints>
-        <properties/>
+        <properties>
+          <preferredSize width="204" height="220"/>
+        </properties>
         <border type="bevel-raised"/>
         <children>
           <component id="32a5c" class="javax.swing.JLabel">
@@ -124,7 +126,7 @@
                   <maximumSize width="-1" height="-1"/>
                   <preferredSize width="100" height="50"/>
                   <requestFocusEnabled value="false"/>
-                  <text value="Data"/>
+                  <text value=""/>
                 </properties>
               </component>
             </children>
@@ -376,6 +378,16 @@
               <text value=""/>
             </properties>
           </component>
+          <component id="10a3" class="javax.swing.JButton" binding="stopButton">
+            <constraints>
+              <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <horizontalTextPosition value="0"/>
+              <text value=""/>
+            </properties>
+          </component>
         </children>
       </grid>
       <grid id="5ba81" binding="obstacles" layout-manager="GridBagLayout">
@@ -383,7 +395,10 @@
           <grid row="0" column="2" row-span="3" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
           <gridbag weightx="1.0" weighty="0.0"/>
         </constraints>
-        <properties/>
+        <properties>
+          <minimumSize width="120" height="40"/>
+          <preferredSize width="120" height="40"/>
+        </properties>
         <border type="bevel-raised"/>
         <children>
           <grid id="24827" binding="obstaclePanel" layout-manager="GridBagLayout">
