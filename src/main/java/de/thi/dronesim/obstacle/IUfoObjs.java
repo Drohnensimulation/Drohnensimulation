@@ -96,7 +96,7 @@ public interface IUfoObjs {
      * @param radius Größe des kugelförmigen Hitboxes
      * @return true wenn die Drohne mit einem fremden Objekt kollidiert
      */
-    boolean checkDroneCollision(Vector3f origin, float radius);
+    boolean checkSphereCollision(Vector3f origin, float radius);
 
     /**
      * Extracts the current state into the ConfigDTO

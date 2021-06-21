@@ -1,11 +1,12 @@
 package de.thi.dronesim.gui.mview;
 
 import de.thi.dronesim.Simulation;
+import de.thi.dronesim.SimulationState;
 import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.drone.Drone;
 import de.thi.dronesim.drone.Location;
 import de.thi.dronesim.gui.GuiManager;
-import de.thi.dronesim.gui.IGuiView;
+import de.thi.dronesim.gui.AGuiFrame;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 import de.thi.dronesim.sensor.SensorModule;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 
 @SuppressWarnings("FieldCanBeLocal")
-public class MView extends JFrame implements IGuiView {
+public class MView extends AGuiFrame {
 
     // These values are currently set to fit the current information
     private static final int WINDOW_MIN_WIDTH = 550;
@@ -401,6 +402,16 @@ public class MView extends JFrame implements IGuiView {
     }
 
     @Override
+    public void init(Simulation simulation) {
+        // TODO: Use simulation if needed
+    }
+
+    /**
+     * Updates all values in the MView with the received information of the simulationUpdateEvent.
+     *
+     * @param simulationUpdateEvent
+     */
+    @Override
     public void updateDroneStatus(SimulationUpdateEvent simulationUpdateEvent) {
         Drone d = simulationUpdateEvent.getDrone();
         Location location = d.getLocation();
@@ -513,37 +524,38 @@ public class MView extends JFrame implements IGuiView {
 
             } // (sensorModule != null)
         }
-
-        if (!sim.isRunning() && !wasStopped && wasStarted) {
-            startButton.setText("Exit Simulation");
-            statusValue.setText("Simulation Ended");
-            wasStopped = true;
-        }
     }
 
-    // TODO: Remove once simulation was updated to return its state (?). Just to prevent an exception.
-    boolean wasStarted = false;
-    boolean wasStopped = false;
-
+    /**
+     * Controls the simulation with the start button. It switches according to the state of the simulation.
+     */
     private void runSimulation() {
-        // Simulation is running and was not stopped yet, so stop it:
-        if (sim.isRunning() && !wasStopped) {
-            wasStopped = true;
-            sim.stop();
-
-            startButton.setText("Exit Simulation");
-            statusValue.setText("Simulation Ended");
-            startButton.removeAll();
-        // Simulation was running, but was stopped and now the button function as "exit":
-        } else if (wasStopped && wasStarted) {
-            System.exit(0);
-        // Simulation has yet to start, so do that:
-        } else if (!wasStarted){
-            wasStarted = true;
-            sim.start();
-
-            startButton.setText("Stop Simulation");
-            statusValue.setText("Running...");
+        SimulationState state = sim.getState();
+        System.out.println(state);
+        switch(state) {
+            case CREATED:
+                sim.prepare();
+                while((state = sim.getState()) != SimulationState.PREPARED) {
+                    statusValue.setText("Preparring...");
+                    // Wait till it is prepped
+                }
+                statusValue.setText("RUNNING...");
+                sim.start();
+                break;
+            case PREPARED:
+            case PAUSED:
+                statusValue.setText("RUNNING...");
+                sim.start();
+                break;
+            case RUNNING:
+                statusValue.setText("PAUSED!");
+                sim.pause();
+                break;
+            case STOPPED:
+                System.exit(0);
+                break;
+            default:
+                System.out.printf("Unknown Simulation State: %s", state.name());
         }
     }
 

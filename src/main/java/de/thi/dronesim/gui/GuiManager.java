@@ -6,6 +6,7 @@ import de.thi.dronesim.ISimulationChild;
 import de.thi.dronesim.Simulation;
 import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.SimulationUpdateListener;
+import de.thi.dronesim.drone.Drone;
 import de.thi.dronesim.drone.Location;
 import de.thi.dronesim.gui.drenderer.*;
 import de.thi.dronesim.gui.dview.DView;
@@ -24,7 +25,7 @@ import java.util.List;
 public class GuiManager implements ISimulationChild, SimulationUpdateListener {
 
     private Simulation simulation;
-    private IGuiView instrumentView;
+    private AGuiFrame instrumentView;
     private DRenderer dRenderer;
 
     @Override
@@ -45,8 +46,18 @@ public class GuiManager implements ISimulationChild, SimulationUpdateListener {
         }
         if (dRenderer != null) {
             RenderableDrone drone = dRenderer.getDrone();
-            updateDroneLocation(drone, event.getDrone().getLocation());
+            updateDroneLocation(drone, event.getDrone());
         }
+    }
+
+    @Override
+    public void onSimulationStart() {
+        onUpdate(new SimulationUpdateEvent(simulation.getDrone(), simulation.getTime(), simulation.getTps()));
+    }
+
+    @Override
+    public void onSimulationStop() {
+        onUpdate(new SimulationUpdateEvent(simulation.getDrone(), simulation.getTime(), simulation.getTps()));
     }
 
     public GuiManager() {
@@ -60,6 +71,7 @@ public class GuiManager implements ISimulationChild, SimulationUpdateListener {
     public void openMViewGui() {
         if (!existsGui()) {
             instrumentView = new MView(this);
+            instrumentView.init(simulation);
         }
     }
 
@@ -70,6 +82,7 @@ public class GuiManager implements ISimulationChild, SimulationUpdateListener {
         if (!existsGui()) {
             dRenderer = initDRenderer();
             instrumentView = new DView(this, dRenderer);
+            instrumentView.init(simulation);
         }
     }
 
@@ -87,18 +100,22 @@ public class GuiManager implements ISimulationChild, SimulationUpdateListener {
         return dRenderer != null;
     }
 
-    private void updateDroneLocation(RenderableDrone drone, Location location) {
-        if (drone != null) {
-            drone.setPosition(location.getPosition());
+    private void updateDroneLocation(RenderableDrone renderDrone, Drone drone) {
+        if (renderDrone != null && drone != null) {
+            Location location = drone.getLocation();
+            if(location == null) {
+                return;
+            }
+            renderDrone.setPosition(location.getPosition());
             float rotation = (float) (location.getHeading() * (Math.PI / 180.0));
-            drone.setRotation(new Vector3f(0, -rotation, 0));
-            drone.setRotateRotors(location.getAirspeed() != 0 || location.getVerticalSpeed() != 0);
+            renderDrone.setRotation(new Vector3f(0, -rotation, 0));
+            renderDrone.setRotateRotors(!drone.isCrashed() && simulation.isRunning());
         }
     }
 
     private DRenderer initDRenderer() {
-        // Create DView
-        DRenderer dView = new DRenderer();
+        // Create DRenderer
+        DRenderer dRenderer = new DRenderer();
 
         // Add map objects
         List<RenderableObject> mapObjects = new ArrayList<>();
@@ -120,14 +137,14 @@ public class GuiManager implements ISimulationChild, SimulationUpdateListener {
                     // TODO: Read path and load from local object file
             }
         }
-        dView.addRenderableObjects(mapObjects);
+        dRenderer.addRenderableObjects(mapObjects);
 
         // Add drone
         RenderableDrone drone = new RenderableDrone(simulation.getDrone().getRadius());
-        updateDroneLocation(drone, simulation.getDrone().getLocation());
-        dView.addRenderableObject(drone);
+        updateDroneLocation(drone, simulation.getDrone());
+        dRenderer.addRenderableObject(drone);
 
-        // Return DView
-        return dView;
+        // Return DRenderer
+        return dRenderer;
     }
 }

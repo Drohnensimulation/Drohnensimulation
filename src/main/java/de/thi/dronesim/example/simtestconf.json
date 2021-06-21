@@ -5,8 +5,7 @@
     "y": "0",
     "z": "1"
   },
-
-  "droneRadius": 1.0,
+  "droneRadius": 0.49,
 
   "obstacleConfigList":
     [{
@@ -132,28 +131,7 @@
 
 
   "sensorConfigList": [
-      {
-      "className": "WindSensor",
-      "sensorId": 0,
-      "measurementAccuracy": 14.0,
-      "directionX": 15.0,
-      "directionY": 16.0,
-      "directionZ": 17.0,
-      "posX": 18.0,
-      "posY": 19.0,
-      "posZ": 20.0,
-      "range": 10.0,
-      "sensorAngle": 11.0,
-      "sensorRadius": 13.0,
-      "zeroDegreeDirectionX": 0.0,
-      "zeroDegreeDirectionY": 0.0,
-      "zeroDegreeDirectionZ": 0.0,
-      "nintyDegreeDirectionX": 0.0,
-      "nintyDegreeDirectionY": 0.0,
-      "nintyDegreeDirectionZ": 0.0,
-      "rangeIncreaseVelocity": 0.0,
-      "callTimerForSensorValues": 0
-    }
+
   ],
 
 
