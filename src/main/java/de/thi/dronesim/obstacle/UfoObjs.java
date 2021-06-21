@@ -84,10 +84,11 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         for (HitBoxDTO hit : obstacleDto.hitboxes) {
             float[] position = {hit.position[0], hit.position[1], hit.position[2]};
             float[] rotation = {hit.rotation[0], hit.rotation[1], hit.rotation[2]};
-            float[] dimension = {hit.dimension[0], hit.dimension[1], hit.dimension[2]};
+            javax.vecmath.Vector3f halfDimension = VecMathHelper.of(hit.dimension);
+            halfDimension.scale(0.5f);
 
             // Add hit boxes to the jBullet context
-            HitBoxRigidBody hitBoxRigidBody = jBullet.addHitBox(new javax.vecmath.Vector3f(position), new javax.vecmath.Vector3f(rotation), new javax.vecmath.Vector3f(dimension), obstacle);
+            HitBoxRigidBody hitBoxRigidBody = jBullet.addHitBox(new javax.vecmath.Vector3f(position), new javax.vecmath.Vector3f(rotation), halfDimension, obstacle);
 
             // Add hit boxes into a set for Obstacle setter method
             objectHitBoxes.add(hitBoxRigidBody);
@@ -409,10 +410,10 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
     }
 
     /**
-     * @author Christian Schmied
      * @param origin
      * @param radius
      * @return
+     * @author Christian Schmied
      */
     boolean checkSphereBodyCollisionImp(Vector3f origin, float radius) {
         RigidBody hitBody = jBullet.createSphere(VecMathHelper.of(origin), radius);
@@ -425,10 +426,10 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
     }
 
     /**
-     * @author Bakri Aghyourli
      * @param origin
      * @param radius
      * @return
+     * @author Bakri Aghyourli
      */
     boolean checkSphereRayCollisionImp(Vector3f origin, float radius) {
         float goldenRatio = (1f + (float) Math.sqrt(5)) / 2;
