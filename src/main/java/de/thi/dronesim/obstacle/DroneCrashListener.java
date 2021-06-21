@@ -5,6 +5,9 @@ import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.SimulationUpdateListener;
 import de.thi.dronesim.drone.Drone;
 
+/**
+ * @author Christian Schmied
+ */
 public class DroneCrashListener implements SimulationUpdateListener {
 
     public static final int LISTENER_PRIORITY = 600;
@@ -17,10 +20,15 @@ public class DroneCrashListener implements SimulationUpdateListener {
 
     @Override
     public void onUpdate(SimulationUpdateEvent event) {
+        if (event.getDrone().isCrashed()) {
+            return;
+        }
+
         Drone theDrone = event.getDrone();
         Vector3f dronePosition = theDrone.getLocation().getPosition();
         float droneRadius = theDrone.getRadius();
-        if (ufoObjs.checkDroneCollision(dronePosition, droneRadius)) {
+
+        if (ufoObjs.checkSphereCollision(dronePosition, droneRadius)) {
             theDrone.setCrashed(true);
         }
     }

@@ -16,6 +16,7 @@ public class HitBoxRigidBody extends RigidBody {
 
     public HitBoxRigidBody(RigidBodyConstructionInfo constructionInfo, Obstacle obstacle) {
         super(constructionInfo);
+        this.setUserPointer(obstacle.getID());
         this.obstacle = obstacle;
     }
 
