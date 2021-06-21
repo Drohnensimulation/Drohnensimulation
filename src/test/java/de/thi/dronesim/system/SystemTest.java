@@ -35,7 +35,7 @@ public class SystemTest {
      */
     //private static final String FILENAME = "wind/wind_flight_1.json"; // Wind from North      ^
     //private static final String FILENAME = "wind/wind_flight_2.json"; // Wind from North-East ^>
-    private static final String FILENAME = "wind/wind_flight_3.json"; // Wind from East       >
+    //private static final String FILENAME = "wind/wind_flight_3.json"; // Wind from East       >
     //private static final String FILENAME = "wind/wind_flight_4.json"; // Wind from South-East v>
     //private static final String FILENAME = "wind/wind_flight_5.json"; // Wind from South      v
     //private static final String FILENAME = "wind/wind_flight_6.json"; // Wind from South-West <v
@@ -51,6 +51,11 @@ public class SystemTest {
     //private static final String FILENAME = "wind/wind_and_gust_flight_8.json"; // Wind from North-West + Gusts
 
     /** Testing flying with obstacles, crashing and wind influences + Obstacle-Detecting Sensors */
+    //private static final String FILENAME = "obstacles/obstacles_1.json"; // Fly-By - Right Side of Obstacle
+    //private static final String FILENAME = "obstacles/obstacles_2.json"; // Fly-By - Left Side of Obstacle
+    //private static final String FILENAME = "obstacles/obstacles_3.json"; // Fly-By - Over Obstacle
+    //private static final String FILENAME = "obstacles/obstacles_4.json"; // Fly-By - Under Obstacle
+    private static final String FILENAME = "obstacles/obstacles_5.json"; // Fly-By - Into Obstacle
     //private static final String FILENAME = "obstacles/obstacles_and_wind_flight_1.json"; // Fly-By South + North-Wind
     //private static final String FILENAME = "obstacles/obstacles_and_wind_flight_2.json"; // Fly-By North + North-Wind
     //private static final String FILENAME = "obstacles/obstacles_and_wind_flight_3.json"; // Overflight + North-Wind
@@ -154,9 +159,33 @@ public class SystemTest {
 
         // Autopilot Flight
         try {
-            ap.awaitCondition(event -> event.getDrone().getLocation().getY() != 0);
+            // Take off
+            sim.start();
+            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(1, 0, 0));
+            ap.awaitCondition(event -> event.getDrone().getLocation().getY() >= 10);
+
+            // Fly towards Goal
+            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(-1, 2, 0));
+            ap.awaitCondition(event -> event.getDrone().getLocation().getZ() >= 9.75);
+
+            // Slow down when approaching
+            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(0, -1.6, 0));
+            ap.awaitCondition(event -> event.getDrone().getLocation().getZ() >= 9.95);
+
+            // Landing process
+            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(-1, -0.4, 0));
+            ap.awaitCondition(event -> event.getDrone().getLocation().getY() <= 1);
+            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(0.8, 0, 0));
+            ap.awaitCondition(event -> event.getDrone().getLocation().getY() <= 0.05);
+            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(0.2, 0, 0));
+
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+
+        System.out.println("Test Over!");
+        while(true){
+
         }
     }
 

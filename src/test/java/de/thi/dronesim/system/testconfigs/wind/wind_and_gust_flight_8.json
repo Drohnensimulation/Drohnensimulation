@@ -243,7 +243,7 @@
   "windConfigList": [
     {
       "windSpeed": 5.0,
-      "gustSpeed": 0.0,
+      "gustSpeed": 5.0,
       "timeStart": 10.0,
       "timeEnd": 20.0,
       "altitudeBottom": 0.0,

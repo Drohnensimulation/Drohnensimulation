@@ -247,7 +247,7 @@
       "timeStart": 10.0,
       "timeEnd": 20.0,
       "altitudeBottom": 0.0,
-      "altitudeTop": 0.0,
+      "altitudeTop": 50.0,
       "windDirection": 225.0
     }
   ]
