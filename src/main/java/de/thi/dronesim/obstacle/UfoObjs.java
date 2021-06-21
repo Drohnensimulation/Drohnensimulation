@@ -451,11 +451,8 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
                     (float) Math.cos(inclination)).normalizeLocal();
 
             //check for collision & set crash flag
-            if (this.rayTest(origin, ray, radius) != null) {
-                // The Collision update is handled by the UfoObjsCrash Listener
-                // simulation.getDrone().setCrashed(true);
+            if (this.rayTest(origin, ray, radius) != null)
                 return true;
-            }
         }
         return false;
     }
