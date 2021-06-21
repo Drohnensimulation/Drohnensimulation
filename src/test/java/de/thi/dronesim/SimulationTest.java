@@ -1,5 +1,8 @@
 package de.thi.dronesim;
 
+import com.google.common.util.concurrent.AtomicDouble;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -226,6 +229,47 @@ public class SimulationTest {
         simulation.stop();
 
         assertEquals(1000, simulation.getTime(), 100);
+    }
+
+    /**
+     * @author Christian Schmied
+     */
+    @Test
+    void pauseResumeSimulation() throws InterruptedException {
+
+        final Logger logger = LogManager.getLogger(SimulationTest.class);
+
+        Simulation simulation = new Simulation();
+        simulation.prepare();
+
+        AtomicInteger i = new AtomicInteger();
+        AtomicDouble flag = new AtomicDouble();
+
+        SimulationUpdateListener listener = event -> {
+            if(i.get() == 10){
+                logger.info("Pausing Simulation");
+                flag.set(event.getTime());
+                simulation.pause();
+            }else if(i.get() == 11){
+                double delta = event.getTime() - flag.get();
+                logger.info("Pause Delta is {}", delta);
+                assertTrue(delta < 1_000);
+                simulation.stop();
+            }
+            i.incrementAndGet();
+        };
+        simulation.registerUpdateListener(listener);
+
+        simulation.start();
+
+        //Jep Busy Wait ;D
+        while(simulation.getState() != SimulationState.PAUSED){
+            Thread.sleep(10);
+        }
+        logger.info("Pause Detected, sleeping 1.5 Seconds to resume the Sim");
+        Thread.sleep(1_500);
+
+        simulation.start();
     }
 
 }
