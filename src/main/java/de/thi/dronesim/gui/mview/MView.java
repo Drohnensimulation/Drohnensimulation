@@ -5,8 +5,8 @@ import de.thi.dronesim.SimulationState;
 import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.drone.Drone;
 import de.thi.dronesim.drone.Location;
-import de.thi.dronesim.gui.GuiManager;
 import de.thi.dronesim.gui.AGuiFrame;
+import de.thi.dronesim.gui.GuiManager;
 import de.thi.dronesim.obstacle.entity.Obstacle;
 import de.thi.dronesim.sensor.SensorModule;
 import de.thi.dronesim.sensor.dto.SensorResultDto;
@@ -93,7 +93,7 @@ public class MView extends AGuiFrame {
 
     // Buttons
     private final JButton startButton;
-    private final JButton loadButton;
+    private final JButton stopButton;
 
     public MView(GuiManager guiManager) {
         super("Drone Simulation (No GFX)");
@@ -122,16 +122,12 @@ public class MView extends AGuiFrame {
         panelObstaclesWindOuter = new JPanel();
         panelObstaclesWindInner = new JPanel();
 
-        startButton = new JButton("Start | Pause | Stop Simulation");
-        loadButton = new JButton("Load Scenario");
+        startButton = new JButton("Start Simulation");
+        stopButton = new JButton("Exit Simulation");
 
         // Button Actions
         startButton.addActionListener(e -> runSimulation());
-
-        loadButton.addActionListener(e -> {
-            // TODO: Once this is actually possible (If, else the whole button can be removed).
-            // Simulation.loadScenario();
-        });
+        stopButton.addActionListener(e -> stopSimulation());
 
         // Group Layout setup of the main panel
         GroupLayout gl_contentPane = new GroupLayout(contentPane);
@@ -149,7 +145,7 @@ public class MView extends AGuiFrame {
                                                         .addComponent(startButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                                 .addGroup(gl_contentPane.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                                        .addComponent(loadButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(stopButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(panelObstaclesWindOuter, GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
                                                         .addComponent(panelVelocityOuter, GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE))))
                                 .addContainerGap(18, Short.MAX_VALUE))
@@ -171,7 +167,7 @@ public class MView extends AGuiFrame {
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(gl_contentPane.createParallelGroup(GroupLayout.Alignment.LEADING, false)
                                         .addComponent(startButton, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(loadButton, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(stopButton, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
                                 .addContainerGap())
         );
 
@@ -451,6 +447,9 @@ public class MView extends AGuiFrame {
 
         runtimeValue.setText(time.toString());
 
+        // No need to continue if the drone crashed
+        if (d.isCrashed())
+            return;
 
         // Update Position
         coordinateXValue.setText(String.format("%.3f", location.getX()));
@@ -532,18 +531,11 @@ public class MView extends AGuiFrame {
     private void runSimulation() {
         SimulationState state = sim.getState();
         System.out.println(state);
-        switch(state) {
+        switch (state) {
             case CREATED:
-                sim.prepare();
-                while((state = sim.getState()) != SimulationState.PREPARED) {
-                    statusValue.setText("Preparring...");
-                    // Wait till it is prepped
-                }
-                statusValue.setText("RUNNING...");
-                sim.start();
-                break;
             case PREPARED:
             case PAUSED:
+                stopButton.setText("Stop Simulation");
                 statusValue.setText("RUNNING...");
                 sim.start();
                 break;
@@ -559,4 +551,19 @@ public class MView extends AGuiFrame {
         }
     }
 
+    /**
+     * Stops the simulation at the press of the button
+     */
+    private void stopSimulation() {
+        if (sim.isRunning())
+        {
+            sim.stop();
+            startButton.setText("Exit Simulation");
+            stopButton.setText("Exit Simulation");
+        }
+        else
+        {
+            System.exit(0);
+        }
+    }
 }
