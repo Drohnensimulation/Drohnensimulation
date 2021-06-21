@@ -5,6 +5,9 @@ import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.SimulationUpdateListener;
 import de.thi.dronesim.drone.Drone;
 
+/**
+ * @author Christian Schmied
+ */
 public class DroneCrashListener implements SimulationUpdateListener {
 
     public static final int LISTENER_PRIORITY = 600;
