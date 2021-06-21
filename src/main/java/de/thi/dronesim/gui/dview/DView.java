@@ -58,6 +58,7 @@ public class DView extends AGuiFrame {
     private JButton nearbyObstaclesButton;
     private JButton windButton;
     private JButton simulationButton;
+    private JButton stopButton;
 
     //All JPanel, which are either used for wrapping, or to frame something
     private JPanel graphicPanel;
@@ -94,9 +95,12 @@ public class DView extends AGuiFrame {
         simulationButton.setText("Start");
         status.setText("Resting");
         simulationButton.setBackground(Color.GREEN);
+        stopButton.setText("Stop");
+        stopButton.setBackground(Color.RED);
         thirdPerson.addActionListener(e -> dRenderer.setPerspective(DRenderer.Perspective.THIRD_PERSON));
         birdView.addActionListener(e -> dRenderer.setPerspective(DRenderer.Perspective.BIRD_VIEW));
         firstPerson.addActionListener(e -> dRenderer.setPerspective(DRenderer.Perspective.FIRST_PERSON));
+        stopButton.addActionListener(e -> simulation.stop());
         nearbyObstaclesButton.addActionListener(this::toggleObstacles);
         windButton.addActionListener(this::toggleWind);
         simulationButton.addActionListener(this::changeButton);
@@ -342,14 +346,16 @@ public class DView extends AGuiFrame {
             status.setText("Flying");
             simulationButton.setBackground(Color.YELLOW);
         } else if (!paused && simulation.isRunning()) {
-            //TODO pause Button missing
+            simulation.pause();
             paused = true;
             simulationButton.setText("Resume");
+            status.setText("Resting");
             simulationButton.setBackground(Color.GREEN);
         } else if (paused) {
-            //TODO continue Button missing
+            simulation.start();
             paused = false;
             simulationButton.setText("Pause");
+            status.setText("Flying");
             simulationButton.setBackground(Color.YELLOW);
         } else if (stopped) {
             simulation.stop();
