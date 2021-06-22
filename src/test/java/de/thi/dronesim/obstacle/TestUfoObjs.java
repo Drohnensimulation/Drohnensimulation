@@ -183,7 +183,7 @@ public class TestUfoObjs {
         origin = Jme3MathHelper.of(2,1, 2);
         assertTrue(instance.checkSphereCollision(origin,2.0f));
         simulation.getDrone().setCrashed(false);
-        
+
         origin = Jme3MathHelper.of(2, 1, 1);
         assertFalse(instance.checkSphereCollision(origin,2.0f));
 
@@ -191,7 +191,7 @@ public class TestUfoObjs {
         origin = Jme3MathHelper.of(4, 1, 3);
         assertTrue(instance.checkSphereCollision(origin, 2.0f));
         simulation.getDrone().setCrashed(false);
-        
+
         origin = Jme3MathHelper.of(5, 1, 3);
         assertFalse(instance.checkSphereCollision(origin, 2.0f));
 
@@ -199,7 +199,7 @@ public class TestUfoObjs {
         origin = Jme3MathHelper.of(-2,1,3);
         assertTrue(instance.checkSphereCollision(origin,2.0f));
         simulation.getDrone().setCrashed(false);
-        
+
         origin = Jme3MathHelper.of(-3,1,3);
         assertFalse(instance.checkSphereCollision(origin,2.0f));
 
@@ -207,7 +207,7 @@ public class TestUfoObjs {
         origin = Jme3MathHelper.of(1,1,6);
         assertTrue(instance.checkSphereCollision(origin,2.0f));
         simulation.getDrone().setCrashed(false);
-        
+
         origin = Jme3MathHelper.of(1,1,8);
         assertFalse(instance.checkSphereCollision(origin,2.0f));
 
@@ -215,7 +215,7 @@ public class TestUfoObjs {
         origin = Jme3MathHelper.of(1,2,5);
         assertTrue(instance.checkSphereCollision(origin,2.0f));
         simulation.getDrone().setCrashed(false);
-        
+
         origin = Jme3MathHelper.of(1, 4, 5);
         assertFalse(instance.checkSphereCollision(origin,2.0f));
 
@@ -223,9 +223,34 @@ public class TestUfoObjs {
         origin = Jme3MathHelper.of(4, 9,1);
         assertTrue(instance.checkSphereCollision(origin,2.0f));
         simulation.getDrone().setCrashed(false);
-        
+
         origin = Jme3MathHelper.of(4,7,1);
         assertFalse(instance.checkSphereCollision(origin,2.0f));
+    }
+
+    @Test
+    public void checkHalfSphere() {
+        Vector3f origin;
+
+        // drone on top of an obstacle. obstacle position = (2.5, 1.0, 3.5) (lenghts 0.5)
+        // 0.05 above of object
+        origin = Jme3MathHelper.of(2.5f,1.55f, 3.5f);
+        assertFalse(instance.checkSphereHalfCollision(origin,2.0f, 1));
+        // check lower Half
+        assertTrue(instance.checkSphereHalfCollision(origin,2.0f, -1));
+
+        // drone below of an obstacle
+        origin = Jme3MathHelper.of(2.5f, 0, 3.5f);
+        assertTrue(instance.checkSphereHalfCollision(origin,2.0f, 1));
+        // check lower half
+        assertFalse(instance.checkSphereHalfCollision(origin,2.0f, -1));
+
+
+        // drone next to an obstacle
+        origin = Jme3MathHelper.of(2.3f, 1.2f, 3.5f);
+        assertTrue(instance.checkSphereHalfCollision(origin,2.0f, 1));
+        // check lower half
+        assertTrue(instance.checkSphereHalfCollision(origin,2.0f, -1));
     }
 
     /**

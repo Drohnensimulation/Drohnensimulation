@@ -459,6 +459,17 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
     }
 
     @Override
+    public boolean checkSphereHalfCollision(Vector3f origin, float radius, int signum){
+        RigidBody hitBody = jBullet.createSphere(VecMathHelper.of(origin), radius);
+        try {
+            return jBullet.checkCollisionHalf(hitBody, signum).get(COLLISION_CHECK_TIMEOUT, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            logger.info("Timeout waiting for Collision");
+        }
+        return false;
+    }
+
+    @Override
     public ObstacleJsonDTO save() {
         Set<Obstacle> obstacles = this.getObstacles();
         HashSet<ObstacleDTO> obstacleDTOSet = new HashSet<>();
