@@ -150,6 +150,12 @@ public class JBulletContext {
         return future;
     }
 
+    /**
+     * @author Christian Schmied
+     * @param body
+     * @param signum
+     * @return
+     */
     public Future<Boolean> checkCollisionHalf(RigidBody body, int signum) {
         rwLock.writeLock().lock();
         final CompletableFuture<Boolean> future = new CompletableFuture<>();
@@ -178,7 +184,7 @@ public class JBulletContext {
                                     Vector3f theSpherePoint = manifold.getBody0().equals(body) ? contactPoint.positionWorldOnA : contactPoint.positionWorldOnB;
                                     //Vector3f theOtherPoint = manifold.getBody0().equals(body) ? contactPoint.positionWorldOnB : contactPoint.positionWorldOnA;
                                     float signedDistance = (theSpherePoint.y - sphereTransform.origin.y) * signum;
-                                    contact = signedDistance >= 0;
+                                    contact = signedDistance >= 0; // Whenn distance is equal to 0 the collision was horizontally...
                 /*
                                     System.out.printf("So%s\n", sphereTransform.origin);
                                     System.out.printf("S %s\n", theSpherePoint);
