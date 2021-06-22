@@ -142,6 +142,11 @@ public class Wind implements ISimulationChild {
         Collection<WindLayer> removed = new ArrayList<>();
         for (int i = 0; i < windLayers.size(); i++) {
             WindLayer currentLayer = windLayers.get(i);
+            // Check if layer is already removed
+            if (removed.contains(currentLayer)) {
+                continue;
+            }
+
             // Check layer length is valid
             if (!currentLayer.isValid()) {
                 removed.add(currentLayer);
@@ -155,7 +160,7 @@ public class Wind implements ISimulationChild {
                 if (currentLayer.overlapsWith(followingLayer)) {
                     // Remove layer from list
                     removed.add(followingLayer);
-                    logger.warn("Wind layer ({}) violates the border of another layer and is therefore removed!", x);
+                    logger.warn("Wind layer ({}) violates the border of layer ({}) and is therefore removed!", x, i);
                     logger.warn("Borders of different wind layers must not overlap.");
                 }
             }
