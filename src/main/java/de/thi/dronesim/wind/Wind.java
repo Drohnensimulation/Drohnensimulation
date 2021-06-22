@@ -145,6 +145,7 @@ public class Wind implements ISimulationChild {
             // Check layer length is valid
             if (!currentLayer.isValid()) {
                 removed.add(currentLayer);
+                logger.warn("Wind layer ({}) is invalid and therefore removed!", i);
                 continue;
             }
             // Check if any following layer violates borders of current layers
@@ -154,8 +155,8 @@ public class Wind implements ISimulationChild {
                 if (currentLayer.overlapsWith(followingLayer)) {
                     // Remove layer from list
                     removed.add(followingLayer);
-                    logger.error("Wind layer ({}) violates the border of another layer and is therefore removed!",x);
-                    logger.error("Borders of different wind layers must not overlap.");
+                    logger.warn("Wind layer ({}) violates the border of another layer and is therefore removed!", x);
+                    logger.warn("Borders of different wind layers must not overlap.");
                 }
             }
         }
