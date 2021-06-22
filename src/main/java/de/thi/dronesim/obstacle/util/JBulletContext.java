@@ -51,14 +51,14 @@ public class JBulletContext {
      *
      * @param position
      * @param rotation
-     * @param dimension
+     * @param halfDimension
      * @param obstacle
      * @return The gloryfied HitBox Object to persist in the List as Replica, actually never needed outside of Physics
      */
-    public HitBoxRigidBody addHitBox(Vector3f position, Vector3f rotation, Vector3f dimension, Obstacle obstacle) {
+    public HitBoxRigidBody addHitBox(Vector3f position, Vector3f rotation, Vector3f halfDimension, Obstacle obstacle) {
         rwLock.writeLock().lock();
         try {
-            CollisionShape boxShape = new BoxShape(dimension);
+            CollisionShape boxShape = new BoxShape(halfDimension);
             MotionState boxMotionState = new DefaultMotionState(
                     new Transform(new Matrix4f(
                             new Quat4f(rotation.x, rotation.y, rotation.z, 1),

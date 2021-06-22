@@ -16,7 +16,6 @@ public class UfoExample {
         sim.prepare();
 
         GuiManager gui = sim.getChild(GuiManager.class);
-        sim.start();
         gui.openDViewGui();
 
         Autopilot auto = sim.getChild(Autopilot.class);

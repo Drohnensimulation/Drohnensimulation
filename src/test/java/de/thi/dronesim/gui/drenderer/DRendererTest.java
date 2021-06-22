@@ -56,7 +56,7 @@ public class DRendererTest extends JFrame {
         dRenderer.addRenderableObjects(mapObjects);
 
         // Add drone
-        RenderableDrone drone = new RenderableDrone(new Vector3f(0, 1, 0), 1);
+        RenderableDrone drone = new RenderableDrone(new Vector3f(0, 1, 0), .49f);
         drone.setTilt(new Vector3f((float) Math.PI * .05f, 0, (float) Math.PI * .05f));
         drone.setRotation(new Vector3f(0, (float) Math.PI * 1.5f, 0));
         drone.moveRelativeToWorld(new Vector3f(0, .2f, 0));

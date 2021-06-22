@@ -19,7 +19,7 @@ public class Drone {
      */
     public Drone() {
         location = new Location(0, 0, 0);
-        radius = 1f;
+        radius = .49f;
     }
     
     public Drone(float x, float y, float z, float radius) {
