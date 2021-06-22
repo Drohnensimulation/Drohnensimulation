@@ -22,7 +22,7 @@ public class SimulationUpdateEvent {
     }
 
     /**
-     * @return Passed simulation time in s
+     * @return Passed simulation time in ms
      */
     public double getTime() {
         return time;

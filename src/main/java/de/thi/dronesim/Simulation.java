@@ -29,9 +29,9 @@ public class Simulation {
     private final Map<Class<? extends ISimulationChild>, ISimulationChild> children;
     private final Drone drone;
 
-    private SimulationState simState = null;
+    private SimulationState simState;
 
-    private double time = 0;                                           // elapsed simulation time since reset [s]
+    private double time = 0;                                           // elapsed simulation time since reset [ms]
     private int tps = 32;
     private double speed = 1;
     private final ScheduledExecutorService executorService;
@@ -63,7 +63,7 @@ public class Simulation {
 
     /**
      *
-     * @return time Elapsed simulation time in s
+     * @return time Elapsed simulation time in ms
      */
     public double getTime() {
         return time;
