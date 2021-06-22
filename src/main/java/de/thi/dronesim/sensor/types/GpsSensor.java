@@ -85,7 +85,7 @@ public class GpsSensor implements ISensor {
 		zCoord = this.addNoise(zCoord, this.horizontalNoise);
 		yCoord = this.addNoise(yCoord, this.verticalNoise);
 		
-		int currentTime = (int)(event.getTime()*1000);
+		int currentTime = (int)(event.getTime()+0.5);
 		
 		//Adds the measurement to the queue
 		this.measurements.addBack(currentTime, new Coordinates(xCoord, yCoord, zCoord));
