@@ -5,7 +5,7 @@
     "y": "0",
     "z": "1"
   },
-  "droneRadius": 1.0,
+  "droneRadius": 0.49,
 
 
   "obstacleConfigList":
@@ -124,7 +124,7 @@
         "scale": [1.0, 1.0, 1.0]
       }],
       "config": {
-        "rayDensity": 5
+        "rayDensity": 3
       }
     }]
   ,
@@ -135,18 +135,18 @@
       {
       "className": "InfraredSensor",
       "sensorId": 0,
-      "measurementAccuracy": 14.0,
-      "directionX": 15.0,
-      "directionY": 16.0,
-      "directionZ": 17.0,
-      "posX": 18.0,
-      "posY": 19.0,
-      "posZ": 20.0,
+      "measurementAccuracy": 1.0,
+      "directionX": 0.0,
+      "directionY": -1.0,
+      "directionZ": 0.0,
+      "posX": 0.0,
+      "posY": 0.0,
+      "posZ": 0.0,
 
-      "range": 40.0,
-      "sensorAngle": 11.0,
-      "sensorRadius": 40,
-      "sensorForm": "CYLINDER",
+      "range": 100.0,
+      "sensorAngle": 8.0,
+      "sensorRadius": 0.25,
+      "sensorForm": "PYRAMID",
       "calcType": "NEAREST",
 
       "zeroDegreeDirectionX": 0.0,
