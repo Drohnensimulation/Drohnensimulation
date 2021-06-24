@@ -1,9 +1,11 @@
 package de.thi.dronesim.obstacle;
 
+import com.bulletphysics.dynamics.RigidBody;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import de.thi.dronesim.ISimulationChild;
 import de.thi.dronesim.Simulation;
+import de.thi.dronesim.helpers.VecMathHelper;
 import de.thi.dronesim.obstacle.dto.HitBoxDTO;
 import de.thi.dronesim.obstacle.dto.ObstacleDTO;
 import de.thi.dronesim.obstacle.dto.ObstacleJsonDTO;
@@ -12,11 +14,16 @@ import de.thi.dronesim.obstacle.entity.Obstacle;
 import de.thi.dronesim.obstacle.util.HitBoxRigidBody;
 import de.thi.dronesim.obstacle.util.JBulletContext;
 import de.thi.dronesim.obstacle.util.JBulletHitMark;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Bakri Aghyourli
@@ -25,6 +32,9 @@ import java.util.Set;
  */
 
 public class UfoObjs implements ISimulationChild, IUfoObjs {
+
+    private static final long COLLISION_CHECK_TIMEOUT = 25L;
+    private final Logger logger;
     private final JBulletContext jBullet;
     private final Set<Obstacle> obstacles;
     /**
@@ -35,6 +45,8 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
     private Simulation simulation;
 
     public UfoObjs() {
+        logger = LogManager.getLogger(UfoObjs.class);
+
         jBullet = new JBulletContext();
         obstacles = new HashSet<>();
         hitBoxes = new HashSet<>();
@@ -72,10 +84,11 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         for (HitBoxDTO hit : obstacleDto.hitboxes) {
             float[] position = {hit.position[0], hit.position[1], hit.position[2]};
             float[] rotation = {hit.rotation[0], hit.rotation[1], hit.rotation[2]};
-            float[] dimension = {hit.dimension[0], hit.dimension[1], hit.dimension[2]};
+            javax.vecmath.Vector3f halfDimension = VecMathHelper.of(hit.dimension);
+            halfDimension.scale(0.5f);
 
             // Add hit boxes to the jBullet context
-            HitBoxRigidBody hitBoxRigidBody = jBullet.addHitBox(new javax.vecmath.Vector3f(position), new javax.vecmath.Vector3f(rotation), new javax.vecmath.Vector3f(dimension), obstacle);
+            HitBoxRigidBody hitBoxRigidBody = jBullet.addHitBox(new javax.vecmath.Vector3f(position), new javax.vecmath.Vector3f(rotation), halfDimension, obstacle);
 
             // Add hit boxes into a set for Obstacle setter method
             objectHitBoxes.add(hitBoxRigidBody);
@@ -391,12 +404,35 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         return hits;
     }
 
-	@Override
-	public boolean checkDroneCollision(Vector3f origin, float radius) {
-		if (simulation.getDrone().isCrashed())
-			return true;
-		
-    	float goldenRatio = (1f + (float) Math.sqrt(5)) / 2;
+    @Override
+    public boolean checkSphereCollision(Vector3f origin, float radius) {
+        return checkSphereBodyCollisionImp(origin, radius);
+    }
+
+    /**
+     * @param origin
+     * @param radius
+     * @return
+     * @author Christian Schmied
+     */
+    boolean checkSphereBodyCollisionImp(Vector3f origin, float radius) {
+        RigidBody hitBody = jBullet.createSphere(VecMathHelper.of(origin), radius);
+        try {
+            return jBullet.checkCollision(hitBody).get(COLLISION_CHECK_TIMEOUT, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            logger.info("Timeout waiting for Collision");
+        }
+        return false;
+    }
+
+    /**
+     * @param origin
+     * @param radius
+     * @return
+     * @author Bakri Aghyourli
+     */
+    boolean checkSphereRayCollisionImp(Vector3f origin, float radius) {
+        float goldenRatio = (1f + (float) Math.sqrt(5)) / 2;
         float angle = 2 * (float) Math.PI * goldenRatio;
 
         Vector3f ray = new Vector3f();
@@ -406,24 +442,18 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         float azimuth;
         float sin;
 
-        // TODO probably insert a Sphere into the JBullet context and do a "collision check"
-        //   could be faster than radial Ray-Castings
-
         for (int l = 0; l < rayCount; l++) {
             inclination = (float) Math.acos(1 - 2 * l / (float) rayCount);
             azimuth = angle * l;
             sin = (float) Math.sin(inclination);
 
             ray.set(sin * (float) Math.cos(azimuth),
-            		sin * (float) Math.sin(azimuth),
-            		(float) Math.cos(inclination)).normalizeLocal();
-            
+                    sin * (float) Math.sin(azimuth),
+                    (float) Math.cos(inclination)).normalizeLocal();
+
             //check for collision & set crash flag
-            if(this.rayTest(origin, ray, radius) != null) {
-                // The Collision update is handled by the UfoObjsCrash Listener
-            	// simulation.getDrone().setCrashed(true);
-            	return true;
-            }
+            if (this.rayTest(origin, ray, radius) != null)
+                return true;
         }
         return false;
     }
