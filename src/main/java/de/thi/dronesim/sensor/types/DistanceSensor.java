@@ -2,6 +2,8 @@ package de.thi.dronesim.sensor.types;
 
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
+import de.thi.dronesim.Simulation;
+import de.thi.dronesim.drone.Drone;
 import de.thi.dronesim.obstacle.UfoObjs;
 import de.thi.dronesim.obstacle.entity.HitMark;
 import de.thi.dronesim.obstacle.entity.Obstacle;
@@ -48,6 +50,9 @@ public abstract class DistanceSensor implements ISensor {
     private final CalcType calcType;
     protected SensorResultDto sensorResultDtoValues;
 
+    protected Drone drone;
+    protected Vector3f preveousDroneDirectionVector;
+
     // /////////////////////////////////////////////////////////////////////////////
     // Init
     // /////////////////////////////////////////////////////////////////////////////
@@ -68,6 +73,36 @@ public abstract class DistanceSensor implements ISensor {
         this.measurementAccuracy = config.getMeasurementAccuracy();
         this.directionVector = new Vector3f(config.getDirectionX(), config.getDirectionY(), config.getDirectionZ());
         this.positionVector = new Vector3f(config.getPosX(), config.getPosY(), config.getPosZ());
+        SensorForm tempForm = SensorForm.CONE; //Default
+        try{
+            tempForm = SensorForm.valueOf(config.getSensorForm());
+        }catch(IllegalArgumentException e){
+            logger.error("SensorForm {} wird nicht unterstützt! Defaultwert ist CONE", config.getSensorForm());
+        }finally {
+            this.sensorForm = tempForm;
+        }
+        CalcType tempCalcType = CalcType.AVG;
+        try{
+            tempCalcType = CalcType.valueOf(config.getCalcType());
+        }catch(IllegalArgumentException e){
+            logger.error("CalcType {} wird nicht unterstützt! Defaultwert ist AVG", config.getCalcType());
+            tempCalcType = CalcType.AVG;
+        }finally {
+            this.calcType = tempCalcType;
+        }
+    }
+
+    public DistanceSensor(SensorConfig config, Simulation simulation){
+        this.name = config.getClassName();
+        this.id = config.getSensorId();
+        this.range = config.getRange();
+        this.sensorAngle = config.getSensorAngle();
+        this.sensorRadius = config.getSensorRadius();
+        this.measurementAccuracy = config.getMeasurementAccuracy();
+        this.directionVector = new Vector3f(config.getDirectionX(), config.getDirectionY(), config.getDirectionZ());
+        this.positionVector = new Vector3f(config.getPosX(), config.getPosY(), config.getPosZ());
+        this.drone = simulation.getDrone();
+        this.preveousDroneDirectionVector = drone.getLocation().getMovement();
         SensorForm tempForm = SensorForm.CONE; //Default
         try{
             tempForm = SensorForm.valueOf(config.getSensorForm());
@@ -330,11 +365,7 @@ public abstract class DistanceSensor implements ISensor {
 
         //now we can rotate the vector around the y-Axses
         double sensorAngleAsRadiant = Math.toRadians(sensorAngle);
-        cosPhi = (float) Math.cos(sensorAngleAsRadiant);
-        sinPhi = (float) Math.sin(sensorAngleAsRadiant);
-        minSinPhi = (float) (Math.sin(sensorAngleAsRadiant) * (-1));
-        Matrix3f transformMatrixY = new Matrix3f((float) cosPhi, (float) 0, (float) sinPhi, (float) 0, (float) 1, (float) 0, (float) minSinPhi, (float) 0, (float) cosPhi);
-        Vector3f vectorWithAngel = transformMatrixY.mult(vectorX);
+        Vector3f vectorWithAngel = rotateAroundY(vectorX, sensorAngleAsRadiant);
 
         //rerotate the new vectors with all used angles. startt with the last one used
         rotX = rotX * (-1);
@@ -350,6 +381,18 @@ public abstract class DistanceSensor implements ISensor {
         minSinPhi = (Math.sin(rotXY) * (-1));
         transformMatrixX = new Matrix3f((float) 1, (float) 0, (float) 0, (float) 0, (float) cosPhi, (float) minSinPhi, (float) 0, (float) sinPhi, (float) cosPhi);
         return transformMatrixX.mult(vectorWithAngelXY);
+    }
+
+    private Vector3f rotateAroundY(Vector3f vectorX, double sensorAngleAsRadiant) {
+        double cosPhi;
+        double minSinPhi;
+        double sinPhi;
+        cosPhi = (float) Math.cos(sensorAngleAsRadiant);
+        sinPhi = (float) Math.sin(sensorAngleAsRadiant);
+        minSinPhi = (float) (Math.sin(sensorAngleAsRadiant) * (-1));
+        Matrix3f transformMatrixY = new Matrix3f((float) cosPhi, (float) 0, (float) sinPhi, (float) 0, (float) 1, (float) 0, (float) minSinPhi, (float) 0, (float) cosPhi);
+        Vector3f vectorWithAngel = transformMatrixY.mult(vectorX);
+        return vectorWithAngel;
     }
 
     /**
@@ -394,7 +437,7 @@ public abstract class DistanceSensor implements ISensor {
 
         // with this vector we can calculate the origin point by simply adding the normalizedOrientationVector
         // to the position point of the Sensor
-        return positionVector.add(normalizedOrientationVector);
+        return getAbsolutePosition().add(normalizedOrientationVector);
     }
 
     /**
@@ -644,6 +687,24 @@ public abstract class DistanceSensor implements ISensor {
     protected CalcType getCalcType() {
         return calcType;
     }
+
+    protected void updateSensorPositionAndDirection(){
+
+        Vector3f oldVector = preveousDroneDirectionVector;
+        oldVector.setY(0);
+        Vector3f newVector = drone.getLocation().getMovement();
+        newVector.setY(0);
+        if(oldVector.angleBetween(newVector) != 0){
+            this.positionVector = rotateAroundY(this.positionVector, oldVector.angleBetween(newVector));
+            this.directionVector = rotateAroundY(this.directionVector, oldVector.angleBetween(newVector));
+        }
+        this.preveousDroneDirectionVector = drone.getLocation().getMovement();
+    }
+
+    protected Vector3f getAbsolutePosition(){
+        return drone.getLocation().getPosition().add(this.positionVector);
+    }
+
 
     /**
      * The type of the Sensor - what the sensor is measuring

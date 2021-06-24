@@ -2,6 +2,7 @@ package de.thi.dronesim.sensor.types;
 
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
+import de.thi.dronesim.Simulation;
 import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.SensorModule;
@@ -39,6 +40,13 @@ public class RotationSensor extends DistanceSensor {
 	 */
 	public RotationSensor(SensorConfig config) {
 		super(config);
+		this.spinsPerSecond = config.getSpinsPerSecond();
+		this.startRotationTime = config.getStartRotationTime();
+		spinsToRotationVelocityConverter(this.spinsPerSecond);
+	}
+
+	public RotationSensor(SensorConfig config, Simulation simulation) {
+		super(config, simulation);
 		this.spinsPerSecond = config.getSpinsPerSecond();
 		this.startRotationTime = config.getStartRotationTime();
 		spinsToRotationVelocityConverter(this.spinsPerSecond);
@@ -115,6 +123,7 @@ public class RotationSensor extends DistanceSensor {
 	 */
 	@Override
 	public void runMeasurement(SimulationUpdateEvent event, SensorModule sensorModule) {
+		updateSensorPositionAndDirection();
 		setDirection(newOrientation(getTraveledArcMeasure(traveledTime(event))));
 		sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), calcConeHeight(), calcSurfaceVector(), sensorModule);
 	}

@@ -1,5 +1,6 @@
 package de.thi.dronesim.sensor.types;
 
+import de.thi.dronesim.Simulation;
 import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.SensorModule;
@@ -11,8 +12,13 @@ public class InfraredSensor extends DistanceSensor {
 		super(config);
 	}
 
+	public InfraredSensor(SensorConfig config, Simulation simulation) {
+		super(config,simulation);
+	}
+
 	@Override
 	public void runMeasurement(SimulationUpdateEvent event, SensorModule sensorModule) {
+		updateSensorPositionAndDirection();
 		sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), calcConeHeight(), calcSurfaceVector(), sensorModule);
 	}
 

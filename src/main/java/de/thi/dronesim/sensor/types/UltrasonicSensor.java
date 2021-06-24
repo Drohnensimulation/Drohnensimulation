@@ -1,5 +1,6 @@
 package de.thi.dronesim.sensor.types;
 
+import de.thi.dronesim.Simulation;
 import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.persistence.entity.SensorConfig;
 import de.thi.dronesim.sensor.SensorModule;
@@ -13,18 +14,26 @@ public class UltrasonicSensor extends DistanceSensor {
 	 * @author Moris Breitenborn
 	 */
 
-	private float rangeIncreaseVelocity; // meters per second
-	private float startIncreaseTime;
-	
+
 	/**
 	 * Constructor:
 	 *
-	 * @param rangeIncreaseVelocity: defines how fast the sensor increase in one second
-	 * @param startIncreaseTime: defines the time when the Sensor starts to increase. if the value is 5 the increase starts
+	 * rangeIncreaseVelocity: defines how fast the sensor increase in one second
+	 * param startIncreaseTime: defines the time when the Sensor starts to increase. if the value is 5 the increase starts
 	 * after the Simulation is running for 5 seconds.
 	 */
+	private float rangeIncreaseVelocity; // meters per second
+	private float startIncreaseTime;
+	
+
 	public UltrasonicSensor(SensorConfig config) {
 		super(config);
+		this.rangeIncreaseVelocity = config.getRangeIncreaseVelocity();
+		this.startIncreaseTime= config.getStartIncreaseTime();
+	}
+
+	public UltrasonicSensor(SensorConfig config, Simulation simulation) {
+		super(config, simulation);
 		this.rangeIncreaseVelocity = config.getRangeIncreaseVelocity();
 		this.startIncreaseTime= config.getStartIncreaseTime();
 	}
@@ -78,6 +87,7 @@ public class UltrasonicSensor extends DistanceSensor {
 	 */
 	@Override
 	public void runMeasurement(SimulationUpdateEvent event, SensorModule sensorModule) {
+		updateSensorPositionAndDirection();
 		float traveledTime =  traveledTime(event);
 		this.sensorResultDtoValues = getSensorResult(calcOrigin(), getDirectionVector(), getCurrentConeHeight(traveledTime), calcSurfaceVector(), sensorModule); // getCurrentConeHeight()
 	}

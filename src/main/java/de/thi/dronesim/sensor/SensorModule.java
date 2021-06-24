@@ -91,11 +91,11 @@ public class SensorModule implements ISimulationChild {
             case "GpsSensor":
                 return new GpsSensor(config);
             case "InfraredSensor":
-                return new InfraredSensor(config);
+                return new InfraredSensor(config, getSimulation());
             case "RotationSensor":
-                return new RotationSensor(config);
+                return new RotationSensor(config, getSimulation());
             case "UltrasonicSensor":
-                return new UltrasonicSensor(config);
+                return new UltrasonicSensor(config, getSimulation());
             case "WindSensor":
                 return new WindSensor(config);
             default:
