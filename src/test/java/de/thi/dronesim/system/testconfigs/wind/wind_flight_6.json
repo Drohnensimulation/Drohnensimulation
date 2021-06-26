@@ -235,19 +235,19 @@
       "nintyDegreeDirectionY": 1.0,
       "nintyDegreeDirectionZ": 0.0,
       "rangeIncreaseVelocity": 0.0,
-      "startIncreaseTime": 0.0,
-      "spinsPerSecond": 0,
-      "startRotationTime": 0.0
+      "startIncreaseTime": 0.01,
+      "spinsPerSecond": 60,
+      "startRotationTime": 1.0
     }
   ],
   "windConfigList": [
     {
-      "windSpeed": 5.0,
-      "gustSpeed": 0.0,
-      "timeStart": 10.0,
-      "timeEnd": 20.0,
+      "windSpeed": 10.0,
+      "gustSpeed": 10.0,
+      "timeStart": 0.0,
+      "timeEnd": 100000.0,
       "altitudeBottom": 0.0,
-      "altitudeTop": 50.0,
+      "altitudeTop": 100.0,
       "windDirection": 225.0
     }
   ]

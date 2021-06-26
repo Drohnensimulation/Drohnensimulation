@@ -38,7 +38,9 @@ public class SystemTest {
     //private static final String FILENAME = "wind/wind_flight_3.json"; // Wind from East       >
     //private static final String FILENAME = "wind/wind_flight_4.json"; // Wind from South-East v>
     //private static final String FILENAME = "wind/wind_flight_5.json"; // Wind from South      v
-    //private static final String FILENAME = "wind/wind_flight_6.json"; // Wind from South-West <v
+
+    private static final String FILENAME = "wind/wind_flight_6.json"; // Wind from South-West <v
+
     //private static final String FILENAME = "wind/wind_flight_7.json"; // Wind from West       <
     //private static final String FILENAME = "wind/wind_flight_8.json"; // Wind from North-West <^
     //private static final String FILENAME = "wind/wind_and_gust_flight_1.json"; // Wind from North + Gusts
@@ -53,9 +55,10 @@ public class SystemTest {
     /** Testing flying with obstacles, crashing and wind influences + Obstacle-Detecting Sensors */
     //private static final String FILENAME = "obstacles/obstacles_1.json"; // Fly-By - Right Side of Obstacle
     //private static final String FILENAME = "obstacles/obstacles_2.json"; // Fly-By - Left Side of Obstacle
+
     //private static final String FILENAME = "obstacles/obstacles_3.json"; // Fly-By - Over Obstacle
     //private static final String FILENAME = "obstacles/obstacles_4.json"; // Fly-By - Under Obstacle
-    private static final String FILENAME = "obstacles/obstacles_5.json"; // Fly-By - Into Obstacle
+    //private static final String FILENAME = "obstacles/obstacles_5.json"; // Fly-By - Into Obstacle
     //private static final String FILENAME = "obstacles/obstacles_and_wind_flight_1.json"; // Fly-By South + North-Wind
     //private static final String FILENAME = "obstacles/obstacles_and_wind_flight_2.json"; // Fly-By North + North-Wind
     //private static final String FILENAME = "obstacles/obstacles_and_wind_flight_3.json"; // Overflight + North-Wind
@@ -107,6 +110,7 @@ public class SystemTest {
         // Autopilot flight
         try {
             // Take off
+            System.out.printf("\n\nTest Start. Config: %s\n\n", FILENAME);
             sim.start();
             ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(1, 0, 0));
             ap.awaitCondition(event -> event.getDrone().getLocation().getY() >= 10);

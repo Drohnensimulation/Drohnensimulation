@@ -283,9 +283,9 @@
       "posX": 0.0,
       "posY": 0.0,
       "posZ": 0.0,
-      "range": 20.0,
+      "range": 100.0,
       "sensorAngle": 0.0,
-      "sensorRadius": 20.0,
+      "sensorRadius": 100.0,
       "sensorForm": "CONE",
       "calcType": "NEAREST",
       "zeroDegreeDirectionX": 0.0,
@@ -294,8 +294,8 @@
       "nintyDegreeDirectionX": 0.0,
       "nintyDegreeDirectionY": 0.0,
       "nintyDegreeDirectionZ": 0.0,
-      "rangeIncreaseVelocity": 0.0,
-      "callTimerForSensorValues": 0
+      "rangeIncreaseVelocity": 0.5,
+      "callTimerForSensorValues": 0.5
     },
     {
       "className": "InfraredSensor",
@@ -307,9 +307,9 @@
       "posX": 0.0,
       "posY": 0.0,
       "posZ": 0.0,
-      "range": 20.0,
+      "range": 100.0,
       "sensorAngle": 0.0,
-      "sensorRadius": 20.0,
+      "sensorRadius": 100.0,
       "sensorForm": "CONE",
       "calcType": "NEAREST",
       "zeroDegreeDirectionX": 0.0,
@@ -318,8 +318,8 @@
       "nintyDegreeDirectionX": 0.0,
       "nintyDegreeDirectionY": 0.0,
       "nintyDegreeDirectionZ": 0.0,
-      "rangeIncreaseVelocity": 0.0,
-      "callTimerForSensorValues": 1
+      "rangeIncreaseVelocity": 0.5,
+      "callTimerForSensorValues": 0.5
     }
   ]
 }
