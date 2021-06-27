@@ -108,7 +108,6 @@ public class UfoObjsSpeedTest {
             instance.checkSphereCollision(origin, 2);
         }
         long bodyDuration = System.currentTimeMillis() - startBody;
-        System.out.println("body: " + bodyDuration + ",   ray: " + rayDuration);
         logger.info("TimeBody: {}", bodyDuration);
 
         Assertions.assertTrue(bodyDuration <= rayDuration);
