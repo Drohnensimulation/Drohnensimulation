@@ -105,9 +105,10 @@ public class UfoObjsSpeedTest {
         origin = new Vector3f(0, 0, 0);
         for (int i = 0; i < NUM_RUNS; i++) {
             origin.addLocal(1, 0, 0);
-            instance.checkSphereBodyCollisionImp(origin, 2);
+            instance.checkSphereCollision(origin, 2);
         }
         long bodyDuration = System.currentTimeMillis() - startBody;
+        System.out.println("body: " + bodyDuration + ",   ray: " + rayDuration);
         logger.info("TimeBody: {}", bodyDuration);
 
         Assertions.assertTrue(bodyDuration <= rayDuration);

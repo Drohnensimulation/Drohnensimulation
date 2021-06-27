@@ -33,7 +33,10 @@ import java.util.concurrent.TimeoutException;
 
 public class UfoObjs implements ISimulationChild, IUfoObjs {
 
+    private static final float GOLDEN_RATIO = (1f + (float) Math.sqrt(5)) / 2;
+    private static final float GOLDEN_ANGLE = 2 * (float) Math.PI * GOLDEN_RATIO;
     private static final long COLLISION_CHECK_TIMEOUT = 25L;
+
     private final Logger logger;
     private final JBulletContext jBullet;
     private final Set<Obstacle> obstacles;
@@ -166,9 +169,6 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
          * https://youtu.be/bqtqltqcQhw?t=128
          */
         Set<HitMark> hits = new HashSet<>();
-        //using golden Ration Distribution to equally distribute rays
-        float goldenRatio = (1f + (float) Math.sqrt(5)) / 2;
-        float angle = 2 * (float) Math.PI * goldenRatio;
         float dist;
 
         Vector3f angleVec = opening.normalize();
@@ -199,8 +199,8 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
             //use the golden angle and ray number to get x and y coordinates relative
             //to circle center and transform it to world x, y, z coordinates
-            dI.set(i.mult(dist * (float) Math.cos(angle * l)));
-            dJ.set(j.mult(dist * (float) Math.sin(angle * l)));
+            dI.set(i.mult(dist * (float) Math.cos(GOLDEN_ANGLE * l)));
+            dJ.set(j.mult(dist * (float) Math.sin(GOLDEN_ANGLE * l)));
             ray.set(angleProjOnDir.x + dI.x + dJ.x,
                     angleProjOnDir.y + dI.y + dJ.y,
                     angleProjOnDir.z + dI.z + dJ.z).normalizeLocal();
@@ -357,10 +357,6 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         //if dimensions of the cylinder base differs take the biggest one (error forgiving)
         float radius = (dimension.x >= dimension.y) ? dimension.x / 2f : dimension.y / 2f; //cylinder radius
         float range = dimension.z; //cylinder height
-
-        //using golden Ration Distribution to equally distribute rays
-        float goldenRatio = (1f + (float) Math.sqrt(5)) / 2;
-        float angle = 2 * (float) Math.PI * goldenRatio;
         float dist;
 
         //create a random Point to generate a vector perpendicular to direction 
@@ -389,8 +385,8 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
             //use the golden angle and ray number to get x and y coordinates relative
             //to circle center and transform it to world x, y, z coordinates
-            dI.set(i.mult(dist * (float) Math.cos(angle * l)));
-            dJ.set(j.mult(dist * (float) Math.sin(angle * l)));
+            dI.set(i.mult(dist * (float) Math.cos(GOLDEN_ANGLE * l)));
+            dJ.set(j.mult(dist * (float) Math.sin(GOLDEN_ANGLE * l)));
             startPoint.set(origin.x + dI.x + dJ.x,
                     origin.y + dI.y + dJ.y,
                     origin.z + dI.z + dJ.z);
@@ -406,16 +402,6 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
 
     @Override
     public boolean checkSphereCollision(Vector3f origin, float radius) {
-        return checkSphereBodyCollisionImp(origin, radius);
-    }
-
-    /**
-     * @param origin
-     * @param radius
-     * @return
-     * @author Christian Schmied
-     */
-    boolean checkSphereBodyCollisionImp(Vector3f origin, float radius) {
         RigidBody hitBody = jBullet.createSphere(VecMathHelper.of(origin), radius);
         try {
             return jBullet.checkCollision(hitBody).get(COLLISION_CHECK_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -425,26 +411,33 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         return false;
     }
 
+    @Override
+    public boolean checkSphereHalfCollision(Vector3f origin, float radius, int signum){
+        RigidBody hitBody = jBullet.createSphere(VecMathHelper.of(origin), radius);
+        try {
+            return jBullet.checkCollisionHalf(hitBody, signum).get(COLLISION_CHECK_TIMEOUT, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            logger.info("Timeout waiting for Collision");
+        }
+        return false;
+    }
+
     /**
+     * sends rays in sphere shape and checks for collisions. COULD be faster in certain situations
+     * and slower in other compared to {@link #checkSphereCollision(Vector3f, float)}
      * @param origin
      * @param radius
      * @return
      * @author Bakri Aghyourli
      */
-    boolean checkSphereRayCollisionImp(Vector3f origin, float radius) {
-        float goldenRatio = (1f + (float) Math.sqrt(5)) / 2;
-        float angle = 2 * (float) Math.PI * goldenRatio;
-
+    public boolean checkSphereRayCollisionImp(Vector3f origin, float radius) {
         Vector3f ray = new Vector3f();
-
         int rayCount = 300;
-        float inclination;
-        float azimuth;
-        float sin;
+        float inclination, azimuth, sin;
 
         for (int l = 0; l < rayCount; l++) {
             inclination = (float) Math.acos(1 - 2 * l / (float) rayCount);
-            azimuth = angle * l;
+            azimuth = GOLDEN_ANGLE * l;
             sin = (float) Math.sin(inclination);
 
             ray.set(sin * (float) Math.cos(azimuth),
@@ -458,13 +451,40 @@ public class UfoObjs implements ISimulationChild, IUfoObjs {
         return false;
     }
 
-    @Override
-    public boolean checkSphereHalfCollision(Vector3f origin, float radius, int signum){
-        RigidBody hitBody = jBullet.createSphere(VecMathHelper.of(origin), radius);
-        try {
-            return jBullet.checkCollisionHalf(hitBody, signum).get(COLLISION_CHECK_TIMEOUT, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            logger.info("Timeout waiting for Collision");
+    /**
+     * sends rays in half sphere shape and checks for collisions. COULD be faster in certain situations
+     * and slower in other compared to {@link #checkSphereHalfCollision(Vector3f, float, int)}
+     * @param origin
+     * @param radius
+     * @param signum Orientation of the Bowl (Positive for Upper, negative for Lower)
+     * @return
+     * @author Bakri Aghyourli
+     */
+    public boolean checkSphereHalfRayCollisionImp(Vector3f origin, float radius, int signum) {
+        //making sure signum is 1 or -1
+        signum = (signum >= 0)? 1:-1;
+        Vector3f ray = new Vector3f();
+
+        int rayCount = 150;
+        float inclination, azimuth, sin, cos;
+
+        //half the rays will be skipped -> doubling loop iterations
+        for (int l = 0; l < 2 * rayCount; l++) {
+            inclination = (float) Math.acos(1 - 2 * l / (float) rayCount);
+
+            cos = (float) Math.cos(inclination);
+            if (cos * signum < 0) continue;
+            sin = (float) Math.sin(inclination);
+
+            azimuth = GOLDEN_ANGLE * l;
+
+            ray.set(sin * (float) Math.cos(azimuth),
+                    cos,
+                    sin * (float) Math.sin(azimuth)).normalizeLocal();
+
+            //check for collision & set crash flag
+            if (this.rayTest(origin, ray, radius) != null)
+                return true;
         }
         return false;
     }
