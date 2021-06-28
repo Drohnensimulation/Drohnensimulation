@@ -1,0 +1,107 @@
+{
+  "locationConfig": {
+    "x": 1.0,
+    "y": 2.0,
+    "z": 3.0
+  },
+  "droneRadius": 1.0,
+  "obstacleConfigList": [
+    {
+      "obstacles": [],
+      "config": {
+        "rayDensity": null
+      }
+    }
+  ],
+  "sensorConfigList": [
+    {
+      "className": null,
+      "sensorId": 0,
+      "measurementAccuracy": 14.0,
+      "directionX": 15.0,
+      "directionY": 16.0,
+      "directionZ": 17.0,
+      "posX": 18.0,
+      "posY": 19.0,
+      "posZ": 20.0,
+      "range": 10.0,
+      "sensorAngle": 11.0,
+      "sensorRadius": 13.0,
+      "sensorForm": null,
+      "calcType": null,
+      "zeroDegreeDirectionX": 0.0,
+      "zeroDegreeDirectionY": 0.0,
+      "zeroDegreeDirectionZ": 0.0,
+      "nintyDegreeDirectionX": 0.0,
+      "nintyDegreeDirectionY": 0.0,
+      "nintyDegreeDirectionZ": 0.0,
+      "rangeIncreaseVelocity": 0.0,
+      "startIncreaseTime": 0.0,
+      "spinsPerSecond": 0,
+      "startRotationTime": 0.0
+    },
+    {
+      "className": null,
+      "sensorId": 0,
+      "measurementAccuracy": 0.0,
+      "directionX": 0.0,
+      "directionY": 0.0,
+      "directionZ": 0.0,
+      "posX": 0.0,
+      "posY": 0.0,
+      "posZ": 0.0,
+      "range": 0.0,
+      "sensorAngle": 0.0,
+      "sensorRadius": 0.0,
+      "sensorForm": null,
+      "calcType": null,
+      "zeroDegreeDirectionX": 0.0,
+      "zeroDegreeDirectionY": 0.0,
+      "zeroDegreeDirectionZ": 0.0,
+      "nintyDegreeDirectionX": 0.0,
+      "nintyDegreeDirectionY": 0.0,
+      "nintyDegreeDirectionZ": 0.0,
+      "rangeIncreaseVelocity": 0.0,
+      "startIncreaseTime": 0.0,
+      "spinsPerSecond": 0,
+      "startRotationTime": 0.0
+    },
+    {
+      "className": null,
+      "sensorId": 0,
+      "measurementAccuracy": 0.0,
+      "directionX": 0.0,
+      "directionY": 0.0,
+      "directionZ": 0.0,
+      "posX": 0.0,
+      "posY": 0.0,
+      "posZ": 0.0,
+      "range": 0.0,
+      "sensorAngle": 0.0,
+      "sensorRadius": 0.0,
+      "sensorForm": null,
+      "calcType": null,
+      "zeroDegreeDirectionX": 0.0,
+      "zeroDegreeDirectionY": 0.0,
+      "zeroDegreeDirectionZ": 0.0,
+      "nintyDegreeDirectionX": 0.0,
+      "nintyDegreeDirectionY": 0.0,
+      "nintyDegreeDirectionZ": 0.0,
+      "rangeIncreaseVelocity": 0.0,
+      "startIncreaseTime": 0.0,
+      "spinsPerSecond": 0,
+      "startRotationTime": 0.0
+    }
+  ],
+  "windConfigList": [
+    {
+      "windSpeed": 0.0,
+      "gustSpeed": 0.0,
+      "timeStart": 0.0,
+      "timeEnd": 0.0,
+      "altitudeBottom": 0.0,
+      "altitudeTop": 0.0,
+      "windDirection": 0.0
+    }
+  ]
+}

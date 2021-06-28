@@ -305,6 +305,8 @@ public class Simulation {
                 instance.initialize(this);
                 this.children.put(childClass, instance);
             } catch (InstantiationException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                System.out.println(childClass.getName());
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }
