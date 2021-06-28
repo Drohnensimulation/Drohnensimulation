@@ -396,8 +396,8 @@
           <gridbag weightx="1.0" weighty="0.0"/>
         </constraints>
         <properties>
-          <minimumSize width="120" height="40"/>
-          <preferredSize width="120" height="40"/>
+          <minimumSize width="200" height="80"/>
+          <preferredSize width="200" height="80"/>
         </properties>
         <border type="bevel-raised"/>
         <children>
@@ -406,7 +406,10 @@
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
               <gridbag weightx="1.0" weighty="1.0"/>
             </constraints>
-            <properties/>
+            <properties>
+              <minimumSize width="-1" height="-1"/>
+              <preferredSize width="-1" height="-1"/>
+            </properties>
             <border type="none"/>
             <children/>
           </grid>

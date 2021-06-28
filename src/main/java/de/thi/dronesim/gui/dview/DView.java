@@ -95,12 +95,14 @@ public class DView extends AGuiFrame {
         simulationButton.setText("Start");
         status.setText("Resting");
         simulationButton.setBackground(Color.GREEN);
-        stopButton.setText("Stop");
+        simulationButton.setForeground(Color.BLACK);
+        stopButton.setText("Exit Simulation");
         stopButton.setBackground(Color.RED);
+        stopButton.setForeground(Color.BLACK);
         thirdPerson.addActionListener(e -> dRenderer.setPerspective(DRenderer.Perspective.THIRD_PERSON));
         birdView.addActionListener(e -> dRenderer.setPerspective(DRenderer.Perspective.BIRD_VIEW));
         firstPerson.addActionListener(e -> dRenderer.setPerspective(DRenderer.Perspective.FIRST_PERSON));
-        stopButton.addActionListener(e -> simulation.stop());
+        stopButton.addActionListener(e -> this.dispose());
         nearbyObstaclesButton.addActionListener(this::toggleObstacles);
         windButton.addActionListener(this::toggleWind);
         simulationButton.addActionListener(this::changeButton);
@@ -132,8 +134,14 @@ public class DView extends AGuiFrame {
         if (simulation.getDrone().isCrashed()) {
             status.setText("Crashed!");
             stopped = true;
-            simulationButton.setText("Stop");
-            simulationButton.setBackground(Color.RED);
+        }
+        if(simulation.isRunning()) {
+            started = true;
+            simulationButton.setText("Pause");
+            status.setText("Flying");
+            simulationButton.setBackground(Color.YELLOW);
+            simulationButton.setForeground(Color.BLACK);
+
         }
         xCord.setText(String.valueOf(Math.round(location.getX() * 100.0) / 100.0));
         yCord.setText(String.valueOf(Math.round(location.getY() * 100.0) / 100.0));
@@ -165,7 +173,7 @@ public class DView extends AGuiFrame {
                 if (sensor.getSensor().getType().equals("WindSensor")) {
                     if (sensor.getValues() != null) {
                         if (!sensor.getValues().get(1).isNaN()) {
-                            windData.setText(sensor.getValues().get(1) + "km/h");
+                            windData.setText(Math.round(sensor.getValues().get(1) * 100.0) / 100.0 + "m/s");
                         } else {
                             windData.setText("No Wind");
                         }
@@ -180,17 +188,18 @@ public class DView extends AGuiFrame {
                         List<Obstacle> obstacles = sensor.getObstacle();
                         List<Integer> ids = new ArrayList<>();
                         for (Obstacle obstacle : obstacles) {
-                            if (panelsMap.get(obstacle.getID().intValue()) != null) {
-                                distance = sensor.getValues().get(0);
-                                updateJLabel(panelsMap.get(obstacle.getID().intValue()), obstacle.getPosition(), distance);
-                            } else {
-                                if (sensor.getValues() != null && !sensor.getValues().isEmpty()) {
-                                    distance = sensor.getValues().get(0);
-                                    JPanel addedObstacle = addObstacle(obstacle.getID().intValue(), obstacle.getPosition(), distance);
-                                    panelsMap.put(obstacle.getID().intValue(), addedObstacle);
-                                }
+                            if(sensor.getValues() != null && !sensor.getValues().isEmpty()) {
+                                    distance = sensor.getValues().get(obstacles.indexOf(obstacle));
+                                    if (panelsMap.get(obstacle.getID().intValue()) != null) {
+                                        updateJLabel(panelsMap.get(obstacle.getID().intValue()), obstacle.getPosition(), distance);
+                                    } else {
+                                        if (sensor.getValues() != null && !sensor.getValues().isEmpty()) {
+                                            JPanel addedObstacle = addObstacle(obstacle.getID().intValue(), obstacle.getPosition(), distance);
+                                            panelsMap.put(obstacle.getID().intValue(), addedObstacle);
+                                        }
+                                    }
+                                    ids.add(obstacle.getID().intValue());
                             }
-                            ids.add(obstacle.getID().intValue());
                         }
 
                         //iterates through a few lists, to sort out the JPanels, which are no longer displayed in
@@ -232,7 +241,7 @@ public class DView extends AGuiFrame {
         JLabel zPosition = (JLabel) components[3];
         zPosition.setText("Z: " + position[2]);
         JLabel distanceLabel = (JLabel) components[4];
-        distanceLabel.setText("Distance: " + distance);
+        distanceLabel.setText("Distance: " +  Math.round(distance*100.0) / 100.0);
     }
 
     /**
@@ -345,18 +354,21 @@ public class DView extends AGuiFrame {
             simulationButton.setText("Pause");
             status.setText("Flying");
             simulationButton.setBackground(Color.YELLOW);
+            simulationButton.setForeground(Color.BLACK);
         } else if (!paused && simulation.isRunning()) {
-            simulation.pause();
+            simulation.stop();
             paused = true;
             simulationButton.setText("Resume");
             status.setText("Resting");
             simulationButton.setBackground(Color.GREEN);
+            simulationButton.setForeground(Color.BLACK);
         } else if (paused) {
             simulation.start();
             paused = false;
             simulationButton.setText("Pause");
             status.setText("Flying");
             simulationButton.setBackground(Color.YELLOW);
+            simulationButton.setForeground(Color.BLACK);
         } else if (stopped) {
             simulation.stop();
         }
@@ -408,7 +420,7 @@ public class DView extends AGuiFrame {
         constraints.gridy = ++yInside;
         distanceLabel.setHorizontalAlignment(JLabel.CENTER);
         distanceLabel.setVerticalAlignment(JLabel.CENTER);
-        distanceLabel.setText("Distance: " + distance + "m");
+        distanceLabel.setText("Distance: " + Math.round(distance*100.00) / 100.00 + "m");
         obstacle.add(distanceLabel, constraints);
 
         constraints = new GridBagConstraints();
