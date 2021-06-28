@@ -28,7 +28,7 @@ public class DroneCrashListener implements SimulationUpdateListener {
         Vector3f dronePosition = theDrone.getLocation().getPosition();
         float droneRadius = theDrone.getRadius();
 
-        if (ufoObjs.checkSphereCollision(dronePosition, droneRadius)) {
+        if (ufoObjs.checkSphereHalfCollision(dronePosition, droneRadius, 1)) {
             theDrone.setCrashed(true);
         }
     }

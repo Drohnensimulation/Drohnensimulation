@@ -10,8 +10,8 @@ import java.util.Random;
  */
 public class WindLayer {
 
-    protected static final double GUST_RISE_TIME = 2;       // Time until gust reaches full speed   [s]
-    protected static final double MAX_CALM_TIME = 120;      // Maximum time for no gust             [s]
+    public static final double GUST_RISE_TIME = 2;       // Time until gust reaches full speed   [s]
+    public static final double MAX_CALM_TIME = 120;      // Maximum time for no gust             [s]
 
     private final double windSpeed;                         // Speed of the steady wind             [m/s]
     private final double gustSpeed;                         // Max Speed of the gusts               [m/s]
@@ -165,7 +165,7 @@ public class WindLayer {
         Random random = new Random();
         nextGustStart = random.nextDouble() * MAX_CALM_TIME + time;
         nextGustSpeed = random.nextDouble() * (gustSpeed - windSpeed) + windSpeed;
-        nextGustDuration = Math.min(random.nextGaussian() * 4 + GUST_RISE_TIME * 2, GUST_RISE_TIME * 2);
+        nextGustDuration = Math.min(random.nextGaussian() * GUST_RISE_TIME * 2 + GUST_RISE_TIME * 2, GUST_RISE_TIME * 2);
     }
 
     protected double getWindSpeed() {

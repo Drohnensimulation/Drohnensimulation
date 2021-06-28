@@ -12,8 +12,9 @@ import com.jme3.math.Vector3f;
 import de.thi.dronesim.SimulationUpdateEvent;
 import de.thi.dronesim.drone.Drone;
 import de.thi.dronesim.drone.Location;
-import de.thi.dronesim.drone.Vector3;
 import de.thi.dronesim.persistence.entity.SensorConfig;
+
+import javax.vecmath.Vector3d;
 
 public class WindSensorTest {
 
@@ -25,8 +26,8 @@ public class WindSensorTest {
 	    return bd.doubleValue();
 	}
 	
-	private Vector3 roundVector(Vector3f vec, int places) {
-		return new Vector3(roundValue(vec.x, places), roundValue(vec.y, places), roundValue(vec.z, places));
+	private Vector3d roundVector(Vector3f vec, int places) {
+		return new Vector3d(roundValue(vec.x, places), roundValue(vec.y, places), roundValue(vec.z, places));
 	}
 	
 	/**
@@ -53,7 +54,7 @@ public class WindSensorTest {
 		WindSensor sensor = new WindSensor(conf);
 		sensor.runMeasurement(event, null);
 		
-		assertEquals(new Vector3(0,0,1), roundVector(sensor.getLastAbsSensorDirection(), maxFractionDigits));
+		assertEquals(new Vector3d(0,0,1), roundVector(sensor.getLastAbsSensorDirection(), maxFractionDigits));
 	}
 	
 	/**
@@ -80,7 +81,7 @@ public class WindSensorTest {
 		WindSensor sensor = new WindSensor(conf);
 		sensor.runMeasurement(event, null);
 		
-		assertEquals(new Vector3(1,0,0), roundVector(sensor.getLastAbsSensorDirection(), maxFractionDigits));
+		assertEquals(new Vector3d(1,0,0), roundVector(sensor.getLastAbsSensorDirection(), maxFractionDigits));
 	}
 	
 	/**
@@ -107,7 +108,7 @@ public class WindSensorTest {
 		WindSensor sensor = new WindSensor(conf);
 		sensor.runMeasurement(event, null);
 		
-		assertEquals(new Vector3(0,-1,0), roundVector(sensor.getLastAbsSensorDirection(), maxFractionDigits));
+		assertEquals(new Vector3d(0,-1,0), roundVector(sensor.getLastAbsSensorDirection(), maxFractionDigits));
 	}
 	
 	/**
@@ -134,7 +135,7 @@ public class WindSensorTest {
 		WindSensor sensor = new WindSensor(conf);
 		sensor.runMeasurement(event, null);
 		
-		assertEquals(new Vector3(roundValue((float)(-Math.sqrt(2)*0.5), maxFractionDigits),-1,roundValue((float)(Math.sqrt(2)*0.5), maxFractionDigits)), roundVector(sensor.getLastAbsSensorDirection(), maxFractionDigits));
+		assertEquals(new Vector3d(roundValue((float)(-Math.sqrt(2)*0.5), maxFractionDigits),-1,roundValue((float)(Math.sqrt(2)*0.5), maxFractionDigits)), roundVector(sensor.getLastAbsSensorDirection(), maxFractionDigits));
 	}
 	
 	/**
@@ -162,7 +163,7 @@ public class WindSensorTest {
 		sensor.runMeasurement(event, null);
 		
 		double rotFromDefaultPos = Math.toRadians(135);
-		assertEquals(new Vector3(
+		assertEquals(new Vector3d(
 				roundValue((float)(Math.cos(rotFromDefaultPos)*conf.getDirectionX()+Math.sin(rotFromDefaultPos)*conf.getDirectionZ()), maxFractionDigits),
 				conf.getDirectionY(),
 				roundValue((float)(-Math.sin(rotFromDefaultPos)*conf.getDirectionX()+Math.cos(rotFromDefaultPos)*conf.getDirectionZ()), maxFractionDigits)), 

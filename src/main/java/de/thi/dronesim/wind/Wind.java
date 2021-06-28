@@ -142,9 +142,15 @@ public class Wind implements ISimulationChild {
         Collection<WindLayer> removed = new ArrayList<>();
         for (int i = 0; i < windLayers.size(); i++) {
             WindLayer currentLayer = windLayers.get(i);
+            // Check if layer is already removed
+            if (removed.contains(currentLayer)) {
+                continue;
+            }
+
             // Check layer length is valid
             if (!currentLayer.isValid()) {
                 removed.add(currentLayer);
+                logger.warn("Wind layer ({}) is invalid and therefore removed!", i);
                 continue;
             }
             // Check if any following layer violates borders of current layers
@@ -154,8 +160,8 @@ public class Wind implements ISimulationChild {
                 if (currentLayer.overlapsWith(followingLayer)) {
                     // Remove layer from list
                     removed.add(followingLayer);
-                    logger.error("Wind layer ({}) violates the border of another layer and is therefore removed!",x);
-                    logger.error("Borders of different wind layers must not overlap.");
+                    logger.warn("Wind layer ({}) violates the border of layer ({}) and is therefore removed!", x, i);
+                    logger.warn("Borders of different wind layers must not overlap.");
                 }
             }
         }
@@ -204,6 +210,7 @@ public class Wind implements ISimulationChild {
      * @param location Location of the drone
      */
     public void applyWind(Location location, double time) {
+        time /= 1000;
 
         // Update latest layer based on time to set start point of search algorithm
         updateLatestLayer(time - WIND_LAYER_INTERPOLATION_TIME_RANGE);

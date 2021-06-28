@@ -29,8 +29,8 @@ public class MView extends AGuiFrame {
     private static final int WINDOW_MIN_HEIGHT = 500;
 
     // Current Manager
-    private final GuiManager guiManager;
-    private final Simulation sim;
+    private Simulation sim;
+    private SensorModule sensorModule;
 
     // Main Panel
     private final JPanel contentPane;
@@ -96,11 +96,7 @@ public class MView extends AGuiFrame {
     private final JButton stopButton;
 
     public MView(GuiManager guiManager) {
-        super("Drone Simulation (No GFX)");
-
-        // Holding a ref to the manager, so we can access the simulation, so our buttons can start/pause it.
-        this.guiManager = guiManager;
-        this.sim = guiManager.getSimulation();
+        super("Drone Simulation (Data only)");
 
         // Init
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -200,7 +196,7 @@ public class MView extends AGuiFrame {
         obstacle.setHorizontalAlignment(SwingConstants.CENTER);
         panelObstaclesWindInner.add(obstacle);
 
-        obstacleValue = new JLabel("[50 m] [NE]");
+        obstacleValue = new JLabel(" - / - ");
         obstacleValue.setHorizontalAlignment(SwingConstants.CENTER);
         panelObstaclesWindInner.add(obstacleValue);
 
@@ -208,7 +204,7 @@ public class MView extends AGuiFrame {
         wind.setHorizontalAlignment(SwingConstants.CENTER);
         panelObstaclesWindInner.add(wind);
 
-        windValue = new JLabel("[3 m/s] [SW]");
+        windValue = new JLabel(" - / - ");
         windValue.setHorizontalAlignment(SwingConstants.CENTER);
         panelObstaclesWindInner.add(windValue);
 
@@ -239,7 +235,7 @@ public class MView extends AGuiFrame {
         heading.setHorizontalAlignment(SwingConstants.CENTER);
         panelDirectionInner.add(heading);
 
-        headingValue = new JLabel("North,East,South,West");
+        headingValue = new JLabel(" - / - ");
         headingValue.setHorizontalAlignment(SwingConstants.CENTER);
         panelDirectionInner.add(headingValue);
 
@@ -247,7 +243,7 @@ public class MView extends AGuiFrame {
         pitch.setHorizontalAlignment(SwingConstants.CENTER);
         panelDirectionInner.add(pitch);
 
-        pitchValue = new JLabel("0");
+        pitchValue = new JLabel(" - / - ");
         pitchValue.setHorizontalAlignment(SwingConstants.CENTER);
         panelDirectionInner.add(pitchValue);
 
@@ -255,7 +251,7 @@ public class MView extends AGuiFrame {
         roll.setHorizontalAlignment(SwingConstants.CENTER);
         panelDirectionInner.add(roll);
 
-        rollValue = new JLabel("0");
+        rollValue = new JLabel(" - / - ");
         rollValue.setHorizontalAlignment(SwingConstants.CENTER);
         panelDirectionInner.add(rollValue);
 
@@ -263,7 +259,7 @@ public class MView extends AGuiFrame {
         yaw.setHorizontalAlignment(SwingConstants.CENTER);
         panelDirectionInner.add(yaw);
 
-        yawValue = new JLabel("0");
+        yawValue = new JLabel(" - / - ");
         yawValue.setHorizontalAlignment(SwingConstants.CENTER);
         panelDirectionInner.add(yawValue);
 
@@ -273,7 +269,7 @@ public class MView extends AGuiFrame {
         status.setHorizontalAlignment(SwingConstants.CENTER);
         panelTop.add(status);
 
-        statusValue = new JLabel("Not Running");
+        statusValue = new JLabel(" - / - ");
         statusValue.setHorizontalAlignment(SwingConstants.CENTER);
         statusValue.setBackground(Color.RED);
         panelTop.add(statusValue);
@@ -282,7 +278,7 @@ public class MView extends AGuiFrame {
         runtime.setHorizontalAlignment(SwingConstants.CENTER);
         panelTop.add(runtime);
 
-        runtimeValue = new JLabel("00:00:00");
+        runtimeValue = new JLabel("--:--:--");
         runtimeValue.setHorizontalAlignment(SwingConstants.CENTER);
         panelTop.add(runtimeValue);
 
@@ -313,7 +309,7 @@ public class MView extends AGuiFrame {
         airSpeed.setHorizontalAlignment(SwingConstants.CENTER);
         panelVelocityInner.add(airSpeed);
 
-        airSpeedValue = new JLabel(String.valueOf(Integer.MIN_VALUE));
+        airSpeedValue = new JLabel(" - / - ");
         airSpeedValue.setHorizontalAlignment(SwingConstants.CENTER);
         panelVelocityInner.add(airSpeedValue);
 
@@ -321,7 +317,7 @@ public class MView extends AGuiFrame {
         verticalVelocity.setHorizontalAlignment(SwingConstants.CENTER);
         panelVelocityInner.add(verticalVelocity);
 
-        verticalVelocityValue = new JLabel(String.valueOf(Integer.MIN_VALUE));
+        verticalVelocityValue = new JLabel(" - / - ");
         verticalVelocityValue.setHorizontalAlignment(SwingConstants.CENTER);
         panelVelocityInner.add(verticalVelocityValue);
 
@@ -329,7 +325,7 @@ public class MView extends AGuiFrame {
         groundSpeed.setHorizontalAlignment(SwingConstants.CENTER);
         panelVelocityInner.add(groundSpeed);
 
-        groundSpeedValue = new JLabel(String.valueOf(Integer.MIN_VALUE));
+        groundSpeedValue = new JLabel(" - / - ");
         groundSpeedValue.setHorizontalAlignment(SwingConstants.CENTER);
         panelVelocityInner.add(groundSpeedValue);
 
@@ -361,7 +357,7 @@ public class MView extends AGuiFrame {
         coordinateX.setHorizontalAlignment(SwingConstants.CENTER);
         panelCoordsInner.add(coordinateX);
 
-        coordinateXValue = new JLabel(String.valueOf(Integer.MIN_VALUE));
+        coordinateXValue = new JLabel(" - / - ");
         coordinateXValue.setHorizontalAlignment(SwingConstants.CENTER);
         panelCoordsInner.add(coordinateXValue);
 
@@ -369,7 +365,7 @@ public class MView extends AGuiFrame {
         coordinateY.setHorizontalAlignment(SwingConstants.CENTER);
         panelCoordsInner.add(coordinateY);
 
-        coordinateYValue = new JLabel(String.valueOf(Integer.MIN_VALUE));
+        coordinateYValue = new JLabel(" - / - ");
         coordinateYValue.setHorizontalAlignment(SwingConstants.CENTER);
         panelCoordsInner.add(coordinateYValue);
 
@@ -377,7 +373,7 @@ public class MView extends AGuiFrame {
         coordinateZ.setHorizontalAlignment(SwingConstants.CENTER);
         panelCoordsInner.add(coordinateZ);
 
-        coordinateZValue = new JLabel(String.valueOf(Integer.MIN_VALUE));
+        coordinateZValue = new JLabel(" - / - ");
         coordinateZValue.setHorizontalAlignment(SwingConstants.CENTER);
         panelCoordsInner.add(coordinateZValue);
         contentPane.setLayout(gl_contentPane);
@@ -397,21 +393,49 @@ public class MView extends AGuiFrame {
         setVisible(true);
     }
 
+    /**
+     * Initialises the View with optional stuff.
+     *
+     * @param simulation The current Simulation
+     */
     @Override
     public void init(Simulation simulation) {
-        // TODO: Use simulation if needed
+        sim = simulation;
+        sensorModule = simulation.getChild(SensorModule.class);
     }
 
     /**
      * Updates all values in the MView with the received information of the simulationUpdateEvent.
      *
-     * @param simulationUpdateEvent
+     * @param simulationUpdateEvent Upodate of a Tick
      */
     @Override
     public void updateDroneStatus(SimulationUpdateEvent simulationUpdateEvent) {
         Drone d = simulationUpdateEvent.getDrone();
-        Location location = d.getLocation();
 
+        if (d.isCrashed()) {
+            startButton.setText("Exit Simulation");
+            stopButton.setText("Exit Simulation");
+            statusValue.setText("CRASHED!");
+            return;
+        }
+
+        Location loc = d.getLocation();
+
+        // Run updates
+        updateRuntime(simulationUpdateEvent);
+        updatePosition(loc);
+        updateHeadingsAndTilts(loc);
+        updateVelocities(loc);
+        updateSensorData();
+    }
+
+    /**
+     * Updates the runtime.
+     *
+     * @param simulationUpdateEvent Update of a Tick
+     */
+    private void updateRuntime(SimulationUpdateEvent simulationUpdateEvent) {
         // Update runtime
         double t = simulationUpdateEvent.getTime() / 1000;
 
@@ -427,7 +451,6 @@ public class MView extends AGuiFrame {
             }
         }
 
-        // Only update if we have a change, small save I guess
         // Just for a better visual representation, if times are single digit, we add a 0 in front
         StringBuilder time = new StringBuilder();
         if (hours < 10)
@@ -446,16 +469,26 @@ public class MView extends AGuiFrame {
             time.append(String.format(":%d", seconds));
 
         runtimeValue.setText(time.toString());
+    }
 
-        // No need to continue if the drone crashed
-        if (d.isCrashed())
-            return;
-
+    /**
+     * Updates the position data.
+     *
+     * @param location Current location data of the drone
+     */
+    private void updatePosition(Location location) {
         // Update Position
-        coordinateXValue.setText(String.format("%.3f", location.getX()));
-        coordinateYValue.setText(String.format("%.3f", location.getY()));
-        coordinateZValue.setText(String.format("%.3f", location.getZ()));
+        coordinateXValue.setText(String.format("%.2f", location.getX()));
+        coordinateYValue.setText(String.format("%.2f", location.getY()));
+        coordinateZValue.setText(String.format("%.2f", location.getZ()));
+    }
 
+    /**
+     * Updates the Headings and Tilts data.
+     *
+     * @param location Current location data of the drone
+     */
+    private void updateHeadingsAndTilts(Location location) {
         // Update Heading and Tilts
         double hdg = location.getHeading() % 360.00;
         String dir = "???";
@@ -478,51 +511,71 @@ public class MView extends AGuiFrame {
         else if (hdg > 292.5 && hdg <= 360.1)
             dir = "E";
 
-        headingValue.setText(dir.concat(String.format(" @ %.3f", hdg) + " Degree"));
-        pitchValue.setText(String.format("%.3f", location.getPitch()));
+        headingValue.setText(dir.concat(String.format(" @ %.2f", hdg) + " Degree"));
+        pitchValue.setText(String.format("%.2f", location.getPitch()));
 
         // These values do not exist currently, but can be added
-        //rollValue.setText(String.format("%.3f", location.getRoll()));
-        //yawValue.setText(String.format("%.3f", location.getYaw()));
+        //rollValue.setText(String.format("%.2f", location.getRoll()));
+        //yawValue.setText(String.format("%.2f", location.getYaw()));
+    }
 
-        // Velocities
-        airSpeedValue.setText(String.format("%.3f", location.getAirspeed()));
-        verticalVelocityValue.setText(String.format("%.3f", location.getVerticalSpeed()));
-        groundSpeedValue.setText(String.format("%.3f", location.getGroundSpeed()));
+    /**
+     * Updates the Velocities data
+     *
+     * @param location Current location data of the drone
+     */
+    private void updateVelocities(Location location) {
+        airSpeedValue.setText(String.format("%.2f", location.getAirspeed()));
+        verticalVelocityValue.setText(String.format("%.2f", location.getVerticalSpeed()));
+        groundSpeedValue.setText(String.format("%.2f", location.getGroundSpeed()));
+    }
 
-        // Obstacles and Wind
-        if (sim != null) {
-            SensorModule sensorModule = sim.getChild(SensorModule.class);
+    /**
+     * Updates the sensor data (Wind and Obstacle detections)
+     */
+    private void updateSensorData() {
+        List<SensorResultDto> sensorResults = sensorModule.getResultsFromAllSensors();
 
-            // If we have a sensormodule, read it
-            if (sensorModule != null) {
-                List<SensorResultDto> sensorList = sensorModule.getResultsFromAllSensors();
-                Obstacle obstacle = null;
-                for (SensorResultDto res : sensorList) {
-                    // Handle Wind
-                    if (res.getSensor() != null) {
-                        float wind = res.getValues().get(0);
+        Obstacle closestObstacle = null;
+        float distance = Float.MAX_VALUE;
 
-                        // It is possible for there to be no wind, which results in NaN
-                        if (Float.isNaN(wind)) {
-                            windValue.setText("Windless");
+        try {
+            for (SensorResultDto sensor : sensorResults) {
+                if (sensor == null) continue;
+
+                if (sensor.getSensor().getType().equals("WindSensor")) {
+                    if (sensor.getValues() != null) {
+                        if (!sensor.getValues().get(1).isNaN()) {
+                            windValue.setText(Math.round(sensor.getValues().get(1) * 100.0) / 100.0 + "m/s");
                         } else {
-                            windValue.setText(String.format("%3.2f", wind));
+                            windValue.setText("- / -");
                         }
-
-                        continue;
-                    } // if (res.getSensor)
-
-                    // Handle Obstacles ... TODO: Needs the actual module running...
-                    List<Obstacle> list = res.getObstacle();
-                    if (list.isEmpty())
+                    }
+                } else if (sensor.getSensor().getType().equals("DistanceSensor")) {
+                    // Iterate over all values and determine the obstacle with the shortest distance
+                    List<Float> values = sensor.getValues();
+                    if (values == null)
                         continue;
 
-                    obstacleValue.setText(String.valueOf(res.getValues().get(0)) + " m");
-                } // for
-
-            } // (sensorModule != null)
+                    for (int i = 0; i < values.size(); i++) {
+                        float sensorDistance = values.get(i);
+                        if (sensorDistance < distance) {
+                            distance = sensorDistance;
+                            closestObstacle = sensor.getObstacle().get(i);
+                        }
+                    } // ~ for (int i = 0; i < values.size(); i++)
+                } // ~ if (sensor.getSensor().getType().equals(...))
+            } // ~ for(SensorResultDto sensor : sensorResults)
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         }
+
+        if (closestObstacle != null) {
+            obstacleValue.setText(closestObstacle.getModelName().concat(String.format(" %.2f", distance)));
+        } else {
+          obstacleValue.setText(" - / - ");
+        }
+
     }
 
     /**
@@ -530,17 +583,18 @@ public class MView extends AGuiFrame {
      */
     private void runSimulation() {
         SimulationState state = sim.getState();
-        System.out.println(state);
         switch (state) {
             case CREATED:
             case PREPARED:
             case PAUSED:
                 stopButton.setText("Stop Simulation");
                 statusValue.setText("RUNNING...");
+                startButton.setText("Pause Simulation");
                 sim.start();
                 break;
             case RUNNING:
                 statusValue.setText("PAUSED!");
+                startButton.setText("Resume Simulation");
                 sim.pause();
                 break;
             case STOPPED:
@@ -555,14 +609,12 @@ public class MView extends AGuiFrame {
      * Stops the simulation at the press of the button
      */
     private void stopSimulation() {
-        if (sim.isRunning())
-        {
+        if (sim.isRunning()) {
             sim.stop();
+            statusValue.setText("STOPPED");
             startButton.setText("Exit Simulation");
             stopButton.setText("Exit Simulation");
-        }
-        else
-        {
+        } else {
             System.exit(0);
         }
     }
