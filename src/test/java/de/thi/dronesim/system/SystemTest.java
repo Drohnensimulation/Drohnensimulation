@@ -4,13 +4,8 @@ import de.thi.dronesim.Simulation;
 import de.thi.dronesim.autopilot.AsyncAutopilot;
 import de.thi.dronesim.autopilot.Autopilot;
 import de.thi.dronesim.gui.GuiManager;
-import org.junit.jupiter.api.BeforeEach;
+import jdk.jshell.spi.ExecutionControl;
 import org.junit.jupiter.api.Test;
-
-import javax.swing.*;
-
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -80,14 +75,14 @@ public class SystemTest {
     private GuiManager gui;
     private Autopilot ap;
 
-       /**
-     * This test is supposed to be used with the Wind or GUI Tests.
+    /**
+     * This test is supposed to be used with the Wind, Obstacles or GUI Tests.
      * <p>
      * It is a simple, straight flight without any obstacles from (10, 0, 0) towards (-10, 0, 0)
      * with a fly height of 10.
      */
     @Test
-    void TestSimulation_Wind_GUI() {
+    void TestSimulation_Wind_Obstacle_GUI() {
         // Preparation
         Simulation sim = new Simulation("src/test/java/de/thi/dronesim/system/testconfigs/".concat(FILENAME));
         assertNotNull(sim, "Unable to create simulation");
@@ -100,99 +95,26 @@ public class SystemTest {
         Autopilot ap = sim.getChild(Autopilot.class);
         assertNotNull(ap, "Could not get autopilot.");
 
-        // A forced wait to give the gui a chance to load up before running the sim
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        System.out.printf("\n\nTest Valid. Config: %s\n\n", FILENAME);
 
         // Autopilot flight
         try {
-            // Take off
-            System.out.printf("\n\nTest Start. Config: %s\n\n", FILENAME);
-            sim.start();
-            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(1, 0, 0));
-            ap.awaitCondition(event -> event.getDrone().getLocation().getY() >= 10);
-
-            // Fly towards Goal
-            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(-1, 2, 0));
-            ap.awaitCondition(event -> event.getDrone().getLocation().getZ() >= 9.75);
-
-            // Slow down when approaching
-            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(0, -1.6, 0));
-            ap.awaitCondition(event -> event.getDrone().getLocation().getZ() >= 9.95);
-
-            // Landing process
-            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(-1, -0.4, 0));
-            ap.awaitCondition(event -> event.getDrone().getLocation().getY() <= 1);
-            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(0.8, 0, 0));
-            ap.awaitCondition(event -> event.getDrone().getLocation().getY() <= 0.05);
-            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(0.2, 0, 0));
-
+            flightTest1(ap);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        System.out.println("Test Over!");
-        while(true){
+        System.out.println("Test Finished!");
 
+        while (true) {
+            // Stay open
         }
     }
 
-    @Test
-    public void TestSimulation_Obstacles() {
-        // Preparation
-        Simulation sim = new Simulation("src/test/java/de/thi/dronesim/system/testconfigs/".concat(FILENAME));
-        assertNotNull(sim, "Unable to create simulation");
-        sim.prepare();
-
-        GuiManager gui = sim.getChild(GuiManager.class);
-        assertNotNull(gui, "Could not get GuiManager.");
-        gui.openDViewGui();
-
-        Autopilot ap = sim.getChild(Autopilot.class);
-        assertNotNull(ap, "Could not get autopilot.");
-
-        // A forced wait to give the gui a chance to load up before running the sim
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // Autopilot Flight
-        try {
-            // Take off
-            sim.start();
-            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(1, 0, 0));
-            ap.awaitCondition(event -> event.getDrone().getLocation().getY() >= 10);
-
-            // Fly towards Goal
-            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(-1, 2, 0));
-            ap.awaitCondition(event -> event.getDrone().getLocation().getZ() >= 9.75);
-
-            // Slow down when approaching
-            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(0, -1.6, 0));
-            ap.awaitCondition(event -> event.getDrone().getLocation().getZ() >= 9.95);
-
-            // Landing process
-            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(-1, -0.4, 0));
-            ap.awaitCondition(event -> event.getDrone().getLocation().getY() <= 1);
-            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(0.8, 0, 0));
-            ap.awaitCondition(event -> event.getDrone().getLocation().getY() <= 0.05);
-            ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(0.2, 0, 0));
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("Test Over!");
-        while(true){
-
-        }
-    }
-
+    /**
+     * This test is supposed to run with one of the complex flight tests.
+     * Each test requires its own flight code below.
+     */
     @Test
     public void TestSimulation_Complex() {
         // Preparation
@@ -207,18 +129,192 @@ public class SystemTest {
         Autopilot ap = sim.getChild(Autopilot.class);
         assertNotNull(ap, "Could not get autopilot.");
 
-        // A forced wait to give the gui a chance to load up before running the sim
+        System.out.printf("\n\nTest Valid. Config: %s\n\n", FILENAME);
+
+        // Autopilot flight
         try {
-            Thread.sleep(2000);
+            flightTest_Complex_1(ap);
+            //flightTest_Complex_2(ap);
+            //flightTest_Complex_3(ap);
+            //flightTest_Complex_4(ap);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        // Autopilot Flight
+        System.out.println("Test Finished!");
+
+        while (true) {
+            // Stay open
+        }
+    }
+
+    /* ********************************************************************************************************
+                                        Autopilot Flight control below
+     ******************************************************************************************************* */
+
+    /**
+     * The AutoPilot flight code for the Wind/Obstacle/Gui test scenarios
+     *
+     * @param ap The autopilot of the current simulation.
+     * @throws InterruptedException When the autopilot gets interrupted by something
+     */
+    private void flightTest1(Autopilot ap) throws InterruptedException {
+        // Take off
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(1, 0, 0));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getY() >= 10);
+
+        // Fly towards Goal
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(-1, 2, 0));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getZ() >= 9.75);
+
+        // Slow down when approaching
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(0, -1.6, 0));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getZ() >= 9.95);
+
+        // Landing process
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(-1, -0.4, 0));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getY() <= 1);
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(0.8, 0, 0));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getY() <= 0.05);
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest(0.2, 0, 0));
+    }
+
+    /**
+     * The AutoPilot flight code for the complex test scenario 1.
+     *
+     * @param ap The autopilot of the current simulation.
+     * @throws InterruptedException When the autopilot gets interrupted by something
+     */
+    private void flightTest_Complex_1(Autopilot ap) throws InterruptedException {
+        // This Code and scenario was taken from UfoExample, made by Fabian Fischer, slightly adjusted scenario by me
+
+        //Fly drone to 2m high
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(1));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getPosition().y > 2);
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(-1));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getVerticalSpeed() == 0);
+
+        //Rotate drone 180°
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaHeading(180));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getHeading() == 180);
+
+        //Fly drone near z = 0
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(1));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getPosition().z < 0.2);
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(-1));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() == 0);
+
+        //Turn drone -90°
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaHeading(-90));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getHeading() == 90);
+
+        //Fly drone near x = 0
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(1));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getPosition().x < 0.5);
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(-1));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() == 0);
+
+        //Fly around in a circle
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(1));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() == 1);
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaHeading(360));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getHeading() < 90);
+        ap.awaitCondition(event -> event.getDrone().getLocation().getHeading() == 90);
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(-2));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() == 0);
+
+        //Fly down to 1.25m
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(-1));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getPosition().y <= 1.25);
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(1));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getVerticalSpeed() == 0);
+
+        //Short pause
         try {
-            ap.awaitCondition(event -> event.getDrone().getLocation().getY() != 0);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+
+        //Fly up a certain distance depending on the current location
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(0.5));
+        double i = (ap.getSimulation().getDrone().getLocation().getPosition().y + 0.5);
+        ap.awaitCondition(event ->
+                event.getDrone().getLocation().getPosition().y >= i);
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(-0.5));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getVerticalSpeed() == 0);
+
+
+        //Fly in a circle down to the ground and back up
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(1));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() == 1);
+
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(-0.25));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getVerticalSpeed() == -0.25);
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaHeading(-360));
+
+        ap.awaitCondition(event -> (event.getDrone().getLocation().getHeading() > 90
+                || event.getDrone().getLocation().getHeading() < 270)
+                && event.getDrone().getLocation().getPosition().y <= 0.1);
+
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(0.75));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getHeading() <= 90
+                && event.getDrone().getLocation().getPosition().y >= 0.75);
+
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(-0.25));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getHeading() <= 90);
+
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(-1));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() == 0);
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(-0.25));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getVerticalSpeed() <= 0.25);
+
+
+        //Turn around 180°
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaHeading(-180));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getHeading() == 270);
+
+        //Fly near x = 0
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(1));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getPosition().x >= -0.2);
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaAirspeed(-1));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getAirspeed() == 0);
+
+        //Fly down to 1.1m
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(-1));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getPosition().y <= 1.1);
+        ap.requestLocationDelta(new AsyncAutopilot.DeltaRequest().requestDeltaVerticalSpeed(1));
+        ap.awaitCondition(event -> event.getDrone().getLocation().getVerticalSpeed() <= 0.1);
+    }
+
+    /**
+     * Stub for another complex test 2
+     *
+     * @param ap The autopilot of the current simulation
+     * @throws ExecutionControl.NotImplementedException Because it does not exist yet, duh
+     */
+    private void flightTest_Complex_2(Autopilot ap) throws ExecutionControl.NotImplementedException {
+        throw new ExecutionControl.NotImplementedException("Not Implemented");
+    }
+
+    /**
+     * Stub for another complex test 3
+     *
+     * @param ap The autopilot of the current simulation
+     * @throws ExecutionControl.NotImplementedException Because it does not exist yet, duh
+     */
+    private void flightTest_Complex_3(Autopilot ap) throws ExecutionControl.NotImplementedException {
+        throw new ExecutionControl.NotImplementedException("Not Implemented");
+    }
+
+    /**
+     * Stub for another complex test 4
+     *
+     * @param ap The autopilot of the current simulation
+     * @throws ExecutionControl.NotImplementedException Because it does not exist yet, duh
+     */
+    private void flightTest_Complex_4(Autopilot ap) throws ExecutionControl.NotImplementedException {
+        throw new ExecutionControl.NotImplementedException("Not Implemented");
     }
 }

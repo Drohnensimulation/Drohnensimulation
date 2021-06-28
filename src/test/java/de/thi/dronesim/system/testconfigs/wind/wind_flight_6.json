@@ -243,9 +243,9 @@
   "windConfigList": [
     {
       "windSpeed": 10.0,
-      "gustSpeed": 10.0,
+      "gustSpeed": 11.0,
       "timeStart": 0.0,
-      "timeEnd": 100000.0,
+      "timeEnd": 2.0,
       "altitudeBottom": 0.0,
       "altitudeTop": 100.0,
       "windDirection": 225.0
