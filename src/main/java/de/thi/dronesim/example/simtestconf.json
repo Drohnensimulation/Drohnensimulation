@@ -131,11 +131,84 @@
 
 
   "sensorConfigList": [
-
+    {
+      "className": "WindSensor",
+      "sensorId": 0,
+      "measurementAccuracy": 10.0,
+      "directionX": 0.0,
+      "directionY": 0.0,
+      "directionZ": 1.0,
+      "posX": 0.0,
+      "posY": 0.0,
+      "posZ": 0.0,
+      "range": 100.0,
+      "sensorAngle": 0.0,
+      "sensorRadius": 100.0,
+      "sensorForm": "Cylinder",
+      "calcType": "AVG",
+      "zeroDegreeDirectionX": 1.0,
+      "zeroDegreeDirectionY": 0.0,
+      "zeroDegreeDirectionZ": 0.0,
+      "nintyDegreeDirectionX": 0.0,
+      "nintyDegreeDirectionY": 1.0,
+      "nintyDegreeDirectionZ": 0.0,
+      "rangeIncreaseVelocity": 0.0,
+      "startIncreaseTime": 0.0,
+      "spinsPerSecond": 50.0,
+      "startRotationTime": 0.0
+    },
+    {
+      "className": "RotationSensor",
+      "sensorId": 1,
+      "measurementAccuracy": 20.0,
+      "directionX": 0.0,
+      "directionY": 0.0,
+      "directionZ": 0.0,
+      "posX": 0.0,
+      "posY": 0.0,
+      "posZ": 0.0,
+      "range": 5.0,
+      "sensorAngle": 0.0,
+      "sensorRadius": 30.0,
+      "sensorForm": "CONE",
+      "calcType": "NEAREST",
+      "zeroDegreeDirectionX": 0.0,
+      "zeroDegreeDirectionY": 0.0,
+      "zeroDegreeDirectionZ": 0.0,
+      "nintyDegreeDirectionX": 0.0,
+      "nintyDegreeDirectionY": 0.0,
+      "nintyDegreeDirectionZ": 0.0,
+      "rangeIncreaseVelocity": 0.0,
+      "callTimerForSensorValues": 0.5,
+      "startIncreaseTime": 0.0,
+      "spinsPerSecond": 50.0,
+      "startRotationTime": 0.01
+    },
+    {
+      "className": "InfraredSensor",
+      "sensorId": 2,
+      "measurementAccuracy": 20.0,
+      "directionX": 0.0,
+      "directionY": 0.0,
+      "directionZ": 0.0,
+      "posX": 0.0,
+      "posY": 0.0,
+      "posZ": 0.0,
+      "range": 5.0,
+      "sensorAngle": -45.0,
+      "sensorRadius": 25.0,
+      "sensorForm": "CONE",
+      "calcType": "NEAREST",
+      "zeroDegreeDirectionX": 0.0,
+      "zeroDegreeDirectionY": 0.0,
+      "zeroDegreeDirectionZ": 0.0,
+      "nintyDegreeDirectionX": 0.0,
+      "nintyDegreeDirectionY": 0.0,
+      "nintyDegreeDirectionZ": 0.0,
+      "rangeIncreaseVelocity": 0.0,
+      "callTimerForSensorValues": 0.5
+    }
   ],
-
-
-
 
   "windConfigList": [
 
