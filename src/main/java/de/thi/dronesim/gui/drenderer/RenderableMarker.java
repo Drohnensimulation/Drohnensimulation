@@ -17,6 +17,6 @@ public class RenderableMarker extends RenderableObject {
      * @param center Coordinates of the object center
      */
     public RenderableMarker(Vector3f center) {
-        super(center, MODEL);
+        super(center, MODEL, false);
     }
 }

@@ -19,7 +19,7 @@ public class RenderableCuboid extends RenderableObject {
      * @param rotation Rotations around the object-axes (arc measure)
      */
     public RenderableCuboid(Vector3f center, Vector3f scale, Vector3f rotation) {
-        super(center, scale, rotation, MODEL);
+        super(center, scale, rotation, MODEL, false);
     }
 
     /**
@@ -29,7 +29,7 @@ public class RenderableCuboid extends RenderableObject {
      * @param scale Scale factors along the object-axes
      */
     public RenderableCuboid(Vector3f center, Vector3f scale) {
-        super(center, scale, MODEL);
+        super(center, scale, MODEL, false);
     }
 
     /**
@@ -38,6 +38,6 @@ public class RenderableCuboid extends RenderableObject {
      * @param center Coordinates of the object center
      */
     public RenderableCuboid(Vector3f center) {
-        super(center, MODEL);
+        super(center, MODEL, false);
     }
 }

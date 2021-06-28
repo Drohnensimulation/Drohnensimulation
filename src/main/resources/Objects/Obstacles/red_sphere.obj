@@ -1,6 +1,5 @@
 # Drone design by Michael Weichenrieder
 mtllib red_sphere.mtl
-o Sphere
 v 0.000000 -0.500000 0.000000
 v 0.019030 0.490393 -0.095671
 v 0.037329 0.461940 -0.187665

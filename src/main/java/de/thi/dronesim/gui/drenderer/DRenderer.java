@@ -1,6 +1,7 @@
 package de.thi.dronesim.gui.drenderer;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.asset.plugins.FileLocator;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * DRenderer for rendering the 3D-View into a canvas
@@ -55,7 +58,7 @@ public class DRenderer extends SimpleApplication {
      */
     public DRenderer() {
         super();
-        //Logger.getLogger("com.jme3").setLevel(Level.OFF); // TODO: Remove for production
+        Logger.getLogger("com.jme3").setLevel(Level.OFF);
         AppSettings settings = new AppSettings(true);
         settings.setWidth(1280);
         settings.setHeight(720);

@@ -32,7 +32,7 @@ public class RenderableDrone extends RenderableObject {
      * @param radius Radius of drone
      */
     public RenderableDrone(Vector3f center, Vector3f rotation, float radius) {
-        super(center, new Vector3f(radius > .15 ? 2 * radius : .3f, radius > .15 ? 2 * radius : .3f, radius > .15 ? 2 * radius : .3f), rotation, null);
+        super(center, new Vector3f(radius > .15 ? 2 * radius : .3f, radius > .15 ? 2 * radius : .3f, radius > .15 ? 2 * radius : .3f), rotation, null, false);
     }
 
     /**
@@ -42,7 +42,7 @@ public class RenderableDrone extends RenderableObject {
      * @param radius Radius of drone
      */
     public RenderableDrone(Vector3f center, float radius) {
-        super(center, new Vector3f(radius > .15 ? 2 * radius : .3f, radius > .15 ? 2 * radius : .3f, radius > .15 ? 2 * radius : .3f), null);
+        super(center, new Vector3f(radius > .15 ? 2 * radius : .3f, radius > .15 ? 2 * radius : .3f, radius > .15 ? 2 * radius : .3f), null, false);
     }
 
     /**
@@ -51,7 +51,7 @@ public class RenderableDrone extends RenderableObject {
      * @param radius Radius of drone
      */
     public RenderableDrone(float radius) {
-        super(new Vector3f(0, 0, 0), new Vector3f(radius > .15 ? 2 * radius : .3f, radius > .15 ? 2 * radius : .3f, radius > .15 ? 2 * radius : .3f), null);
+        super(new Vector3f(0, 0, 0), new Vector3f(radius > .15 ? 2 * radius : .3f, radius > .15 ? 2 * radius : .3f, radius > .15 ? 2 * radius : .3f), null, false);
     }
 
     /**

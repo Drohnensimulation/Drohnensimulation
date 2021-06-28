@@ -134,7 +134,7 @@ public class GuiManager implements ISimulationChild, SimulationUpdateListener {
                     mapObjects.add(new RenderableMarker(center));
                     break;
                 default:
-                    // TODO: Read path and load from local object file
+                    mapObjects.add(new RenderableObject(center, scale, rotation, obstacle.getModelPath(), true));
             }
         }
         dRenderer.addRenderableObjects(mapObjects);

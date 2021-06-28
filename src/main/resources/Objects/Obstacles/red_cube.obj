@@ -1,6 +1,5 @@
 # Drone design by Michael Weichenrieder
 mtllib red_cube.mtl
-o Cube
 v 0.500000 -0.500000 -0.500000
 v 0.500000 -0.500000 0.500000
 v -0.500000 -0.500000 0.500000

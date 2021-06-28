@@ -102,7 +102,7 @@ public class DView extends AGuiFrame {
         thirdPerson.addActionListener(e -> dRenderer.setPerspective(DRenderer.Perspective.THIRD_PERSON));
         birdView.addActionListener(e -> dRenderer.setPerspective(DRenderer.Perspective.BIRD_VIEW));
         firstPerson.addActionListener(e -> dRenderer.setPerspective(DRenderer.Perspective.FIRST_PERSON));
-        stopButton.addActionListener(e -> this.dispose());
+        stopButton.addActionListener(e -> System.exit(0));
         nearbyObstaclesButton.addActionListener(this::toggleObstacles);
         windButton.addActionListener(this::toggleWind);
         simulationButton.addActionListener(this::changeButton);
