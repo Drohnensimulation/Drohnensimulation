@@ -90,7 +90,6 @@ public class DView extends AGuiFrame {
         getContentPane().add(mainPanel);
         Canvas canvas = dRenderer.getCanvas();
         graphicPanel.add(canvas);
-        JCompass compass = new JCompass();
         compassPanel.add(compass);
         simulationButton.setText("Start");
         status.setText("Resting");
@@ -135,13 +134,12 @@ public class DView extends AGuiFrame {
             status.setText("Crashed!");
             stopped = true;
         }
-        if(simulation.isRunning()) {
+        if (simulation.isRunning()) {
             started = true;
             simulationButton.setText("Pause");
             status.setText("Flying");
             simulationButton.setBackground(Color.YELLOW);
             simulationButton.setForeground(Color.BLACK);
-
         }
         xCord.setText(String.valueOf(Math.round(location.getX() * 100.0) / 100.0));
         yCord.setText(String.valueOf(Math.round(location.getY() * 100.0) / 100.0));
@@ -158,10 +156,10 @@ public class DView extends AGuiFrame {
     }
 
     /**
-     * This method divides the sensor into their different types, reads and
+     * This method divides the sensors into their different types, reads and
      * displays the data, that is being given by them. Therefore, the obstacles,
-     * that are recognized by the sensor have to be stored, so that they can be deleted
-     * when they are no longer in range of the sensor.
+     * that are recognized by the distance-sensor have to be stored, so that they can
+     * be deleted when they are no longer in range of the sensor.
      *
      * @param sensorResultDtos, all the data from the sensors
      */
@@ -177,7 +175,9 @@ public class DView extends AGuiFrame {
                         } else {
                             windData.setText("No Wind");
                         }
-                        compass.setNeedleDirection(sensor.getValues().get(0));
+                        if (!sensor.getValues().get(0).isNaN()) {
+                            compass.setNeedleDirection(sensor.getValues().get(0));
+                        }
                     }
                 }
 
@@ -188,17 +188,17 @@ public class DView extends AGuiFrame {
                         List<Obstacle> obstacles = sensor.getObstacle();
                         List<Integer> ids = new ArrayList<>();
                         for (Obstacle obstacle : obstacles) {
-                            if(sensor.getValues() != null && !sensor.getValues().isEmpty()) {
-                                    distance = sensor.getValues().get(obstacles.indexOf(obstacle));
-                                    if (panelsMap.get(obstacle.getID().intValue()) != null) {
-                                        updateJLabel(panelsMap.get(obstacle.getID().intValue()), obstacle.getPosition(), distance);
-                                    } else {
-                                        if (sensor.getValues() != null && !sensor.getValues().isEmpty()) {
-                                            JPanel addedObstacle = addObstacle(obstacle.getID().intValue(), obstacle.getPosition(), distance);
-                                            panelsMap.put(obstacle.getID().intValue(), addedObstacle);
-                                        }
+                            if (sensor.getValues() != null && !sensor.getValues().isEmpty()) {
+                                distance = sensor.getValues().get(obstacles.indexOf(obstacle));
+                                if (panelsMap.get(obstacle.getID().intValue()) != null) {
+                                    updateJLabel(panelsMap.get(obstacle.getID().intValue()), obstacle.getPosition(), distance);
+                                } else {
+                                    if (sensor.getValues() != null && !sensor.getValues().isEmpty()) {
+                                        JPanel addedObstacle = addObstacle(obstacle.getID().intValue(), obstacle.getPosition(), distance);
+                                        panelsMap.put(obstacle.getID().intValue(), addedObstacle);
                                     }
-                                    ids.add(obstacle.getID().intValue());
+                                }
+                                ids.add(obstacle.getID().intValue());
                             }
                         }
 
@@ -241,7 +241,7 @@ public class DView extends AGuiFrame {
         JLabel zPosition = (JLabel) components[3];
         zPosition.setText("Z: " + position[2]);
         JLabel distanceLabel = (JLabel) components[4];
-        distanceLabel.setText("Distance: " +  Math.round(distance*100.0) / 100.0);
+        distanceLabel.setText("Distance: " + Math.round(distance * 100.0) / 100.0);
     }
 
     /**
@@ -328,7 +328,7 @@ public class DView extends AGuiFrame {
     private void enableWindSidebar() {
         toggleWind = true;
         wind.setVisible(true);
-        compass.setNeedleDirection(0);
+        compass.setNeedleDirection(50);
         compass.setSize(400, 400);
     }
 
@@ -420,7 +420,7 @@ public class DView extends AGuiFrame {
         constraints.gridy = ++yInside;
         distanceLabel.setHorizontalAlignment(JLabel.CENTER);
         distanceLabel.setVerticalAlignment(JLabel.CENTER);
-        distanceLabel.setText("Distance: " + Math.round(distance*100.00) / 100.00 + "m");
+        distanceLabel.setText("Distance: " + Math.round(distance * 100.00) / 100.00 + "m");
         obstacle.add(distanceLabel, constraints);
 
         constraints = new GridBagConstraints();
