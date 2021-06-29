@@ -328,7 +328,7 @@ public class DView extends AGuiFrame {
     private void enableWindSidebar() {
         toggleWind = true;
         wind.setVisible(true);
-        compass.setNeedleDirection(50);
+        compass.setNeedleDirection(0);
         compass.setSize(400, 400);
     }
 
