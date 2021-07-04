@@ -91,6 +91,8 @@ public class DView extends AGuiFrame {
         Canvas canvas = dRenderer.getCanvas();
         graphicPanel.add(canvas);
         compassPanel.add(compass);
+        compass.setNeedleDirection(0);
+        compass.setSize(400, 400);
         simulationButton.setText("Start");
         status.setText("Resting");
         simulationButton.setBackground(Color.GREEN);
@@ -328,8 +330,6 @@ public class DView extends AGuiFrame {
     private void enableWindSidebar() {
         toggleWind = true;
         wind.setVisible(true);
-        compass.setNeedleDirection(0);
-        compass.setSize(400, 400);
     }
 
     /**
